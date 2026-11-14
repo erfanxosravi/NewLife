@@ -1,0 +1,288 @@
+[
+  {
+    "countryId": "turkey",
+    "currencyCode": "TRY",
+    "statusLadder": {
+      "renewableAfterYears": 1,
+      "permanentAfterYears": 8,
+      "citizenshipAfterYears": 5,
+      "minLanguageForPermanent": 3,
+      "minLanguageForCitizenship": 4
+    },
+    "pathways": [
+      {
+        "id": "study",
+        "titleFa": "مسیر تحصیلی",
+        "summaryFa": "پذیرش دانشگاه و اقامت دانشجویی با هزینه شروع متعادل",
+        "minAge": 18,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 2,
+        "proofOfFundsLocal": 420000,
+        "applicationFeeLocal": 28000,
+        "baseSuccessRate": 0.84,
+        "expectedProcessingTurns": 1,
+        "notesFa": "نیاز به تمکن مالی سالانه و بیمه دانشجویی برای تمدید سالانه."
+      },
+      {
+        "id": "work",
+        "titleFa": "پیشنهاد کار و مجوز اشتغال",
+        "summaryFa": "قرارداد با کارفرمای محلی و دریافت مجوز کار",
+        "minAge": 20,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 280000,
+        "applicationFeeLocal": 35000,
+        "baseSuccessRate": 0.68,
+        "expectedProcessingTurns": 1,
+        "notesFa": "وابسته به اسپانسر کارفرما و سهمیه استخدام نیروی خارجی شرکت."
+      },
+      {
+        "id": "investment",
+        "titleFa": "سرمایه‌گذاری و ثبت کسب‌وکار",
+        "summaryFa": "خرید ملک یا سرمایه تجاری با اقامت طولانی‌تر",
+        "minAge": 22,
+        "minEducation": "high_school",
+        "requiredLanguageLevel": 1,
+        "proofOfFundsLocal": 18000000,
+        "applicationFeeLocal": 95000,
+        "baseSuccessRate": 0.88,
+        "expectedProcessingTurns": 1,
+        "notesFa": "آستانه سرمایه بالاست اما مسیر مستقیم‌تری برای اقامت ایجاد می‌کند."
+      }
+    ]
+  },
+  {
+    "countryId": "germany",
+    "currencyCode": "EUR",
+    "statusLadder": {
+      "renewableAfterYears": 1,
+      "permanentAfterYears": 4,
+      "citizenshipAfterYears": 5,
+      "minLanguageForPermanent": 4,
+      "minLanguageForCitizenship": 4
+    },
+    "pathways": [
+      {
+        "id": "study",
+        "titleFa": "تحصیل و حساب مسدودی",
+        "summaryFa": "تحصیل کم‌شهریه با حساب تمکن مالی یورویی",
+        "minAge": 18,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 11904,
+        "applicationFeeLocal": 650,
+        "baseSuccessRate": 0.76,
+        "expectedProcessingTurns": 1,
+        "notesFa": "ارائه موجودی حساب مسدودی یک‌ساله به یورو الزامی است."
+      },
+      {
+        "id": "skilled",
+        "titleFa": "مسیر نیروی متخصص و کارت جستجوی کار",
+        "summaryFa": "ارزیابی مدرک دانشگاهی و اشتغال در مشاغل تخصصی",
+        "minAge": 22,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 12500,
+        "applicationFeeLocal": 1150,
+        "baseSuccessRate": 0.66,
+        "expectedProcessingTurns": 1,
+        "notesFa": "تسلط بالاتر بر زبان و ارزیابی مدرک شانس دریافت پیشنهاد کار را بالا می‌برد."
+      },
+      {
+        "id": "work",
+        "titleFa": "قرارداد کاری مستقیم",
+        "summaryFa": "پیشنهاد شغلی مستقیم و ویزای کار تخصصی",
+        "minAge": 21,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 6500,
+        "applicationFeeLocal": 950,
+        "baseSuccessRate": 0.62,
+        "expectedProcessingTurns": 1,
+        "notesFa": "در صورت وجود قرارداد معتبر و حقوق مطابق کف قانونی، پرونده سرعت بیشتری دارد."
+      }
+    ]
+  },
+  {
+    "countryId": "uae",
+    "currencyCode": "AED",
+    "statusLadder": {
+      "renewableAfterYears": 2,
+      "permanentAfterYears": 10,
+      "citizenshipAfterYears": 30,
+      "minLanguageForPermanent": 3,
+      "minLanguageForCitizenship": 5
+    },
+    "pathways": [
+      {
+        "id": "work",
+        "titleFa": "ویزای کار شرکتی",
+        "summaryFa": "اشتغال با قرارداد تمام‌وقت و اسپانسرشیپ کارفرما",
+        "minAge": 20,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 35000,
+        "applicationFeeLocal": 6500,
+        "baseSuccessRate": 0.72,
+        "expectedProcessingTurns": 1,
+        "notesFa": "اقامت مستقیماً به قرارداد کار وابسته است و پس از پایان کار مهلت محدود انتقال دارد."
+      },
+      {
+        "id": "skilled",
+        "titleFa": "اقامت متخصصان و مشاغل آزاد",
+        "summaryFa": "ویزای مهارتی برای درآمدهای ارزی بالاتر",
+        "minAge": 23,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 4,
+        "proofOfFundsLocal": 75000,
+        "applicationFeeLocal": 9500,
+        "baseSuccessRate": 0.64,
+        "expectedProcessingTurns": 1,
+        "notesFa": "نیازمند سابقه کار معتبر و بیمه درمانی کامل."
+      },
+      {
+        "id": "investment",
+        "titleFa": "سرمایه‌گذاری ملکی یا ثبت شرکت",
+        "summaryFa": "ثبت شرکت یا خرید ملک برای اقامت چندساله",
+        "minAge": 22,
+        "minEducation": "high_school",
+        "requiredLanguageLevel": 2,
+        "proofOfFundsLocal": 750000,
+        "applicationFeeLocal": 24000,
+        "baseSuccessRate": 0.85,
+        "expectedProcessingTurns": 1,
+        "notesFa": "نیازمند سرمایه قابل توجه درهمی؛ تمدیدپذیر تا زمان حفظ دارایی."
+      }
+    ]
+  },
+  {
+    "countryId": "uk",
+    "currencyCode": "GBP",
+    "statusLadder": {
+      "renewableAfterYears": 2,
+      "permanentAfterYears": 5,
+      "citizenshipAfterYears": 6,
+      "minLanguageForPermanent": 4,
+      "minLanguageForCitizenship": 5
+    },
+    "pathways": [
+      {
+        "id": "study",
+        "titleFa": "تحصیل تکمیلی و اقامت پس از تحصیل",
+        "summaryFa": "پذیرش دانشگاهی در بریتانیا با شرط شهریه و تمکن پوندی",
+        "minAge": 18,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 4,
+        "proofOfFundsLocal": 24000,
+        "applicationFeeLocal": 2800,
+        "baseSuccessRate": 0.72,
+        "expectedProcessingTurns": 1,
+        "notesFa": "شامل هزینه بیمه خدمات سلامت مهاجران و شهریه بالا برای دانشجویان بین‌المللی."
+      },
+      {
+        "id": "work",
+        "titleFa": "ویزای کار نیروی ماهر",
+        "summaryFa": "اسپانسرشیپ کارفرمای مجاز با حداقل حقوق مصوب",
+        "minAge": 21,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 4,
+        "proofOfFundsLocal": 9000,
+        "applicationFeeLocal": 3400,
+        "baseSuccessRate": 0.56,
+        "expectedProcessingTurns": 1,
+        "notesFa": "نمره زبان بالا و مهارت در رشته‌های کمبود نیروی کار شانس تایید را افزایش می‌دهد."
+      }
+    ]
+  },
+  {
+    "countryId": "canada",
+    "currencyCode": "CAD",
+    "statusLadder": {
+      "renewableAfterYears": 1,
+      "permanentAfterYears": 3,
+      "citizenshipAfterYears": 5,
+      "minLanguageForPermanent": 4,
+      "minLanguageForCitizenship": 4
+    },
+    "pathways": [
+      {
+        "id": "skilled",
+        "titleFa": "مهاجرت تخصصی امتیازمحور",
+        "summaryFa": "ارزیابی مدرک، نمره زبان بالا و دریافت مستقیم اقامت دائم",
+        "minAge": 22,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 5,
+        "proofOfFundsLocal": 16500,
+        "applicationFeeLocal": 2400,
+        "baseSuccessRate": 0.58,
+        "expectedProcessingTurns": 1,
+        "notesFa": "سن زیر ۳۵ سال، مدرک کارشناسی‌ارشد و سطح زبان پیشرفته امتیاز کلیدی دارد."
+      },
+      {
+        "id": "study",
+        "titleFa": "تحصیل و مجوز کار پس از فراغت",
+        "summaryFa": "مسیر آموزشی برای ورود به بازار کار استانی و اقامت دائم",
+        "minAge": 18,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 4,
+        "proofOfFundsLocal": 32000,
+        "applicationFeeLocal": 1900,
+        "baseSuccessRate": 0.70,
+        "expectedProcessingTurns": 1,
+        "notesFa": "نیازمند تمکن مالی شهریه سال اول به علاوه هزینه زندگی در حساب ارزی."
+      },
+      {
+        "id": "work",
+        "titleFa": "پیشنهاد کاری استانی",
+        "summaryFa": "جذب مستقیم از سوی کارفرمای استانی با تاییدیه بازار کار",
+        "minAge": 22,
+        "minEducation": "associate",
+        "requiredLanguageLevel": 4,
+        "proofOfFundsLocal": 11000,
+        "applicationFeeLocal": 1800,
+        "baseSuccessRate": 0.54,
+        "expectedProcessingTurns": 1,
+        "notesFa": "پیشنهاد کار در شهرهای کوچک‌تر رقابت کمتری نسبت به کلان‌شهرها دارد."
+      },
+      {
+        "id": "investment",
+        "titleFa": "کارآفرینی استانی",
+        "summaryFa": "راه‌اندازی کسب‌وکار فعال و اشتغال‌زایی محلی",
+        "minAge": 25,
+        "minEducation": "diploma",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 400000,
+        "applicationFeeLocal": 8500,
+        "baseSuccessRate": 0.65,
+        "expectedProcessingTurns": 1,
+        "notesFa": "ملزم به اجرای طرح کسب‌وکار واقعی در استان مقصد است."
+      }
+    ]
+  },
+  {
+    "countryId": "generic_template",
+    "currencyCode": "USD",
+    "statusLadder": {
+      "renewableAfterYears": 1,
+      "permanentAfterYears": 5,
+      "citizenshipAfterYears": 7,
+      "minLanguageForPermanent": 4,
+      "minLanguageForCitizenship": 4
+    },
+    "pathways": [
+      {
+        "id": "work",
+        "titleFa": "مسیر کار استاندارد",
+        "summaryFa": "مسیر کاری نمونه برای مقاصد توسعه‌پذیر",
+        "minAge": 20,
+        "minEducation": "bachelor",
+        "requiredLanguageLevel": 3,
+        "proofOfFundsLocal": 12000,
+        "applicationFeeLocal": 900,
+        "baseSuccessRate": 0.65,
+        "expectedProcessingTurns": 1,
+        "notesFa": "مسیر استاندارد نمونه."
+      }
+    ]
+  }
+]

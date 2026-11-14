@@ -1,0 +1,1187 @@
+[
+  {
+    "id": "turkey",
+    "nameFa": "ترکیه",
+    "currencyCode": "TRY",
+    "isTemplate": false,
+    "opennessScore": {
+      "value": 72,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "برآورد سهولت نسبی ورود و اقامت کوتاه‌مدت در مقایسه با کشورهای اروپایی",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.28,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد دشواری نسبی اخذ اقامت کاری یا سرمایه‌گذاری در ترکیه",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "tr_istanbul",
+        "nameFa": "استانبول",
+        "tier": "tier1",
+        "colMultiplier": 1.28,
+        "rentMultiplier": 1.45,
+        "jobOpportunityIndex": 1.22
+      },
+      {
+        "id": "tr_ankara",
+        "nameFa": "آنکارا",
+        "tier": "tier2",
+        "colMultiplier": 0.96,
+        "rentMultiplier": 0.92,
+        "jobOpportunityIndex": 1.0
+      },
+      {
+        "id": "tr_izmir",
+        "nameFa": "ازمیر",
+        "tier": "tier2",
+        "colMultiplier": 1.02,
+        "rentMultiplier": 1.04,
+        "jobOpportunityIndex": 0.98
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.298,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "مرکز آمار ترکیه — تورم نقطه‌به‌نقطه مصرف‌کننده اکتبر ۲۰۲۶ (۲۹٫۷۷٪)",
+        "confidence": "verified"
+      },
+      "policyRate": {
+        "value": 0.36,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "نرخ سیاست پولی و سپرده در دوره کاهش تدریجی تورم ترکیه (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.27,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "الگوی تعدیل سالانه حداقل دستمزد ترکیه نزدیک به تورم",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.088,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بیکاری ترکیه (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "minWageMonthlyLocal": {
+        "value": 28075.5,
+        "unit": "TRY/month",
+        "asOf": "2026-01",
+        "source": "مصوبه کمیسیون تعیین دستمزد ترکیه برای سال ۲۰۲۶ (خالص ۲۸٬۰۷۵٫۵ لیر ~ ۶۵۵ دلار در زمان تصویب)",
+        "confidence": "verified"
+      },
+      "minWageHourlyLocal": {
+        "value": 124.78,
+        "unit": "TRY/hour",
+        "asOf": "2026-01",
+        "source": "محاسبه ساعتی بر اساس خالص ۲۸٬۰۷۵٫۵ لیر ماهانه و ۲۲۵ ساعت استاندارد",
+        "confidence": "estimate"
+      },
+      "standardMonthlyHours": 225,
+      "housingPricePerSqmLocal": {
+        "value": 64000,
+        "unit": "TRY/sqm",
+        "asOf": "2026-10",
+        "source": "میانگین برآوردی قیمت هر متر مربع مسکن در شهرهای اصلی ترکیه",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 24000,
+        "unit": "TRY/month",
+        "asOf": "2026-10",
+        "source": "برآورد اجاره آپارتمان کوچک تک‌نفره در شهرهای متوسط و بزرگ ترکیه",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 36000,
+        "unit": "TRY/month",
+        "asOf": "2026-10",
+        "source": "برآورد سبد ماهانه یک فرد مجرد شامل اجاره، خوراک و حمل‌ونقل",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": 0.08,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "حساسیت تورمی اقتصاد واردکننده انرژی به قیمت نفت",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.35,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "وابستگی رشد صنعتی و گردشگری به تقاضای جهانی",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "تورم اکتبر ۲۰۲۶ حدود ۲۹٫۸٪، حداقل حقوق خالص ۲۸٬۰۷۵ لیر و نرخ ارز حدود ۴۵ لیر به ازای هر دلار در آوریل ۲۰۲۶."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.14,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "سهم بیمه اجتماعی کارمند در ترکیه (هم‌راستا با مقررات کار)",
+        "confidence": "estimate"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 1800,
+        "unit": "TRY/month",
+        "asOf": "2026-10",
+        "source": "برآورد حق بیمه تکمیلی یا اقامت سالانه سرشکن‌شده ماهانه",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 1.15, "rate": 0.0 },
+        { "upToMultipleOfMinWage": 2.2, "rate": 0.15 },
+        { "upToMultipleOfMinWage": 4.5, "rate": 0.22 },
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.30 }
+      ],
+      "unemploymentBenefitRatio": 0.45,
+      "unemploymentEligibleMonthsWorked": 20,
+      "pensionContributionRatio": 0.09
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 24,
+      "employerTiedWorkPermit": true,
+      "jobLossGraceMonths": 3,
+      "investorMinLocalAmount": 18000000,
+      "proofOfFundsMonths": 12
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.32, "needsRelicensing": true, "costLocal": 85000, "durationYears": 2, "minLanguageLevel": 4 },
+      "law": { "recognitionFactor": 0.28, "needsRelicensing": true, "costLocal": 70000, "durationYears": 2, "minLanguageLevel": 5 },
+      "pharmacy": { "recognitionFactor": 0.36, "needsRelicensing": true, "costLocal": 75000, "durationYears": 2, "minLanguageLevel": 4 },
+      "education": { "recognitionFactor": 0.55, "needsRelicensing": true, "costLocal": 35000, "durationYears": 1, "minLanguageLevel": 4 },
+      "engineering": { "recognitionFactor": 0.78, "needsRelicensing": false, "costLocal": 15000, "durationYears": 0, "minLanguageLevel": 3 },
+      "general": { "recognitionFactor": 0.85, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 2 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.22,
+      "yearsToConverge": 3,
+      "languageWeight": 0.55
+    },
+    "events": [
+      {
+        "id": "tr_rent_renewal",
+        "titleFa": "تجدید قرارداد اجاره در استانبول",
+        "textFa": "صاحب‌خانه هنگام تمدید سالانه قرارداد بر اساس شاخص تورم محلی افزایش اجاره را پیشنهاد داده است.",
+        "contentTag": "mild",
+        "costLocal": 48000,
+        "statsDelta": { "mentalHealth": -3, "happiness": -2 }
+      },
+      {
+        "id": "tr_community_cafe",
+        "titleFa": "شبکه دوستان تازه در کافه محله",
+        "textFa": "آشنایی با چند هم‌وطن و همکار محلی باعث شد حس غربت کمتر شود و فرصت‌های شغلی تازه‌ای بشنوی.",
+        "contentTag": "mild",
+        "costLocal": 2500,
+        "statsDelta": { "happiness": 6, "mentalHealth": 5 }
+      }
+    ],
+    "prosFa": [
+      "نزدیکی جغرافیایی و فرهنگی به ایران و هزینه سفر پایین‌تر",
+      "شروع سریع‌تر فرآیند اقامت تحصیلی یا کاری نسبت به کشورهای دورتر"
+    ],
+    "consFa": [
+      "تورم بالا و کاهش تدریجی ارزش لیر قدرت پس‌انداز محلی را محدود می‌کند",
+      "تبدیل اقامت موقت به اقامت دائم و مجوز کار نیازمند تمدید منظم و مدارک دقیق است"
+    ],
+    "realityNotesFa": [
+      "در سال‌های اول، پرداخت اجاره و قبوض با درآمد محلی نیازمند انضباط مالی بالا است."
+    ]
+  },
+  {
+    "id": "germany",
+    "nameFa": "آلمان",
+    "currencyCode": "EUR",
+    "isTemplate": false,
+    "opennessScore": {
+      "value": 64,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "قوانین مهاجرت تخصصی و تقاضای نیروی کار ماهر در آلمان",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.44,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد دشواری تطبیق مدرک، زبان و وقت سفارت برای آلمان",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "de_berlin",
+        "nameFa": "برلین",
+        "tier": "tier1",
+        "colMultiplier": 1.15,
+        "rentMultiplier": 1.25,
+        "jobOpportunityIndex": 1.16
+      },
+      {
+        "id": "de_munich",
+        "nameFa": "مونیخ",
+        "tier": "tier1",
+        "colMultiplier": 1.32,
+        "rentMultiplier": 1.48,
+        "jobOpportunityIndex": 1.24
+      },
+      {
+        "id": "de_leipzig",
+        "nameFa": "لایپزیگ",
+        "tier": "tier3",
+        "colMultiplier": 0.88,
+        "rentMultiplier": 0.82,
+        "jobOpportunityIndex": 0.92
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.023,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "چشم‌انداز تورم پایدار منطقه یورو و آلمان (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "policyRate": {
+        "value": 0.025,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بهره پایه بانک مرکزی اروپا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.036,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "رشد دستمزد رسمی هم‌راستا با برنامه افزایش مزد قانونی ۲۰۲۶–۲۰۲۷",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.06,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بیکاری بازار کار آلمان (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "minWageHourlyLocal": {
+        "value": 13.9,
+        "unit": "EUR/hour",
+        "asOf": "2026-01",
+        "source": "حداقل دستمزد قانونی آلمان از ژانویه ۲۰۲۶ (۱۳٫۹۰ یورو در ساعت؛ و ۱۴٫۶۰ یورو از ژانویه ۲۰۲۷)",
+        "confidence": "verified"
+      },
+      "minWageHourlyNextYearLocal": {
+        "value": 14.6,
+        "unit": "EUR/hour",
+        "asOf": "2027-01",
+        "source": "مصوبه مرحله دوم حداقل دستمزد قانونی آلمان از ژانویه ۲۰۲۷ (۱۴٫۶۰ یورو در ساعت)",
+        "confidence": "verified"
+      },
+      "minWageMonthlyLocal": {
+        "value": 2409,
+        "unit": "EUR/month",
+        "asOf": "2026-01",
+        "source": "محاسبه تمام‌وقت بر پایه ۱۳٫۹۰ یورو در ساعت و ۱۷۳٫۳ ساعت ماهانه",
+        "confidence": "verified"
+      },
+      "standardMonthlyHours": 173,
+      "housingPricePerSqmLocal": {
+        "value": 4900,
+        "unit": "EUR/sqm",
+        "asOf": "2026-10",
+        "source": "برآورد میانگین قیمت مسکن شهری آلمان",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 1080,
+        "unit": "EUR/month",
+        "asOf": "2026-10",
+        "source": "برآورد اجاره آپارتمان یک‌خوابه با هزینه‌های جانبی در شهرهای متوسط آلمان",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 1720,
+        "unit": "EUR/month",
+        "asOf": "2026-10",
+        "source": "برآورد هزینه ماهانه زندگی مجردی شامل مسکن، بیمه، خوراک و حمل‌ونقل",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": 0.04,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "حساسیت ملایم تورم اروپا به بهای انرژی",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.45,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "اقتصاد صادرات‌محور صنعتی آلمان",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "حداقل دستمزد قانونی آلمان ۱۳٫۹۰ یورو در ساعت در ۲۰۲۶ و ۱۴٫۶۰ یورو در ژانویه ۲۰۲۷ است."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.205,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد مجموع سهم کارمند از بیمه درمان، بیکاری و بازنشستگی در آلمان",
+        "confidence": "estimate"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 145,
+        "unit": "EUR/month",
+        "asOf": "2026-10",
+        "source": "برآورد بیمه درمانی پایه دانشجویی/تکمیلی برای پوشش خارج از اشتغال",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 0.45, "rate": 0.0 },
+        { "upToMultipleOfMinWage": 1.6, "rate": 0.16 },
+        { "upToMultipleOfMinWage": 3.2, "rate": 0.26 },
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.38 }
+      ],
+      "unemploymentBenefitRatio": 0.6,
+      "unemploymentEligibleMonthsWorked": 12,
+      "pensionContributionRatio": 0.093
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 20,
+      "employerTiedWorkPermit": true,
+      "jobLossGraceMonths": 3,
+      "investorMinLocalAmount": 250000,
+      "proofOfFundsMonths": 12
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.28, "needsRelicensing": true, "costLocal": 5400, "durationYears": 2, "minLanguageLevel": 5 },
+      "law": { "recognitionFactor": 0.2, "needsRelicensing": true, "costLocal": 6200, "durationYears": 3, "minLanguageLevel": 6 },
+      "pharmacy": { "recognitionFactor": 0.32, "needsRelicensing": true, "costLocal": 4600, "durationYears": 2, "minLanguageLevel": 5 },
+      "education": { "recognitionFactor": 0.42, "needsRelicensing": true, "costLocal": 2400, "durationYears": 2, "minLanguageLevel": 5 },
+      "engineering": { "recognitionFactor": 0.84, "needsRelicensing": false, "costLocal": 800, "durationYears": 0, "minLanguageLevel": 3 },
+      "general": { "recognitionFactor": 0.86, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 3 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.25,
+      "yearsToConverge": 4,
+      "languageWeight": 0.65
+    },
+    "events": [
+      {
+        "id": "de_apartment_viewing",
+        "titleFa": "رقابت برای اجاره خانه و تکمیل پرونده مدارک",
+        "textFa": "در شهرهای بزرگ آلمان برای یافتن خانه نیازمند سابقه درآمد، نامه کارفرما و پرداخت ودیعه چندماهه هستی.",
+        "contentTag": "mild",
+        "costLocal": 2200,
+        "statsDelta": { "mentalHealth": -4, "happiness": -2 }
+      },
+      {
+        "id": "de_language_certificate",
+        "titleFa": "قبولی در آزمون زبان شغلی",
+        "textFa": "تسلط بهتر بر زبان آلمانی مسیر مصاحبه‌های تخصصی و ارتباط با همکاران را هموارتر کرد.",
+        "contentTag": "mild",
+        "costLocal": 380,
+        "statsDelta": { "intelligence": 3, "happiness": 7, "mentalHealth": 4 }
+      }
+    ],
+    "prosFa": [
+      "اقتصاد صنعتی باثبات، امنیت شغلی و چتر حمایتی بیکاری و درمان",
+      "شهریه بسیار پایین دانشگاه‌های دولتی و مسیر شفاف به اقامت دائم"
+    ],
+    "consFa": [
+      "نیاز جدی به یادگیری زبان آلمانی در مشاغل غیرمتمرکز و اداری",
+      "فرآیند تطبیق مدرک رشته‌های نظام‌مند و کاغذبازی اداری زمان‌بر است"
+    ],
+    "realityNotesFa": [
+      "مالیات و کسورات بیمه در آلمان بالاست اما خدمات درمانی و بیمه بیکاری را پوشش می‌دهد."
+    ]
+  },
+  {
+    "id": "uae",
+    "nameFa": "امارات",
+    "currencyCode": "AED",
+    "isTemplate": false,
+    "opennessScore": {
+      "value": 68,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "بازار کار مبتنی بر اسپانسر کارفرما و ویزای اقامت کاری/تجاری در امارات",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.36,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "نیاز به پیشنهاد کار، اقامت سرمایه‌گذاری یا ثبت شرکت در امارات",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "ae_dubai",
+        "nameFa": "دبی",
+        "tier": "tier1",
+        "colMultiplier": 1.24,
+        "rentMultiplier": 1.38,
+        "jobOpportunityIndex": 1.25
+      },
+      {
+        "id": "ae_abudhabi",
+        "nameFa": "ابوظبی",
+        "tier": "tier1",
+        "colMultiplier": 1.15,
+        "rentMultiplier": 1.22,
+        "jobOpportunityIndex": 1.12
+      },
+      {
+        "id": "ae_sharjah",
+        "nameFa": "شارجه",
+        "tier": "tier2",
+        "colMultiplier": 0.84,
+        "rentMultiplier": 0.78,
+        "jobOpportunityIndex": 0.92
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.028,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد تورم ملایم امارات با نرخ ارز متصل به دلار",
+        "confidence": "estimate"
+      },
+      "policyRate": {
+        "value": 0.0425,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "نرخ پایه هم‌راستا با فدرال رزرو به دلیل پیوند ارزی درهم",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.032,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "رشد برآوردی حقوق در بخش خدمات و فناوری امارات",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.029,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بیکاری پایین بازار کار مبتنی بر ویزا",
+        "confidence": "estimate"
+      },
+      "hasStatutoryMinWage": false,
+      "minWageMonthlyLocal": {
+        "value": 5500,
+        "unit": "AED/month",
+        "asOf": "2026-10",
+        "source": "امارات حداقل دستمزد قانونی عمومی برای اتباع خارجی ندارد؛ رقم ۵٬۵۰۰ درهم برآورد پایه حقوق مشاغل کارمندی شهری است (کف دستمزد بخش خصوصی شهروندان اماراتی ۶٬۰۰۰ درهم است).",
+        "confidence": "estimate"
+      },
+      "minWageHourlyLocal": {
+        "value": 28.65,
+        "unit": "AED/hour",
+        "asOf": "2026-10",
+        "source": "معادل برآوردی ساعتی پایه حقوق شهری در امارات",
+        "confidence": "estimate"
+      },
+      "standardMonthlyHours": 192,
+      "housingPricePerSqmLocal": {
+        "value": 16500,
+        "unit": "AED/sqm",
+        "asOf": "2026-10",
+        "source": "برآورد میانگین قیمت مسکن شهری در مناطق میانی دبی و ابوظبی",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 5400,
+        "unit": "AED/month",
+        "asOf": "2026-10",
+        "source": "برآورد اجاره استودیو یا آپارتمان کوچک در امارات",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 8200,
+        "unit": "AED/month",
+        "asOf": "2026-10",
+        "source": "برآورد هزینه ماهانه زندگی مجردی در امارات",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": -0.04,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "رونق ملایم مخارج عمرانی و مالی در جهش نفت",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.4,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "وابستگی تجارت، ترابری و گردشگری دبی به رشد جهانی",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "درهم با برابری ثابت ۳٫۶۷۲۵ به دلار متصل است؛ امارات حداقل دستمزد قانونی عمومی برای اتباع خارجی ندارد و اقامت عمدتاً وابسته به ویزای کارفرما یا سرمایه‌گذاری است."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "عدم کسر مالیات بر درآمد شخصی حقوق در امارات (برآورد هزینه‌های بیمه درمان توسط کارفرما)",
+        "confidence": "verified"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 420,
+        "unit": "AED/month",
+        "asOf": "2026-10",
+        "source": "برآورد سهم تکمیلی بیمه درمانی خصوصی",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.0 }
+      ],
+      "unemploymentBenefitRatio": 0.35,
+      "unemploymentEligibleMonthsWorked": 12,
+      "pensionContributionRatio": 0.0
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 15,
+      "employerTiedWorkPermit": true,
+      "jobLossGraceMonths": 3,
+      "investorMinLocalAmount": 750000,
+      "proofOfFundsMonths": 6
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.58, "needsRelicensing": true, "costLocal": 14000, "durationYears": 1, "minLanguageLevel": 4 },
+      "law": { "recognitionFactor": 0.32, "needsRelicensing": true, "costLocal": 16000, "durationYears": 2, "minLanguageLevel": 5 },
+      "pharmacy": { "recognitionFactor": 0.62, "needsRelicensing": true, "costLocal": 11000, "durationYears": 1, "minLanguageLevel": 4 },
+      "education": { "recognitionFactor": 0.68, "needsRelicensing": true, "costLocal": 6500, "durationYears": 1, "minLanguageLevel": 4 },
+      "engineering": { "recognitionFactor": 0.88, "needsRelicensing": false, "costLocal": 2500, "durationYears": 0, "minLanguageLevel": 3 },
+      "general": { "recognitionFactor": 0.9, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 3 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.14,
+      "yearsToConverge": 2,
+      "languageWeight": 0.45
+    },
+    "events": [
+      {
+        "id": "ae_annual_cheque_rent",
+        "titleFa": "پرداخت یکجای چک اجاره سالانه",
+        "textFa": "بسیاری از قراردادهای اجاره در دبی به‌صورت ۱ تا ۴ چک سالانه بسته می‌شوند و نقدینگی اولیه بالایی می‌خواهند.",
+        "contentTag": "mild",
+        "costLocal": 18000,
+        "statsDelta": { "mentalHealth": -3, "happiness": -1 }
+      },
+      {
+        "id": "ae_tax_free_bonus",
+        "titleFa": "پاداش عملکرد معاف از مالیات",
+        "textFa": "نبود مالیات بر درآمد شخصی باعث شد پاداش پایان سال کامل به پس‌انداز ارزی تو اضافه شود.",
+        "contentTag": "mild",
+        "costLocal": -9500,
+        "statsDelta": { "happiness": 6, "mentalHealth": 3 }
+      }
+    ],
+    "prosFa": [
+      "معافیت از مالیات بر درآمد شخصی و نرخ ارز ثابت درهم در برابر دلار",
+      "فاصله پروازی کوتاه تا ایران و بازار کار فعال در تجارت، فناوری و مهندسی"
+    ],
+    "consFa": [
+      "اقامت به شغل یا سرمایه‌گذاری گره خورده و مسیر تابعیت بلندمدت برای عموم در دسترس نیست",
+      "هزینه مسکن، مدرسه و اجاره سالانه در دبی و ابوظبی سنگین است"
+    ],
+    "realityNotesFa": [
+      "در صورت از دست دادن شغل، مهلت قانونی محدودی برای یافتن کارفرمای جدید یا تغییر وضعیت اقامت وجود دارد."
+    ]
+  },
+  {
+    "id": "uk",
+    "nameFa": "بریتانیا",
+    "currencyCode": "GBP",
+    "isTemplate": false,
+    "opennessScore": {
+      "value": 52,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "قوانین امتیازمحور ویزای کار، آستانه حقوق و هزینه بالای خدمات سلامت",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.58,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "سخت‌گیری ویزای کاری اسپانسرشیپ و هزینه‌های ورودی بریتانیا",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "uk_london",
+        "nameFa": "لندن",
+        "tier": "tier1",
+        "colMultiplier": 1.38,
+        "rentMultiplier": 1.56,
+        "jobOpportunityIndex": 1.28
+      },
+      {
+        "id": "uk_manchester",
+        "nameFa": "منچستر",
+        "tier": "tier2",
+        "colMultiplier": 0.96,
+        "rentMultiplier": 0.94,
+        "jobOpportunityIndex": 1.04
+      },
+      {
+        "id": "uk_sheffield",
+        "nameFa": "شفیلد",
+        "tier": "tier3",
+        "colMultiplier": 0.86,
+        "rentMultiplier": 0.80,
+        "jobOpportunityIndex": 0.90
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.025,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد تورم سالانه بریتانیا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "policyRate": {
+        "value": 0.0375,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ پایه بانک مرکزی انگلستان (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.038,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "رشد برآوردی دستمزد در بازار کار بریتانیا",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.044,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بیکاری بریتانیا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "minWageHourlyLocal": {
+        "value": 12.71,
+        "unit": "GBP/hour",
+        "asOf": "2026-04",
+        "source": "دستمزد ملی زندگی بریتانیا (سن ۲۱+) از آوریل ۲۰۲۶ برابر ۱۲٫۷۱ پوند در ساعت",
+        "confidence": "verified"
+      },
+      "minWageMonthlyLocal": {
+        "value": 2135,
+        "unit": "GBP/month",
+        "asOf": "2026-04",
+        "source": "معادل ماهانه بر پایه ۱۲٫۷۱ پوند در ساعت و ۳۸٫۵ ساعت کار هفتگی",
+        "confidence": "verified"
+      },
+      "standardMonthlyHours": 168,
+      "housingPricePerSqmLocal": {
+        "value": 4600,
+        "unit": "GBP/sqm",
+        "asOf": "2026-10",
+        "source": "برآورد میانگین قیمت مسکن شهری خارج از مرکز لندن",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 1050,
+        "unit": "GBP/month",
+        "asOf": "2026-10",
+        "source": "برآورد اجاره ماهانه آپارتمان یک‌خوابه در شهرهای متوسط بریتانیا",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 1680,
+        "unit": "GBP/month",
+        "asOf": "2026-10",
+        "source": "برآورد هزینه ماهانه زندگی مجردی شامل اجاره، مالیات شورای شهر و خوراک",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": 0.04,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "حساسیت ملایم تورم به قیمت انرژی",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.38,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "وابستگی خدمات مالی و تجارت بریتانیا به رشد جهانی",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "حداقل دستمزد ملی زندگی در بریتانیا از آوریل ۲۰۲۶ برابر ۱۲٫۷۱ پوند در ساعت است."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.08,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "سهم بیمه ملی کارمند در بازه اصلی حقوق بریتانیا",
+        "confidence": "estimate"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 86,
+        "unit": "GBP/month",
+        "asOf": "2026-10",
+        "source": "سهم سرشکن‌شده هزینه سالانه خدمات سلامت مهاجران روی ویزا",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 0.49, "rate": 0.0 },
+        { "upToMultipleOfMinWage": 1.96, "rate": 0.2 },
+        { "upToMultipleOfMinWage": 4.9, "rate": 0.4 },
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.45 }
+      ],
+      "unemploymentBenefitRatio": 0.32,
+      "unemploymentEligibleMonthsWorked": 24,
+      "pensionContributionRatio": 0.05
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 20,
+      "employerTiedWorkPermit": true,
+      "jobLossGraceMonths": 2,
+      "investorMinLocalAmount": 350000,
+      "proofOfFundsMonths": 9
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.35, "needsRelicensing": true, "costLocal": 4800, "durationYears": 2, "minLanguageLevel": 5 },
+      "law": { "recognitionFactor": 0.24, "needsRelicensing": true, "costLocal": 5500, "durationYears": 2, "minLanguageLevel": 6 },
+      "pharmacy": { "recognitionFactor": 0.38, "needsRelicensing": true, "costLocal": 4200, "durationYears": 2, "minLanguageLevel": 5 },
+      "education": { "recognitionFactor": 0.48, "needsRelicensing": true, "costLocal": 2100, "durationYears": 1, "minLanguageLevel": 5 },
+      "engineering": { "recognitionFactor": 0.85, "needsRelicensing": false, "costLocal": 650, "durationYears": 0, "minLanguageLevel": 4 },
+      "general": { "recognitionFactor": 0.88, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 3 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.2,
+      "yearsToConverge": 3,
+      "languageWeight": 0.55
+    },
+    "events": [
+      {
+        "id": "uk_council_tax_utility",
+        "titleFa": "قبوض زمستانی و مالیات شورای شهر",
+        "textFa": "هزینه گرمایش و مالیات محلی مسکن در ماه‌های سرد بخش محسوسی از بودجه ماهانه را می‌بلعد.",
+        "contentTag": "mild",
+        "costLocal": 1450,
+        "statsDelta": { "mentalHealth": -2, "happiness": -2 }
+      },
+      {
+        "id": "uk_career_networking",
+        "titleFa": "معرفی‌نامه شغلی و ارتقای قرارداد",
+        "textFa": "پس از جا افتادن در محیط کار بریتانیا، کارفرما با تمدید بلندمدت قرارداد و افزایش مزایا موافقت کرد.",
+        "contentTag": "mild",
+        "costLocal": 0,
+        "statsDelta": { "happiness": 7, "mentalHealth": 5 }
+      }
+    ],
+    "prosFa": [
+      "زبان انگلیسی، بازار کار تخصصی بزرگ در فناوری، مالی و پزشکی",
+      "مسیر مشخص پنج‌ساله از ویزای کار تخصصی به اقامت دائم"
+    ],
+    "consFa": [
+      "هزینه بسیار بالای ویزا، خدمات سلامت مهاجرت و اجاره به‌ویژه در لندن",
+      "محدودیت ۵-۶۰ روزه مهلت یافتن کارفرمای جدید در صورت قطع همکاری"
+    ],
+    "realityNotesFa": [
+      "بدون سابقه اعتباری محلی در سال اول، بسیاری از صاحب‌خانه‌ها پیش‌پرداخت چندماهه می‌خواهند."
+    ]
+  },
+  {
+    "id": "canada",
+    "nameFa": "کانادا",
+    "currencyCode": "CAD",
+    "isTemplate": false,
+    "opennessScore": {
+      "value": 66,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "نظام امتیازمحور مهاجرت تخصصی و استانی (با تعدیل سقف‌های جدید)",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.48,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "رقابت امتیاز سنی، زبان و تمکن مالی در برنامه‌های فدرال و استانی کانادا",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "ca_toronto",
+        "nameFa": "تورنتو (انتاریو)",
+        "tier": "tier1",
+        "colMultiplier": 1.28,
+        "rentMultiplier": 1.38,
+        "jobOpportunityIndex": 1.24
+      },
+      {
+        "id": "ca_vancouver",
+        "nameFa": "ونکوور (بریتیش کلمبیا)",
+        "tier": "tier1",
+        "colMultiplier": 1.32,
+        "rentMultiplier": 1.44,
+        "jobOpportunityIndex": 1.15
+      },
+      {
+        "id": "ca_montreal",
+        "nameFa": "مونترال (کبک)",
+        "tier": "tier2",
+        "colMultiplier": 0.94,
+        "rentMultiplier": 0.88,
+        "jobOpportunityIndex": 1.02
+      },
+      {
+        "id": "ca_calgary",
+        "nameFa": "کلگری",
+        "tier": "tier2",
+        "colMultiplier": 0.96,
+        "rentMultiplier": 0.92,
+        "jobOpportunityIndex": 1.04
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.022,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد تورم نزدیک به هدف ۲٪ بانک مرکزی کانادا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "policyRate": {
+        "value": 0.03,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ سیاست پولی بانک مرکزی کانادا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.033,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "رشد برآوردی دستمزد در استان‌های کانادا",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.064,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ بیکاری بازار کار کانادا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "minWageHourlyLocal": {
+        "value": 17.6,
+        "unit": "CAD/hour",
+        "asOf": "2026-10",
+        "source": "برآورد میانگین استانی از ارقام رسمی ۲۰۲۶: انتاریو ۱۷٫۹۵، بریتیش کلمبیا ۱۸٫۲۵، کبک ۱۶٫۶۰ و فدرال ۱۸٫۱۵ دلار کانادا در ساعت",
+        "confidence": "estimate"
+      },
+      "minWageMonthlyLocal": {
+        "value": 3050,
+        "unit": "CAD/month",
+        "asOf": "2026-10",
+        "source": "معادل ماهانه برآورد میانگین استانی بر پایه ۱۷۳٫۳ ساعت کاری",
+        "confidence": "estimate"
+      },
+      "standardMonthlyHours": 173,
+      "housingPricePerSqmLocal": {
+        "value": 6100,
+        "unit": "CAD/sqm",
+        "asOf": "2026-10",
+        "source": "برآورد میانگین قیمت مسکن در کلان‌شهرهای اصلی کانادا",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 1850,
+        "unit": "CAD/month",
+        "asOf": "2026-10",
+        "source": "برآورد اجاره آپارتمان یک‌خوابه در شهرهای متوسط و بزرگ کانادا",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 2750,
+        "unit": "CAD/month",
+        "asOf": "2026-10",
+        "source": "برآورد سبد ماهانه یک فرد مجرد در کانادا",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": -0.02,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "اقتصاد صادرکننده انرژی و مواد خام",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.4,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "همبستگی تجاری با اقتصاد آمریکای شمالی",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "حداقل دستمزد کانادا استانی است: انتاریو ۱۷٫۹۵ (مهر ۱۴۰۵/اکتبر ۲۰۲۶)، بریتیش کلمبیا ۱۸٫۲۵، کبک ۱۶٫۶۰ و فدرال ۱۸٫۱۵ دلار کانادا در ساعت."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.088,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برآورد مجموع سهم بازنشستگی و بیمه بیکاری کارمند در کانادا",
+        "confidence": "estimate"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 95,
+        "unit": "CAD/month",
+        "asOf": "2026-10",
+        "source": "برآورد بیمه درمان خصوصی ماهانه پیش از پوشش استانی یا دندان‌پزشکی",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 0.44, "rate": 0.0 },
+        { "upToMultipleOfMinWage": 1.55, "rate": 0.2 },
+        { "upToMultipleOfMinWage": 3.1, "rate": 0.29 },
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.4 }
+      ],
+      "unemploymentBenefitRatio": 0.55,
+      "unemploymentEligibleMonthsWorked": 12,
+      "pensionContributionRatio": 0.0595
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 24,
+      "employerTiedWorkPermit": false,
+      "jobLossGraceMonths": 6,
+      "investorMinLocalAmount": 400000,
+      "proofOfFundsMonths": 12
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.26, "needsRelicensing": true, "costLocal": 9500, "durationYears": 3, "minLanguageLevel": 5 },
+      "law": { "recognitionFactor": 0.24, "needsRelicensing": true, "costLocal": 8200, "durationYears": 2, "minLanguageLevel": 6 },
+      "pharmacy": { "recognitionFactor": 0.34, "needsRelicensing": true, "costLocal": 7600, "durationYears": 2, "minLanguageLevel": 5 },
+      "education": { "recognitionFactor": 0.45, "needsRelicensing": true, "costLocal": 3400, "durationYears": 1, "minLanguageLevel": 5 },
+      "engineering": { "recognitionFactor": 0.78, "needsRelicensing": true, "costLocal": 1800, "durationYears": 1, "minLanguageLevel": 4 },
+      "general": { "recognitionFactor": 0.84, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 3 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.28,
+      "yearsToConverge": 4,
+      "languageWeight": 0.5
+    },
+    "events": [
+      {
+        "id": "ca_first_canadian_exp",
+        "titleFa": "چالش نبود سابقه کار محلی در سال اول",
+        "textFa": "بسیاری از کارفرمایان به‌دنبال سابقه کار داخل کانادا هستند و شغل اول ممکن است پایین‌تر از سطح تخصصی ایران باشد.",
+        "contentTag": "mild",
+        "costLocal": 1200,
+        "statsDelta": { "mentalHealth": -5, "happiness": -3 }
+      },
+      {
+        "id": "ca_pr_milestone",
+        "titleFa": "تکمیل پرونده اقامت دائم و خدمات درمانی استانی",
+        "textFa": "دریافت کارت اقامت دائم آرامش حقوقی و دسترسی کامل به خدمات درمانی را به همراه آورد.",
+        "contentTag": "mild",
+        "costLocal": 950,
+        "statsDelta": { "happiness": 9, "mentalHealth": 7 }
+      }
+    ],
+    "prosFa": [
+      "جامعه مهاجرپذیر، مسیر مستقیم از تخصص به اقامت دائم و شهروندی",
+      "پوشش درمانی عمومی پس از استقرار و بیمه بیکاری معتبر"
+    ],
+    "consFa": [
+      "افت درآمد سال‌های نخست به‌دلیل حساسیت به سابقه کار و نظام‌مند بودن رشته‌های پزشکی و مهندسی",
+      "گرانی مسکن در تورنتو و ونکوور و سرمای طولانی زمستان"
+    ],
+    "realityNotesFa": [
+      "در سال اول، بسیاری از متخصصان با مشاغل پایه شروع می‌کنند تا تجربه محلی و تأییدیه نظام‌های حرفه‌ای را بگیرند."
+    ]
+  },
+  {
+    "id": "generic_template",
+    "nameFa": "مقصد توسعه‌پذیر عمومی",
+    "currencyCode": "USD",
+    "isTemplate": true,
+    "opennessScore": {
+      "value": 55,
+      "unit": "score_0_100",
+      "asOf": "2026-10",
+      "source": "الگوی عمومی برای افزودن مقاصد جدید در آینده",
+      "confidence": "estimate"
+    },
+    "baseVisaDifficulty": {
+      "value": 0.45,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "پارامتر پیش‌فرض الگو",
+      "confidence": "estimate"
+    },
+    "regions": [
+      {
+        "id": "gen_capital",
+        "nameFa": "پایتخت",
+        "tier": "tier1",
+        "colMultiplier": 1.15,
+        "rentMultiplier": 1.2,
+        "jobOpportunityIndex": 1.1
+      },
+      {
+        "id": "gen_city",
+        "nameFa": "شهر مرکزی",
+        "tier": "tier2",
+        "colMultiplier": 0.95,
+        "rentMultiplier": 0.95,
+        "jobOpportunityIndex": 0.98
+      }
+    ],
+    "macro": {
+      "inflationRate": {
+        "value": 0.03,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "policyRate": {
+        "value": 0.04,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "wageGrowthRate": {
+        "value": 0.035,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "unemploymentRate": {
+        "value": 0.055,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "minWageHourlyLocal": {
+        "value": 12.0,
+        "unit": "USD/hour",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "minWageMonthlyLocal": {
+        "value": 2000,
+        "unit": "USD/month",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "standardMonthlyHours": 173,
+      "housingPricePerSqmLocal": {
+        "value": 3800,
+        "unit": "USD/sqm",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "monthlyRentSingleBaseLocal": {
+        "value": 980,
+        "unit": "USD/month",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "costOfLivingMonthlySingleLocal": {
+        "value": 1550,
+        "unit": "USD/month",
+        "asOf": "2026-10",
+        "source": "مقدار پایه الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "oilShockBeta": {
+        "value": 0.02,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "globalGrowthBeta": {
+        "value": 0.3,
+        "unit": "elasticity",
+        "asOf": "2026-10",
+        "source": "الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "verifiedAnchorNoteFa": "الگوی استاندارد قابل گسترش برای مقاصد آتی."
+    },
+    "taxAndBenefits": {
+      "socialSecurityEmployeeRate": {
+        "value": 0.1,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "healthInsuranceMonthlyLocal": {
+        "value": 110,
+        "unit": "USD/month",
+        "asOf": "2026-10",
+        "source": "الگوی عمومی",
+        "confidence": "estimate"
+      },
+      "taxBrackets": [
+        { "upToMultipleOfMinWage": 0.5, "rate": 0.0 },
+        { "upToMultipleOfMinWage": 2.5, "rate": 0.18 },
+        { "upToMultipleOfMinWage": 99.0, "rate": 0.30 }
+      ],
+      "unemploymentBenefitRatio": 0.45,
+      "unemploymentEligibleMonthsWorked": 12,
+      "pensionContributionRatio": 0.05
+    },
+    "visaRules": {
+      "studentWorkHoursPerWeek": 20,
+      "employerTiedWorkPermit": true,
+      "jobLossGraceMonths": 3,
+      "investorMinLocalAmount": 250000,
+      "proofOfFundsMonths": 12
+    },
+    "credentials": {
+      "medicine": { "recognitionFactor": 0.35, "needsRelicensing": true, "costLocal": 6000, "durationYears": 2, "minLanguageLevel": 5 },
+      "law": { "recognitionFactor": 0.25, "needsRelicensing": true, "costLocal": 6000, "durationYears": 2, "minLanguageLevel": 5 },
+      "pharmacy": { "recognitionFactor": 0.4, "needsRelicensing": true, "costLocal": 5000, "durationYears": 2, "minLanguageLevel": 5 },
+      "education": { "recognitionFactor": 0.5, "needsRelicensing": true, "costLocal": 2500, "durationYears": 1, "minLanguageLevel": 4 },
+      "engineering": { "recognitionFactor": 0.82, "needsRelicensing": false, "costLocal": 800, "durationYears": 0, "minLanguageLevel": 3 },
+      "general": { "recognitionFactor": 0.88, "needsRelicensing": false, "costLocal": 0, "durationYears": 0, "minLanguageLevel": 3 }
+    },
+    "integrationCurve": {
+      "initialPenaltyRatio": 0.22,
+      "yearsToConverge": 3,
+      "languageWeight": 0.5
+    },
+    "events": [],
+    "prosFa": ["ساختار استاندارد قابل توسعه برای افزودن کشور تازه"],
+    "consFa": ["الگوی نمایشی برای تست توسعه‌پذیری موتور"],
+    "realityNotesFa": ["برای افزودن مقصد جدید کافی است یک ورودی هم‌ساختار به داده‌ها اضافه شود."]
+  }
+]

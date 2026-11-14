@@ -183,16 +183,60 @@
   },
   "activities": {
     "categories": {
-      "health": "سلامت",
-      "leisure": "سرگرمی",
-      "travel": "سفر",
+      "health": "سلامت و درمان",
+      "leisure": "سرگرمی و فرهنگ",
+      "travel": "سفر و گردشگری",
+      "sport": "ورزش و تندرستی",
+      "learning": "یادگیری و مهارت",
+      "charity": "خیریه و جامعه",
+      "arts_talent": "هنر و استعداد",
+      "pets": "طبیعت و حیوانات",
+      "social_digital": "شبکه و دیجیتال",
+      "business_trade": "کسب‌وکار و بازار",
+      "legal_civic": "امور حقوقی و مدنی",
+      "lifestyle_shop": "سبک زندگی و خرید",
       "migration": "مهاجرت",
-      "sport": "ورزش",
-      "learning": "یادگیری",
-      "charity": "خیریه و اجتماع",
       "crime": "جرم و تخلف",
       "gambling": "قمار و شرط‌بندی"
     }
+  },
+  "activitiesHub": {
+    "heroTitle": "برنامه امسال",
+    "quotaRemaining": "{left} سهمیه فعالیت از {total} باقی مانده",
+    "quotaFull": "سهمیه فعالیت امسال تکمیل شد",
+    "urgentPriorityTitle": "اولویت امسال",
+    "smartCarouselTitle": "پیشنهاد هوشمند برای تو",
+    "seasonalTitle": "فصلی و مناسبتی",
+    "favoritesTitle": "مورد علاقه‌ها",
+    "recentTitle": "اخیراً انجام دادی",
+    "categoriesTitle": "دسته‌بندی فعالیت‌ها",
+    "travelMigrationTile": "سفر خارجی و مهاجرت",
+    "travelMigrationSubtitle": "برنامه‌ریزی سفر کوتاه‌مدت یا مسیر اقامت در کشورها",
+    "undoLabel": "برگرداندن انتخاب",
+    "resultTitle": "نتیجه فعالیت",
+    "journalPreview": "ثبت در دفترچه خاطرات",
+    "performAction": "انجام بده"
+  },
+  "currencySwitch": {
+    "label": "ارز نمایش",
+    "local": "محلی",
+    "toman": "تومان",
+    "usd": "دلار",
+    "minWageHint": "معادل {months} ماه حقوق حداقل محلی",
+    "exposureTitle": "ترکیب ارزی دارایی‌ها",
+    "counterfactualTitle": "مقایسه بازدهی واقعی",
+    "erosionWarningTitle": "هشدار فرسایش تورمی نقدینگی"
+  },
+  "emigrationHub": {
+    "title": "سفر خارجی و مهاجرت",
+    "travelTab": "سفر خارجی",
+    "migrationTab": "مهاجرت",
+    "recommendedForYou": "پیشنهاد برای تو",
+    "compareButton": "مقایسه",
+    "solveAction": "حلش کن",
+    "simulationBadge": "شبیه‌سازی است",
+    "abroadCenterTitle": "پایگاه زندگی در خارج",
+    "returnHome": "بازگشت به ایران"
   },
   "shop": {
     "categories": {

@@ -34,6 +34,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
     avatarSeed,
     gender,
     originKind,
+    countryId,
+    isAbroad,
   }: {
     name: string;
     role: string;
@@ -45,6 +47,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
     avatarSeed?: string;
     gender?: Gender;
     originKind?: PersonOriginKind;
+    countryId?: string;
+    isAbroad?: boolean;
   }) => (
     <div
       className={`rounded-2xl border px-3 py-2 text-center ${
@@ -61,6 +65,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
             age={age}
             size={36}
             originKind={originKind}
+            countryId={countryId}
+            isAbroad={isAbroad}
             deceased={!alive}
           />
         </div>
@@ -182,6 +188,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                 alive={state.isAlive}
                 avatarSeed={state.player.avatarSeed ?? 'player'}
                 gender={state.player.gender}
+                countryId={state.player.countryId}
+                isAbroad={state.player.countryId !== 'iran'}
                 highlight
               />
               {spouse ? (

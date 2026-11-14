@@ -24,6 +24,7 @@ import {
   SegmentedControl,
   Toggle,
 } from './components/Primitives';
+import { CountryFlag } from './components/flags/CountryFlag';
 import { FamilyTreeView } from './FamilyTreeView';
 import {
   IconBrandMark,
@@ -117,6 +118,12 @@ export function MenuSheet({
   const { player } = state;
   const city = gameDataset.cities.find((c) => c.id === player.currentCityId);
   const country = gameDataset.countries.find((c) => c.id === player.countryId);
+  const countryMacro = gameDataset.countriesMacro.find((c) => c.id === player.countryId);
+  const regionFa = countryMacro?.regions.find((r) => r.id === player.currentCityId)?.nameFa;
+  const locationLabel =
+    player.countryId === 'iran'
+      ? (city?.nameFa ?? country?.nameFa ?? 'ایران')
+      : `${countryMacro?.nameFa ?? country?.nameFa ?? 'خارج از کشور'}${regionFa ? ` · ${regionFa}` : ''}`;
 
   const handleCloseOrBack = () => {
     if (section !== 'root') setSection('root');
@@ -301,8 +308,9 @@ export function MenuSheet({
               </div>
               <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
                 <div className="text-[var(--text-muted)]">محل سکونت</div>
-                <div className="mt-0.5 font-bold">
-                  {city?.nameFa ?? country?.nameFa ?? 'ایران'}
+                <div className="mt-0.5 flex items-center gap-1.5 font-bold">
+                  <CountryFlag countryId={player.countryId} size="xs" />
+                  <span className="truncate">{locationLabel}</span>
                 </div>
               </div>
               <div className="rounded-xl bg-[var(--surface-2)] p-2.5">

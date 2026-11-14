@@ -1,6 +1,8 @@
 import { createEmptyAdoptionState } from './adoption';
 import { gameDataset } from '../data/registry';
+import { initializeFxState } from './fx';
 import { createDefaultJobCompassState } from './jobCompass';
+import { createInitialLedgerState } from './ledger';
 import { SeededRNG } from './rng';
 import { CURRENT_SCHEMA_VERSION, SaveGameSchema } from './schemas';
 import { generateHiddenTalentsAndDiscipline } from './talents';
@@ -230,6 +232,41 @@ const MIGRATIONS: Record<number, MigrationFn> = {
     return {
       ...raw,
       schemaVersion: 6,
+      state,
+    };
+  },
+  6: (raw) => {
+    const state = (typeof raw.state === 'object' && raw.state !== null
+      ? { ...(raw.state as Record<string, unknown>) }
+      : {}) as Record<string, unknown>;
+    const player = (typeof state.player === 'object' && state.player !== null
+      ? { ...(state.player as Record<string, unknown>) }
+      : {}) as Record<string, unknown>;
+
+    const cashToman =
+      typeof player.moneyToman === 'number' && Number.isFinite(player.moneyToman)
+        ? Math.max(0, Math.round(player.moneyToman))
+        : 0;
+    const currentYear =
+      typeof state.currentJalaliYear === 'number' ? state.currentJalaliYear : 1405;
+
+    if (!state.displayCurrencyMode) {
+      state.displayCurrencyMode = 'local';
+    }
+    if (!state.fxState || typeof state.fxState !== 'object') {
+      state.fxState = initializeFxState(currentYear, gameDataset);
+    }
+    if (!state.ledger || typeof state.ledger !== 'object') {
+      state.ledger = createInitialLedgerState(
+        cashToman,
+        state as unknown as Partial<GameState>,
+        gameDataset,
+      );
+    }
+
+    return {
+      ...raw,
+      schemaVersion: 7,
       state,
     };
   },

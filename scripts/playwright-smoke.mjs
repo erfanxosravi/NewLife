@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const BASE_URL = process.env.E2E_URL || 'http://localhost:3000';
 const EXEC_PATH = '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell';
 const SHOT_DIR = path.resolve(
-  '.aistudio/artifacts/brain/9b815c2d-3ce6-4758-8f13-fad3be82c488/screenshots/smoke',
+  '.aistudio/artifacts/brain/135c4a68-3b99-499b-9682-e9a286caf1fc/screenshots/smoke',
 );
 
 fs.mkdirSync(SHOT_DIR, { recursive: true });

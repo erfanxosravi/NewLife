@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
 
 export const GenderSchema = z.enum(['male', 'female']);
 
@@ -633,6 +633,12 @@ export const GameStateSchema = z.object({
   dynasty: DynastyStateSchema.optional(),
   adoption: AdoptionStateSchema.optional(),
   jobCompass: JobCompassStateSchema.optional(),
+  displayCurrencyMode: z.enum(['local', 'IRT', 'USD']).optional(),
+  fxState: z.lazy(() => FxStateSchema).optional(),
+  ledger: z.lazy(() => LedgerStateSchema).optional(),
+  emigration: z.lazy(() => EmigrationStateSchema).optional(),
+  countryMacros: z.record(z.string(), z.lazy(() => CountryRuntimeMacroStateSchema)).optional(),
+  activityState: z.lazy(() => PlayerActivityRuntimeStateSchema).optional(),
 });
 
 export const SaveGameSchema = z.object({
@@ -1001,11 +1007,13 @@ export const EventDefinitionSchema = z.object({
 export const EventsFileSchema = z.array(EventDefinitionSchema).min(1);
 
 export const ActivityOutcomeSchema = z.object({
+  id: z.string().min(1).optional(),
   weight: z.number().positive(),
   resultTextFa: z.string().min(1),
   stats: StatDeltaSchema.optional(),
   moneyToman: z.number().finite().optional(),
   criminalRecordDelta: z.number().int().optional(),
+  memoryTextFa: z.string().min(1).optional(),
 });
 
 export const ActivityDefinitionSchema = z.object({
@@ -1018,6 +1026,12 @@ export const ActivityDefinitionSchema = z.object({
     'sport',
     'learning',
     'charity',
+    'arts_talent',
+    'pets',
+    'social_digital',
+    'business_trade',
+    'legal_civic',
+    'lifestyle_shop',
     'crime',
     'gambling',
   ]),
@@ -1028,6 +1042,11 @@ export const ActivityDefinitionSchema = z.object({
   effectHintFa: z.string().min(1),
   riskLabelFa: z.enum(['کم', 'متوسط', 'زیاد']),
   contentTag: ContentTagSchema,
+  tags: z.array(z.string().min(1)).optional(),
+  seasonTags: z.array(z.enum(['nowruz', 'yalda', 'ramadan', 'summer', 'winter'])).optional(),
+  quotaCost: z.number().int().min(1).max(3).optional(),
+  minIntelligence: z.number().int().min(0).max(100).optional(),
+  requiredSkillId: z.string().min(1).optional(),
   outcomes: z.array(ActivityOutcomeSchema).min(1),
 });
 
@@ -1593,6 +1612,408 @@ export const AdoptionFileSchema = z.object({
       .min(3),
   }),
 });
+
+export const CurrencyCodeSchema = z.enum(['IRT', 'USD', 'TRY', 'EUR', 'GBP', 'CAD', 'AED']);
+
+export const CurrencyDefinitionSchema = z.object({
+  code: CurrencyCodeSchema,
+  nameFa: z.string().min(1),
+  shortNameFa: z.string().min(1),
+  symbolFa: z.string().min(1),
+  minorUnit: z.number().int().min(0).max(4),
+  highInflationRisk: z.boolean(),
+  annualCarryRate: SourcedNumberSchema,
+  oilBeta: SourcedNumberSchema,
+  globalGrowthBeta: SourcedNumberSchema,
+});
+
+export const CurrenciesFileSchema = z.array(CurrencyDefinitionSchema).min(6);
+
+export const FxPairModelParamsSchema = z.object({
+  anchor1405UnitsPerUsd: PositiveSourcedNumberSchema,
+  kappa: SourcedNumberSchema,
+  riskPremiumAnnual: SourcedNumberSchema,
+  jumpProb: SourcedNumberSchema,
+  jumpMeanLog: SourcedNumberSchema,
+  jumpStdLog: SourcedNumberSchema,
+  noiseStd: SourcedNumberSchema,
+  spreadBps: SourcedNumberSchema,
+  conversionFeePct: SourcedNumberSchema,
+});
+
+export const TransferChannelSchema = z.object({
+  id: z.enum(['bank_wire', 'exchange_office', 'remittance_network']),
+  titleFa: z.string().min(1),
+  subtitleFa: z.string().min(1),
+  feePct: SourcedNumberSchema,
+  spreadBps: SourcedNumberSchema,
+  minAmountUsd: SourcedNumberSchema,
+  maxAmountUsd: SourcedNumberSchema,
+  delayTurns: SourcedNumberSchema,
+  failureRisk: SourcedNumberSchema,
+  requiresBankAccount: z.boolean(),
+  notesFa: z.string().min(1),
+});
+
+export const FxParamsFileSchema = z.object({
+  meta: z.object({
+    baseCurrency: z.literal('USD'),
+    anchorYear: z.number().int().min(1340).max(1500),
+    descriptionFa: z.string().min(1),
+  }),
+  usdPairModels: z.record(CurrencyCodeSchema, FxPairModelParamsSchema),
+  transferChannels: z.array(TransferChannelSchema).min(2),
+  historicalUsdRates: z
+    .array(
+      z.object({
+        year: z.number().int().min(1340).max(1500),
+        rates: z.record(CurrencyCodeSchema, PositiveSourcedNumberSchema),
+      }),
+    )
+    .min(66),
+});
+
+export const FxYearSnapshotSchema = z.object({
+  year: z.number().int().min(1250).max(1700),
+  usdRates: z.record(CurrencyCodeSchema, z.number().positive().finite()),
+  fairUsdRates: z.record(CurrencyCodeSchema, z.number().positive().finite()),
+  goldUsdPerOz: z.number().positive().finite(),
+});
+
+export const FxStateSchema = z.object({
+  usdRates: z.record(CurrencyCodeSchema, z.number().positive().finite()),
+  fairUsdRates: z.record(CurrencyCodeSchema, z.number().positive().finite()),
+  cumulativePriceIndices: z.record(CurrencyCodeSchema, z.number().positive().finite()),
+  history: z.array(FxYearSnapshotSchema),
+});
+
+export const WalletEntrySchema = z.object({
+  id: z.string().min(1),
+  currencyCode: CurrencyCodeSchema,
+  accountType: z.enum(['cash', 'bank', 'savings', 'foreign']),
+  labelFa: z.string().min(1),
+  balance: z.number().min(0).finite(),
+  countryId: z.string().min(1).optional(),
+});
+
+export const ConversionRecordSchema = z.object({
+  id: z.string().min(1),
+  turn: z.number().int().min(0),
+  jalaliYear: z.number().int().min(1250).max(1700),
+  fromCurrency: CurrencyCodeSchema,
+  toCurrency: CurrencyCodeSchema,
+  fromAmount: z.number().min(0).finite(),
+  toAmount: z.number().min(0).finite(),
+  effectiveRate: z.number().positive().finite(),
+  feeInFromCurrency: z.number().min(0).finite(),
+  channelId: z.string().min(1).optional(),
+  noteFa: z.string().min(1),
+});
+
+export const PendingTransferOrderSchema = z.object({
+  id: z.string().min(1),
+  createdTurn: z.number().int().min(0),
+  executeAtTurn: z.number().int().min(0),
+  channelId: z.enum(['bank_wire', 'exchange_office', 'remittance_network']),
+  fromCurrency: CurrencyCodeSchema,
+  toCurrency: CurrencyCodeSchema,
+  fromAmount: z.number().positive().finite(),
+  expectedToAmount: z.number().positive().finite(),
+  feeInFromCurrency: z.number().min(0).finite(),
+  failureRisk: z.number().min(0).max(1),
+  purposeFa: z.string().min(1),
+});
+
+export const LedgerYearSnapshotSchema = z.object({
+  year: z.number().int().min(1250).max(1700),
+  netWorthUsd: z.number().finite(),
+  netWorthToman: z.number().finite(),
+  usdRateIrt: z.number().positive().finite(),
+  goldUsdPerOz: z.number().positive().finite(),
+  cpiIranRatio: z.number().positive().finite(),
+  primaryCurrency: CurrencyCodeSchema,
+  localCpiRatio: z.number().positive().finite(),
+});
+
+export const LedgerStateSchema = z.object({
+  wallets: z.array(WalletEntrySchema),
+  conversions: z.array(ConversionRecordSchema),
+  pendingTransfers: z.array(PendingTransferOrderSchema),
+  yearSnapshots: z.array(LedgerYearSnapshotSchema),
+  lastErosionWarningYear: z.number().int().optional(),
+});
+
+export const CountryRegionDefSchema = z.object({
+  id: z.string().min(1),
+  nameFa: z.string().min(1),
+  tier: z.enum(['tier1', 'tier2', 'tier3']),
+  colMultiplier: z.number().positive(),
+  rentMultiplier: z.number().positive(),
+  jobOpportunityIndex: z.number().positive(),
+});
+
+export const CountryCredentialSpecSchema = z.object({
+  recognitionFactor: z.number().gt(0).lte(1),
+  needsRelicensing: z.boolean(),
+  costLocal: z.number().min(0),
+  durationYears: z.number().int().min(0).max(10),
+  minLanguageLevel: z.number().int().min(1).max(6),
+});
+
+export const CountryMacroDefinitionSchema = z.object({
+  id: z.string().min(1),
+  nameFa: z.string().min(1),
+  currencyCode: CurrencyCodeSchema,
+  isTemplate: z.boolean(),
+  opennessScore: SourcedNumberSchema,
+  baseVisaDifficulty: SourcedNumberSchema,
+  regions: z.array(CountryRegionDefSchema).min(2),
+  macro: z.object({
+    inflationRate: SourcedNumberSchema,
+    policyRate: SourcedNumberSchema,
+    wageGrowthRate: SourcedNumberSchema,
+    unemploymentRate: SourcedNumberSchema,
+    hasStatutoryMinWage: z.boolean().optional(),
+    minWageMonthlyLocal: PositiveSourcedNumberSchema,
+    minWageHourlyLocal: PositiveSourcedNumberSchema,
+    minWageHourlyNextYearLocal: PositiveSourcedNumberSchema.optional(),
+    standardMonthlyHours: z.number().int().positive(),
+    housingPricePerSqmLocal: PositiveSourcedNumberSchema,
+    monthlyRentSingleBaseLocal: PositiveSourcedNumberSchema,
+    costOfLivingMonthlySingleLocal: PositiveSourcedNumberSchema,
+    oilShockBeta: SourcedNumberSchema,
+    globalGrowthBeta: SourcedNumberSchema,
+    verifiedAnchorNoteFa: z.string().min(1),
+  }),
+  taxAndBenefits: z.object({
+    socialSecurityEmployeeRate: SourcedNumberSchema,
+    healthInsuranceMonthlyLocal: SourcedNumberSchema,
+    taxBrackets: z
+      .array(z.object({ upToMultipleOfMinWage: z.number().positive(), rate: z.number().min(0).max(0.75) }))
+      .min(1),
+    unemploymentBenefitRatio: z.number().min(0).max(1),
+    unemploymentEligibleMonthsWorked: z.number().int().min(0),
+    pensionContributionRatio: z.number().min(0).max(0.5),
+  }),
+  visaRules: z.object({
+    studentWorkHoursPerWeek: z.number().int().min(0).max(45),
+    employerTiedWorkPermit: z.boolean(),
+    jobLossGraceMonths: z.number().int().min(1).max(12),
+    investorMinLocalAmount: z.number().positive(),
+    proofOfFundsMonths: z.number().int().min(1).max(24),
+  }),
+  credentials: z.object({
+    medicine: CountryCredentialSpecSchema,
+    law: CountryCredentialSpecSchema,
+    pharmacy: CountryCredentialSpecSchema,
+    education: CountryCredentialSpecSchema,
+    engineering: CountryCredentialSpecSchema,
+    general: CountryCredentialSpecSchema,
+  }),
+  integrationCurve: z.object({
+    initialPenaltyRatio: z.number().min(0).max(0.6),
+    yearsToConverge: z.number().int().min(1).max(10),
+    languageWeight: z.number().min(0).max(1),
+  }),
+  events: z.array(
+    z.object({
+      id: z.string().min(1),
+      titleFa: z.string().min(1),
+      textFa: z.string().min(1),
+      contentTag: ContentTagSchema,
+      costLocal: z.number().finite(),
+      statsDelta: StatDeltaSchema,
+    }),
+  ),
+  prosFa: z.array(z.string().min(1)).min(1),
+  consFa: z.array(z.string().min(1)).min(1),
+  realityNotesFa: z.array(z.string().min(1)).min(1),
+});
+
+export const CountriesMacroFileSchema = z.array(CountryMacroDefinitionSchema).min(5);
+
+export const CountryCostsFileSchema = z
+  .array(
+    z.object({
+      countryId: z.string().min(1),
+      currencyCode: CurrencyCodeSchema,
+      monthlyBasketLocal: z.object({
+        rentSingle: PositiveSourcedNumberSchema,
+        foodSingle: PositiveSourcedNumberSchema,
+        utilitiesTransport: PositiveSourcedNumberSchema,
+        healthcareMisc: PositiveSourcedNumberSchema,
+      }),
+      housingNorms: z.object({
+        depositMonths: z.number().int().min(0).max(12),
+        mortgageAllowed: z.boolean(),
+        mortgageDownPaymentRatio: z.number().gt(0).lt(1),
+        mortgageAnnualRate: z.number().min(0).max(1),
+        mortgageMaxYears: z.number().int().min(1).max(40),
+        defaultBuySqm: z.number().positive(),
+      }),
+      shortTrip: z.object({
+        visaType: z.enum(['visa_free', 'e_visa', 'embassy_visa']),
+        visaLabelFa: z.string().min(1),
+        visaFeeUsd: z.number().min(0),
+        visaApprovalBase: z.number().gt(0).lte(1),
+        durationDays: z.number().int().positive(),
+        flightRoundTripUsd: z.number().positive(),
+        tiers: z.object({
+          budget: z.object({
+            labelFa: z.string().min(1),
+            dailyCostLocal: z.number().positive(),
+            happinessBoost: z.number().int(),
+            mentalBoost: z.number().int(),
+          }),
+          standard: z.object({
+            labelFa: z.string().min(1),
+            dailyCostLocal: z.number().positive(),
+            happinessBoost: z.number().int(),
+            mentalBoost: z.number().int(),
+          }),
+          comfort: z.object({
+            labelFa: z.string().min(1),
+            dailyCostLocal: z.number().positive(),
+            happinessBoost: z.number().int(),
+            mentalBoost: z.number().int(),
+          }),
+        }),
+        highlightsFa: z.array(z.string().min(1)).min(1),
+      }),
+    }),
+  )
+  .min(5);
+
+export const CountryPathsFileSchema = z
+  .array(
+    z.object({
+      countryId: z.string().min(1),
+      currencyCode: CurrencyCodeSchema,
+      statusLadder: z.object({
+        renewableAfterYears: z.number().int().min(1),
+        permanentAfterYears: z.number().int().min(1),
+        citizenshipAfterYears: z.number().int().min(1),
+        minLanguageForPermanent: z.number().int().min(1).max(6),
+        minLanguageForCitizenship: z.number().int().min(1).max(6),
+      }),
+      pathways: z
+        .array(
+          z.object({
+            id: z.enum(['study', 'work', 'skilled', 'investment', 'family']),
+            titleFa: z.string().min(1),
+            summaryFa: z.string().min(1),
+            minAge: z.number().int().min(16).max(80),
+            minEducation: EducationLevelSchema,
+            requiredLanguageLevel: z.number().int().min(1).max(6),
+            proofOfFundsLocal: z.number().min(0),
+            applicationFeeLocal: z.number().min(0),
+            baseSuccessRate: z.number().gt(0).lte(1),
+            expectedProcessingTurns: z.number().int().min(1).max(10),
+            notesFa: z.string().min(1),
+          }),
+        )
+        .min(1),
+    }),
+  )
+  .min(5);
+
+export const CountryRuntimeMacroStateSchema = z.object({
+  countryId: z.string().min(1),
+  cpiIndex: z.number().positive().finite(),
+  lastInflationRate: z.number().min(-0.3).max(5).finite(),
+  minWageMonthlyLocal: z.number().positive().finite(),
+  housingIndex: z.number().positive().finite(),
+  rentIndex: z.number().positive().finite(),
+  unemploymentRate: z.number().min(0).max(0.8).finite(),
+  history: z.array(
+    z.object({
+      year: z.number().int(),
+      inflationRate: z.number().finite(),
+      minWageMonthlyLocal: z.number().positive().finite(),
+      housingIndex: z.number().positive().finite(),
+    }),
+  ),
+});
+
+export const EmigrationStateSchema = z.object({
+  shortlistedCountryIds: z.array(z.string().min(1)),
+  activeApplications: z.record(
+    z.string(),
+    z.object({
+      countryId: z.string().min(1),
+      status: z.enum(['unexplored', 'researching', 'in_progress', 'approved', 'rejected_retryable']),
+      selectedPathId: z.enum(['study', 'work', 'skilled', 'investment', 'family']),
+      currentStepIndex: z.number().int().min(0).max(5),
+      stepsCompleted: z.array(z.boolean()),
+      proofOfFundsVerified: z.boolean(),
+      lastAttemptYear: z.number().int().optional(),
+      cooldownUntilYear: z.number().int().optional(),
+      notesFa: z.string().optional(),
+    }),
+  ),
+  languageLevels: z.record(z.string(), z.number().int().min(1).max(6)),
+  residency: z.object({
+    isAbroad: z.boolean(),
+    countryId: z.string().min(1),
+    regionId: z.string().min(1).optional(),
+    arrivedYear: z.number().int().optional(),
+    yearsAbroad: z.number().int().min(0),
+    statusStage: z.enum(['none', 'temporary', 'renewable', 'permanent', 'citizenship']),
+    permitType: z.enum(['study', 'work', 'skilled', 'investment', 'family']).optional(),
+    jobLossGraceMonthsRemaining: z.number().int().min(0).optional(),
+    abroadWorkMonthsAccumulated: z.number().int().min(0),
+    checklistDoneIds: z.array(z.string().min(1)),
+    credentialRelicensedTracks: z.array(z.string().min(1)),
+    annualRemittanceCount: z.number().int().min(0),
+    lastArrivalWelcomeSeenYear: z.number().int().optional(),
+    forcedReturnNoticeFa: z.string().optional(),
+  }),
+  travelHistory: z.array(
+    z.object({
+      id: z.string().min(1),
+      countryId: z.string().min(1),
+      countryNameFa: z.string().min(1),
+      jalaliYear: z.number().int(),
+      tier: z.enum(['budget', 'standard', 'comfort']),
+      totalCostDisplayFa: z.string().min(1),
+      memoryFa: z.string().min(1),
+    }),
+  ),
+  lastReportCard: z
+    .object({
+      year: z.number().int(),
+      netIncomeLocal: z.number().finite(),
+      livingCostsLocal: z.number().finite(),
+      taxesPaidLocal: z.number().finite(),
+      remittanceLocal: z.number().finite(),
+      savingsDeltaLocal: z.number().finite(),
+      currencyCode: CurrencyCodeSchema,
+    })
+    .optional(),
+});
+
+export const PlayerActivityRuntimeStateSchema = z.object({
+  turn: z.number().int().min(0),
+  quotaUsedThisTurn: z.number().int().min(0),
+  maxQuotaPerTurn: z.number().int().min(1),
+  favoriteIds: z.array(z.string().min(1)),
+  recentIds: z.array(z.string().min(1)),
+  seenOutcomeMap: z.record(z.string(), z.array(z.number().int().min(0))),
+  annualUndoSnapshot: z
+    .object({
+      activityId: z.string().min(1),
+      turn: z.number().int().min(0),
+      statsBefore: PlayerStatsSchema,
+      moneyTomanBefore: z.number().finite(),
+      flagsBefore: z.record(z.string(), z.union([z.boolean(), z.number(), z.string()])),
+      timelineLengthBefore: z.number().int().min(0),
+      quotaUsedBefore: z.number().int().min(0),
+      recentIdsBefore: z.array(z.string().min(1)),
+      seenOutcomeIndicesBefore: z.array(z.number().int().min(0)).optional(),
+    })
+    .optional(),
+});
+
 
 
 

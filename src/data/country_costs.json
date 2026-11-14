@@ -1,0 +1,209 @@
+[
+  {
+    "countryId": "turkey",
+    "currencyCode": "TRY",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 24000, "unit": "TRY/month", "asOf": "2026-10", "source": "برآورد اجاره آپارتمان کوچک", "confidence": "estimate" },
+      "foodSingle": { "value": 9200, "unit": "TRY/month", "asOf": "2026-10", "source": "برآورد سبد غذایی یک نفره", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 4600, "unit": "TRY/month", "asOf": "2026-10", "source": "قبوض آب، برق، گاز و حمل‌ونقل شهری", "confidence": "estimate" },
+      "healthcareMisc": { "value": 3200, "unit": "TRY/month", "asOf": "2026-10", "source": "بیمه اقامت و هزینه‌های روزمره", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 2,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.35,
+      "mortgageAnnualRate": 0.38,
+      "mortgageMaxYears": 10,
+      "defaultBuySqm": 75
+    },
+    "shortTrip": {
+      "visaType": "visa_free",
+      "visaLabelFa": "بدون نیاز به ویزای قبلی (اقامت توریستی تا ۹۰ روز)",
+      "visaFeeUsd": 0,
+      "visaApprovalBase": 0.98,
+      "durationDays": 7,
+      "flightRoundTripUsd": 240,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 1800, "happinessBoost": 7, "mentalBoost": 5 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 3600, "happinessBoost": 10, "mentalBoost": 8 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 6800, "happinessBoost": 14, "mentalBoost": 11 }
+      },
+      "highlightsFa": [
+        "پیاده‌روی کنار تنگه بسفر و محله‌های تاریخی استانبول",
+        "تجربه چای و غذاهای محلی و مقایسه قیمت واقعی زندگی"
+      ]
+    }
+  },
+  {
+    "countryId": "germany",
+    "currencyCode": "EUR",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 1080, "unit": "EUR/month", "asOf": "2026-10", "source": "برآورد اجاره آپارتمان یک‌خوابه متوسط آلمان", "confidence": "estimate" },
+      "foodSingle": { "value": 360, "unit": "EUR/month", "asOf": "2026-10", "source": "برآورد خوراک ماهانه یک نفر", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 240, "unit": "EUR/month", "asOf": "2026-10", "source": "بلیت سراسری حمل‌ونقل، اینترنت و برق", "confidence": "estimate" },
+      "healthcareMisc": { "value": 190, "unit": "EUR/month", "asOf": "2026-10", "source": "هزینه پایه بیمه و ملزومات", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 3,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.25,
+      "mortgageAnnualRate": 0.039,
+      "mortgageMaxYears": 25,
+      "defaultBuySqm": 65
+    },
+    "shortTrip": {
+      "visaType": "embassy_visa",
+      "visaLabelFa": "ویزای شینگن (تکمیل مدارک سفارت و وقت مصاحبه)",
+      "visaFeeUsd": 105,
+      "visaApprovalBase": 0.62,
+      "durationDays": 8,
+      "flightRoundTripUsd": 680,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 85, "happinessBoost": 9, "mentalBoost": 6 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 150, "happinessBoost": 13, "mentalBoost": 9 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 265, "happinessBoost": 17, "mentalBoost": 12 }
+      },
+      "highlightsFa": [
+        "بازدید از موزه‌ها، شبکه‌های ریلی دقیق و محیط کار شهرهای آلمان",
+        "بررسی میدانی محله‌ها و دانشگاه‌ها پیش از تصمیم مهاجرت"
+      ]
+    }
+  },
+  {
+    "countryId": "uae",
+    "currencyCode": "AED",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 5400, "unit": "AED/month", "asOf": "2026-10", "source": "برآورد اجاره استودیو در دبی/ابوظبی", "confidence": "estimate" },
+      "foodSingle": { "value": 1650, "unit": "AED/month", "asOf": "2026-10", "source": "برآورد خوراک ماهانه", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 1050, "unit": "AED/month", "asOf": "2026-10", "source": "برق، تهویه و حمل‌ونقل مترو", "confidence": "estimate" },
+      "healthcareMisc": { "value": 650, "unit": "AED/month", "asOf": "2026-10", "source": "هزینه بیمه و هزینه‌های روزمره", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 2,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.25,
+      "mortgageAnnualRate": 0.049,
+      "mortgageMaxYears": 20,
+      "defaultBuySqm": 70
+    },
+    "shortTrip": {
+      "visaType": "e_visa",
+      "visaLabelFa": "ویزای توریستی الکترونیک کوتاه‌مدت",
+      "visaFeeUsd": 115,
+      "visaApprovalBase": 0.86,
+      "durationDays": 6,
+      "flightRoundTripUsd": 290,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 420, "happinessBoost": 8, "mentalBoost": 6 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 820, "happinessBoost": 12, "mentalBoost": 9 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 1550, "happinessBoost": 16, "mentalBoost": 12 }
+      },
+      "highlightsFa": [
+        "بازدید از مراکز تجاری دبی، نمایشگاه‌های شغلی و خلیج فارس",
+        "آشنایی نزدیک با بازار کار و قوانین اقامت کاری امارات"
+      ]
+    }
+  },
+  {
+    "countryId": "uk",
+    "currencyCode": "GBP",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 1050, "unit": "GBP/month", "asOf": "2026-10", "source": "برآورد اجاره آپارتمان یک‌خوابه خارج از مرکز لندن", "confidence": "estimate" },
+      "foodSingle": { "value": 340, "unit": "GBP/month", "asOf": "2026-10", "source": "برآورد خوراک ماهانه", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 270, "unit": "GBP/month", "asOf": "2026-10", "source": "مالیات محلی، انرژی و حمل‌ونقل", "confidence": "estimate" },
+      "healthcareMisc": { "value": 160, "unit": "GBP/month", "asOf": "2026-10", "source": "سهم درمان و مخارج روزمره", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 2,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.2,
+      "mortgageAnnualRate": 0.048,
+      "mortgageMaxYears": 25,
+      "defaultBuySqm": 62
+    },
+    "shortTrip": {
+      "visaType": "embassy_visa",
+      "visaLabelFa": "ویزای بازدید استاندارد سفارت بریتانیا",
+      "visaFeeUsd": 155,
+      "visaApprovalBase": 0.54,
+      "durationDays": 7,
+      "flightRoundTripUsd": 790,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 95, "happinessBoost": 9, "mentalBoost": 6 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 170, "happinessBoost": 13, "mentalBoost": 10 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 295, "happinessBoost": 17, "mentalBoost": 13 }
+      },
+      "highlightsFa": [
+        "گشت‌وگذار در کتابخانه‌ها و محله‌های تاریخی لندن و منچستر",
+        "تجربه فضای دانشگاهی و آشنایی با استانداردهای زندگی در بریتانیا"
+      ]
+    }
+  },
+  {
+    "countryId": "canada",
+    "currencyCode": "CAD",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 1850, "unit": "CAD/month", "asOf": "2026-10", "source": "برآورد اجاره آپارتمان یک‌خوابه", "confidence": "estimate" },
+      "foodSingle": { "value": 520, "unit": "CAD/month", "asOf": "2026-10", "source": "برآورد خوراک ماهانه", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 310, "unit": "CAD/month", "asOf": "2026-10", "source": "قبوض، اینترنت و کارت حمل‌ونقل", "confidence": "estimate" },
+      "healthcareMisc": { "value": 210, "unit": "CAD/month", "asOf": "2026-10", "source": "بیمه تکمیلی و مخارج متفرقه", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 2,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.2,
+      "mortgageAnnualRate": 0.044,
+      "mortgageMaxYears": 25,
+      "defaultBuySqm": 75
+    },
+    "shortTrip": {
+      "visaType": "embassy_visa",
+      "visaLabelFa": "ویزای بازدید موقت و انگشت‌نگاری سفارت کانادا",
+      "visaFeeUsd": 140,
+      "visaApprovalBase": 0.56,
+      "durationDays": 10,
+      "flightRoundTripUsd": 1220,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 135, "happinessBoost": 10, "mentalBoost": 7 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 230, "happinessBoost": 14, "mentalBoost": 10 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 410, "happinessBoost": 18, "mentalBoost": 13 }
+      },
+      "highlightsFa": [
+        "دیدار با دوستان، بازدید از پارک‌های شهری و آشنایی با فضای چندفرهنگی",
+        "بررسی هزینه‌های واقعی اجاره و مراکز آموزشی پیش از اقدام مهاجرتی"
+      ]
+    }
+  },
+  {
+    "countryId": "generic_template",
+    "currencyCode": "USD",
+    "monthlyBasketLocal": {
+      "rentSingle": { "value": 980, "unit": "USD/month", "asOf": "2026-10", "source": "الگوی عمومی", "confidence": "estimate" },
+      "foodSingle": { "value": 350, "unit": "USD/month", "asOf": "2026-10", "source": "الگوی عمومی", "confidence": "estimate" },
+      "utilitiesTransport": { "value": 180, "unit": "USD/month", "asOf": "2026-10", "source": "الگوی عمومی", "confidence": "estimate" },
+      "healthcareMisc": { "value": 150, "unit": "USD/month", "asOf": "2026-10", "source": "الگوی عمومی", "confidence": "estimate" }
+    },
+    "housingNorms": {
+      "depositMonths": 2,
+      "mortgageAllowed": true,
+      "mortgageDownPaymentRatio": 0.25,
+      "mortgageAnnualRate": 0.05,
+      "mortgageMaxYears": 20,
+      "defaultBuySqm": 70
+    },
+    "shortTrip": {
+      "visaType": "e_visa",
+      "visaLabelFa": "ویزای بازدید الکترونیک استاندارد",
+      "visaFeeUsd": 80,
+      "visaApprovalBase": 0.78,
+      "durationDays": 7,
+      "flightRoundTripUsd": 500,
+      "tiers": {
+        "budget": { "labelFa": "سفر اقتصادی", "dailyCostLocal": 70, "happinessBoost": 7, "mentalBoost": 5 },
+        "standard": { "labelFa": "سفر استاندارد", "dailyCostLocal": 130, "happinessBoost": 10, "mentalBoost": 8 },
+        "comfort": { "labelFa": "سفر آسوده", "dailyCostLocal": 240, "happinessBoost": 14, "mentalBoost": 10 }
+      },
+      "highlightsFa": ["سفر آزمایشی و ارزیابی محیط مقصد"]
+    }
+  }
+]

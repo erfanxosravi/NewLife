@@ -5,8 +5,10 @@ import {
   initializeMacroFlagsForBirthYear,
   pickInflationScenario,
 } from './economy';
+import { initializeFxState } from './fx';
 import { toPersianDigits } from './jalali';
 import { createDefaultJobCompassState } from './jobCompass';
+import { createInitialLedgerState } from './ledger';
 import { generateRandomSeedString, SeededRNG } from './rng';
 import { CURRENT_SCHEMA_VERSION } from './schemas';
 import { clampStat } from './stats';
@@ -400,6 +402,13 @@ export function createNewSaveGame(
     },
   };
   initialState.jobCompass = createDefaultJobCompassState(initialState);
+  initialState.displayCurrencyMode = 'local';
+  initialState.fxState = initializeFxState(birthJalaliYear, dataset);
+  initialState.ledger = createInitialLedgerState(
+    initialState.player.moneyToman,
+    initialState,
+    dataset,
+  );
 
   const nowIso = new Date().toISOString();
   return {

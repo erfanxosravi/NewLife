@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const BASE_URL = process.env.E2E_URL || 'http://localhost:3000';
 const EXEC_PATH = '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell';
 const SHOT_DIR = path.resolve(
-  '.aistudio/artifacts/brain/9b815c2d-3ce6-4758-8f13-fad3be82c488/screenshots/hubs',
+  '.aistudio/artifacts/brain/135c4a68-3b99-499b-9682-e9a286caf1fc/screenshots/hubs',
 );
 
 fs.mkdirSync(SHOT_DIR, { recursive: true });
@@ -127,7 +127,7 @@ async function setTheme(page, mode) {
   if (mode === 'dark') {
     await page.click('text=تیره (زغالی گرم)');
   } else {
-    await page.click('text=روشن (سفید و نارنجی)');
+    await page.click('text=روشن (نارنجی و سفید)');
   }
   await closeAllDialogs(page);
 }
@@ -150,6 +150,7 @@ async function runForMode(browser, vp, theme) {
   // 1. Styleguide verification
   await page.goto(`${BASE_URL}/styleguide`, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=کارت خلاصه هاب و سه‌گانه آمار');
+  await page.waitForSelector('[data-testid="styleguide-emigration-activities"]');
   if (theme === 'dark') {
     const darkBtn = page.locator('header button:has-text("تیره")');
     if ((await darkBtn.count()) > 0) {
@@ -198,12 +199,12 @@ async function runForMode(browser, vp, theme) {
   await page.screenshot({ path: path.join(SHOT_DIR, `hub-career-${theme}-${vp.name}.png`) });
 
   if (vp.name === '390') {
-    // Drill down to Job Board -> Job Detail -> Back -> check scroll preserved -> Apply
+    // Drill down to Job Market -> Job Detail -> Back
     await page.click('[data-testid="job-board-entry"]');
-    await page.waitForSelector('text=فهرست مشاغل');
+    await page.waitForSelector('[data-testid="priority-strip"]');
     await assertCleanScreen(page, `${vp.name}-${theme}-job-board`);
-    await page.click('[role="dialog"] button:has-text("آرایشگر")');
-    await page.waitForSelector('text=پیش‌نیازهای استخدام');
+    await page.click('[data-testid="job-row-barber"]');
+    await page.waitForSelector('[data-testid="job-detail-requirements"]');
     await assertCleanScreen(page, `${vp.name}-${theme}-job-detail`);
     await page.screenshot({ path: path.join(SHOT_DIR, `drill-job-detail-${theme}-${vp.name}.png`) });
     await closeTopDialog(page);
@@ -230,18 +231,55 @@ async function runForMode(browser, vp, theme) {
   await assertHubSectionBudgets(page, `${vp.name}-${theme}-edu-hub`);
   await closeAllDialogs(page);
 
-  // ---- HUB 2: ACTIVITIES ----
+  // ---- HUB 2: ACTIVITIES & REDESIGNED EMIGRATION HUB ----
   await page.click('button:has-text("فعالیت‌ها")');
+  await page.waitForSelector('text=برنامه امسال');
   await page.waitForSelector('text=دسته‌بندی فعالیت‌ها');
   await assertCleanScreen(page, `${vp.name}-${theme}-activities-hub`);
   await assertHubSectionBudgets(page, `${vp.name}-${theme}-activities-hub`);
   await page.screenshot({ path: path.join(SHOT_DIR, `hub-activities-${theme}-${vp.name}.png`) });
 
   if (vp.name === '390') {
-    await page.locator('[role="dialog"] button:has-text("مهاجرت")').first().click();
-    await page.waitForSelector('text=مسیر پرونده');
-    await assertCleanScreen(page, `${vp.name}-${theme}-migration-detail`);
-    await page.screenshot({ path: path.join(SHOT_DIR, `drill-migration-${theme}-${vp.name}.png`) });
+    // Drill into an Activity Category
+    await page.locator('[role="dialog"] button:has-text("ورزش و تندرستی")').first().click();
+    await page.waitForTimeout(120);
+    await assertCleanScreen(page, `${vp.name}-${theme}-activity-category-detail`);
+    await assertHubSectionBudgets(page, `${vp.name}-${theme}-activity-category-detail`);
+    await closeTopDialog(page);
+
+    // Open Redesigned Emigration & Travel Hub
+    await page.locator('[role="dialog"] button:has-text("سفر خارجی و مهاجرت")').first().click();
+    await page.waitForSelector('text=کشورهای مقصد مهاجرت');
+    await assertCleanScreen(page, `${vp.name}-${theme}-emigration-hub`);
+    await assertHubSectionBudgets(page, `${vp.name}-${theme}-emigration-hub`);
+    await page.screenshot({ path: path.join(SHOT_DIR, `hub-emigration-${theme}-${vp.name}.png`) });
+
+    // Switch to Travel sub-tab
+    await page.locator('[role="dialog"] button[role="tab"]:has-text("سفر خارجی")').last().click();
+    await page.waitForSelector('text=انتخاب مقصد سفر کوتاه');
+    await assertCleanScreen(page, `${vp.name}-${theme}-travel-tab`);
+
+    // Switch back to Migration sub-tab & open Turkey detail
+    await page.locator('[role="dialog"] button[role="tab"]:has-text("مهاجرت")').last().click();
+    await page.waitForSelector('text=کشورهای مقصد مهاجرت');
+    await page.locator('[role="dialog"] button:has-text("ترکیه")').first().click();
+    await page.waitForSelector('text=تجزیه سختی پرونده');
+    await assertCleanScreen(page, `${vp.name}-${theme}-country-detail-income`);
+    await page.screenshot({ path: path.join(SHOT_DIR, `drill-country-detail-${theme}-${vp.name}.png`) });
+
+    // Check Paths + Economy ("شبیه‌سازی است") tabs
+    await page.locator('[role="dialog"] button[role="tab"]:has-text("مسیرها")').last().click();
+    await page.waitForSelector('text=مسیر شش‌گام پرونده');
+    await assertCleanScreen(page, `${vp.name}-${theme}-country-detail-paths`);
+    await page.locator('[role="dialog"] button[role="tab"]:has-text("اقتصاد")').last().click();
+    await page.waitForSelector('text=شبیه‌سازی است');
+    await assertCleanScreen(page, `${vp.name}-${theme}-country-detail-economy`);
+    await closeTopDialog(page);
+
+    // Check Country Compare Modal
+    await page.locator('[role="dialog"] button:has-text("مقایسه")').first().click();
+    await page.waitForSelector('text=مقایسه کشورهای مقصد');
+    await assertCleanScreen(page, `${vp.name}-${theme}-country-compare`);
     await closeTopDialog(page);
   }
   await closeAllDialogs(page);
@@ -253,12 +291,20 @@ async function runForMode(browser, vp, theme) {
   await assertHubSectionBudgets(page, `${vp.name}-${theme}-assets-overview`);
   await page.screenshot({ path: path.join(SHOT_DIR, `hub-assets-${theme}-${vp.name}.png`) });
 
-  // Drill into Market Analysis
+  // Drill into Market Analysis & FX Drawer
   if (vp.name === '390') {
     await page.click('[role="dialog"] button:has-text("تحلیل بازار")');
     await page.waitForSelector('text=نرخ‌های روز بازار');
     await assertCleanScreen(page, `${vp.name}-${theme}-market-detail`);
     await closeTopDialog(page);
+
+    const fxBtn = page.locator('[role="dialog"] button:has-text("تبدیل و حواله")').first();
+    if ((await fxBtn.count()) > 0) {
+      await fxBtn.click();
+      await page.waitForTimeout(150);
+      await assertCleanScreen(page, `${vp.name}-${theme}-fx-drawer`);
+      await closeTopDialog(page);
+    }
   }
 
   // Switch through Investments / Housing / Loans / Shop

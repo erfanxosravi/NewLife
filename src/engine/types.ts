@@ -387,6 +387,12 @@ export interface GameState {
   dynasty?: DynastyState;
   adoption?: AdoptionState;
   jobCompass?: JobCompassState;
+  displayCurrencyMode?: DisplayCurrencyMode;
+  fxState?: FxState;
+  ledger?: LedgerState;
+  emigration?: EmigrationState;
+  countryMacros?: Record<string, CountryRuntimeMacroState>;
+  activityState?: PlayerActivityRuntimeState;
 }
 
 export interface SaveGame {
@@ -693,15 +699,23 @@ export type ActivityCategory =
   | 'sport'
   | 'learning'
   | 'charity'
+  | 'arts_talent'
+  | 'pets'
+  | 'social_digital'
+  | 'business_trade'
+  | 'legal_civic'
+  | 'lifestyle_shop'
   | 'crime'
   | 'gambling';
 
 export interface ActivityOutcome {
+  id?: string;
   weight: number;
   resultTextFa: string;
   stats?: Partial<PlayerStats>;
   moneyToman?: number;
   criminalRecordDelta?: number;
+  memoryTextFa?: string;
 }
 
 export interface ActivityDefinition {
@@ -715,6 +729,11 @@ export interface ActivityDefinition {
   effectHintFa: string;
   riskLabelFa: 'کم' | 'متوسط' | 'زیاد';
   contentTag: ContentTag;
+  tags?: string[];
+  seasonTags?: ('nowruz' | 'yalda' | 'ramadan' | 'summer' | 'winter')[];
+  quotaCost?: number;
+  minIntelligence?: number;
+  requiredSkillId?: string;
   outcomes: ActivityOutcome[];
 }
 
@@ -949,6 +968,8 @@ export interface EconomyDataset {
   baseline1405: Baseline1405Data;
   historicalSeries: HistoricalYearPoint[];
   jobIncome: JobIncomeEntry[];
+  currencies: CurrencyDefinition[];
+  fxParams: FxParamsDataset;
 }
 
 export interface TalentDefinition {
@@ -1471,6 +1492,376 @@ export interface AdoptionDataset {
     }[];
   };
 }
+
+export type CurrencyCode = 'IRT' | 'USD' | 'TRY' | 'EUR' | 'GBP' | 'CAD' | 'AED';
+export type DisplayCurrencyMode = 'local' | 'IRT' | 'USD';
+export type WalletAccountType = 'cash' | 'bank' | 'savings' | 'foreign';
+
+export interface CurrencyDefinition {
+  code: CurrencyCode;
+  nameFa: string;
+  shortNameFa: string;
+  symbolFa: string;
+  minorUnit: number;
+  highInflationRisk: boolean;
+  annualCarryRate: SourcedNumber;
+  oilBeta: SourcedNumber;
+  globalGrowthBeta: SourcedNumber;
+}
+
+export interface FxPairModelParams {
+  anchor1405UnitsPerUsd: SourcedNumber;
+  kappa: SourcedNumber;
+  riskPremiumAnnual: SourcedNumber;
+  jumpProb: SourcedNumber;
+  jumpMeanLog: SourcedNumber;
+  jumpStdLog: SourcedNumber;
+  noiseStd: SourcedNumber;
+  spreadBps: SourcedNumber;
+  conversionFeePct: SourcedNumber;
+}
+
+export interface TransferChannelDef {
+  id: 'bank_wire' | 'exchange_office' | 'remittance_network';
+  titleFa: string;
+  subtitleFa: string;
+  feePct: SourcedNumber;
+  spreadBps: SourcedNumber;
+  minAmountUsd: SourcedNumber;
+  maxAmountUsd: SourcedNumber;
+  delayTurns: SourcedNumber;
+  failureRisk: SourcedNumber;
+  requiresBankAccount: boolean;
+  notesFa: string;
+}
+
+export interface HistoricalUsdRateRow {
+  year: number;
+  rates: Record<CurrencyCode, SourcedNumber>;
+}
+
+export interface FxParamsDataset {
+  meta: {
+    baseCurrency: 'USD';
+    anchorYear: number;
+    descriptionFa: string;
+  };
+  usdPairModels: Record<CurrencyCode, FxPairModelParams>;
+  transferChannels: TransferChannelDef[];
+  historicalUsdRates: HistoricalUsdRateRow[];
+}
+
+export interface FxYearSnapshot {
+  year: number;
+  usdRates: Record<CurrencyCode, number>;
+  fairUsdRates: Record<CurrencyCode, number>;
+  goldUsdPerOz: number;
+}
+
+export interface FxState {
+  usdRates: Record<CurrencyCode, number>;
+  fairUsdRates: Record<CurrencyCode, number>;
+  cumulativePriceIndices: Record<CurrencyCode, number>;
+  history: FxYearSnapshot[];
+}
+
+export interface WalletEntry {
+  id: string;
+  currencyCode: CurrencyCode;
+  accountType: WalletAccountType;
+  labelFa: string;
+  balance: number;
+  countryId?: string;
+}
+
+export interface ConversionRecord {
+  id: string;
+  turn: number;
+  jalaliYear: number;
+  fromCurrency: CurrencyCode;
+  toCurrency: CurrencyCode;
+  fromAmount: number;
+  toAmount: number;
+  effectiveRate: number;
+  feeInFromCurrency: number;
+  channelId?: string;
+  noteFa: string;
+}
+
+export interface PendingTransferOrder {
+  id: string;
+  createdTurn: number;
+  executeAtTurn: number;
+  channelId: TransferChannelDef['id'];
+  fromCurrency: CurrencyCode;
+  toCurrency: CurrencyCode;
+  fromAmount: number;
+  expectedToAmount: number;
+  feeInFromCurrency: number;
+  failureRisk: number;
+  purposeFa: string;
+}
+
+export interface LedgerYearSnapshot {
+  year: number;
+  netWorthUsd: number;
+  netWorthToman: number;
+  usdRateIrt: number;
+  goldUsdPerOz: number;
+  cpiIranRatio: number;
+  primaryCurrency: CurrencyCode;
+  localCpiRatio: number;
+}
+
+export interface LedgerState {
+  wallets: WalletEntry[];
+  conversions: ConversionRecord[];
+  pendingTransfers: PendingTransferOrder[];
+  yearSnapshots: LedgerYearSnapshot[];
+  lastErosionWarningYear?: number;
+}
+
+export interface CountryRegionDef {
+  id: string;
+  nameFa: string;
+  tier: 'tier1' | 'tier2' | 'tier3';
+  colMultiplier: number;
+  rentMultiplier: number;
+  jobOpportunityIndex: number;
+}
+
+export interface CountryCredentialSpec {
+  recognitionFactor: number;
+  needsRelicensing: boolean;
+  costLocal: number;
+  durationYears: number;
+  minLanguageLevel: number;
+}
+
+export interface CountryAbroadEventDef {
+  id: string;
+  titleFa: string;
+  textFa: string;
+  contentTag: ContentTag;
+  costLocal: number;
+  statsDelta: Partial<PlayerStats>;
+}
+
+export interface CountryMacroDefinition {
+  id: string;
+  nameFa: string;
+  currencyCode: CurrencyCode;
+  isTemplate: boolean;
+  opennessScore: SourcedNumber;
+  baseVisaDifficulty: SourcedNumber;
+  regions: CountryRegionDef[];
+  macro: {
+    inflationRate: SourcedNumber;
+    policyRate: SourcedNumber;
+    wageGrowthRate: SourcedNumber;
+    unemploymentRate: SourcedNumber;
+    hasStatutoryMinWage?: boolean;
+    minWageMonthlyLocal: SourcedNumber;
+    minWageHourlyLocal: SourcedNumber;
+    minWageHourlyNextYearLocal?: SourcedNumber;
+    standardMonthlyHours: number;
+    housingPricePerSqmLocal: SourcedNumber;
+    monthlyRentSingleBaseLocal: SourcedNumber;
+    costOfLivingMonthlySingleLocal: SourcedNumber;
+    oilShockBeta: SourcedNumber;
+    globalGrowthBeta: SourcedNumber;
+    verifiedAnchorNoteFa: string;
+  };
+  taxAndBenefits: {
+    socialSecurityEmployeeRate: SourcedNumber;
+    healthInsuranceMonthlyLocal: SourcedNumber;
+    taxBrackets: { upToMultipleOfMinWage: number; rate: number }[];
+    unemploymentBenefitRatio: number;
+    unemploymentEligibleMonthsWorked: number;
+    pensionContributionRatio: number;
+  };
+  visaRules: {
+    studentWorkHoursPerWeek: number;
+    employerTiedWorkPermit: boolean;
+    jobLossGraceMonths: number;
+    investorMinLocalAmount: number;
+    proofOfFundsMonths: number;
+  };
+  credentials: Record<
+    'medicine' | 'law' | 'pharmacy' | 'education' | 'engineering' | 'general',
+    CountryCredentialSpec
+  >;
+  integrationCurve: {
+    initialPenaltyRatio: number;
+    yearsToConverge: number;
+    languageWeight: number;
+  };
+  events: CountryAbroadEventDef[];
+  prosFa: string[];
+  consFa: string[];
+  realityNotesFa: string[];
+}
+
+export interface CountryRuntimeMacroState {
+  countryId: string;
+  cpiIndex: number;
+  lastInflationRate: number;
+  minWageMonthlyLocal: number;
+  housingIndex: number;
+  rentIndex: number;
+  unemploymentRate: number;
+  history: { year: number; inflationRate: number; minWageMonthlyLocal: number; housingIndex: number }[];
+}
+
+export interface CountryCostDefinition {
+  countryId: string;
+  currencyCode: CurrencyCode;
+  monthlyBasketLocal: {
+    rentSingle: SourcedNumber;
+    foodSingle: SourcedNumber;
+    utilitiesTransport: SourcedNumber;
+    healthcareMisc: SourcedNumber;
+  };
+  housingNorms: {
+    depositMonths: number;
+    mortgageAllowed: boolean;
+    mortgageDownPaymentRatio: number;
+    mortgageAnnualRate: number;
+    mortgageMaxYears: number;
+    defaultBuySqm: number;
+  };
+  shortTrip: {
+    visaType: 'visa_free' | 'e_visa' | 'embassy_visa';
+    visaLabelFa: string;
+    visaFeeUsd: number;
+    visaApprovalBase: number;
+    durationDays: number;
+    flightRoundTripUsd: number;
+    tiers: Record<
+      'budget' | 'standard' | 'comfort',
+      { labelFa: string; dailyCostLocal: number; happinessBoost: number; mentalBoost: number }
+    >;
+    highlightsFa: string[];
+  };
+}
+
+export type MigrationPathType = 'study' | 'work' | 'skilled' | 'investment' | 'family';
+
+export interface MigrationPathSpec {
+  id: MigrationPathType;
+  titleFa: string;
+  summaryFa: string;
+  minAge: number;
+  minEducation: EducationLevel;
+  requiredLanguageLevel: number;
+  proofOfFundsLocal: number;
+  applicationFeeLocal: number;
+  baseSuccessRate: number;
+  expectedProcessingTurns: number;
+  notesFa: string;
+}
+
+export interface CountryPathsDefinition {
+  countryId: string;
+  currencyCode: CurrencyCode;
+  statusLadder: {
+    renewableAfterYears: number;
+    permanentAfterYears: number;
+    citizenshipAfterYears: number;
+    minLanguageForPermanent: number;
+    minLanguageForCitizenship: number;
+  };
+  pathways: MigrationPathSpec[];
+}
+
+export type CountryApplicationStatus =
+  | 'unexplored'
+  | 'researching'
+  | 'in_progress'
+  | 'approved'
+  | 'rejected_retryable';
+
+export type PassportStatusStage =
+  | 'none'
+  | 'temporary'
+  | 'renewable'
+  | 'permanent'
+  | 'citizenship';
+
+export interface CountryApplicationProgress {
+  countryId: string;
+  status: CountryApplicationStatus;
+  selectedPathId: MigrationPathType;
+  currentStepIndex: number; // 0..5 for 6 steps
+  stepsCompleted: boolean[];
+  proofOfFundsVerified: boolean;
+  lastAttemptYear?: number;
+  cooldownUntilYear?: number;
+  notesFa?: string;
+}
+
+export interface TravelHistoryEntry {
+  id: string;
+  countryId: string;
+  countryNameFa: string;
+  jalaliYear: number;
+  tier: 'budget' | 'standard' | 'comfort';
+  totalCostDisplayFa: string;
+  memoryFa: string;
+}
+
+export interface EmigrationState {
+  shortlistedCountryIds: string[];
+  activeApplications: Record<string, CountryApplicationProgress>;
+  languageLevels: Record<CurrencyCode | string, number>; // 1..6 (مبتدی ۱ .. پیشرفته ۲)
+  residency: {
+    isAbroad: boolean;
+    countryId: string;
+    regionId?: string;
+    arrivedYear?: number;
+    yearsAbroad: number;
+    statusStage: PassportStatusStage;
+    permitType?: MigrationPathType;
+    jobLossGraceMonthsRemaining?: number;
+    abroadWorkMonthsAccumulated: number;
+    checklistDoneIds: string[];
+    credentialRelicensedTracks: string[];
+    annualRemittanceCount: number;
+    lastArrivalWelcomeSeenYear?: number;
+    forcedReturnNoticeFa?: string;
+  };
+  travelHistory: TravelHistoryEntry[];
+  lastReportCard?: {
+    year: number;
+    netIncomeLocal: number;
+    livingCostsLocal: number;
+    taxesPaidLocal: number;
+    remittanceLocal: number;
+    savingsDeltaLocal: number;
+    currencyCode: CurrencyCode;
+  };
+}
+
+export interface PlayerActivityRuntimeState {
+  turn: number;
+  quotaUsedThisTurn: number;
+  maxQuotaPerTurn: number;
+  favoriteIds: string[];
+  recentIds: string[];
+  seenOutcomeMap: Record<string, number[]>;
+  annualUndoSnapshot?: {
+    activityId: string;
+    turn: number;
+    statsBefore: PlayerStats;
+    moneyTomanBefore: number;
+    flagsBefore: Record<string, boolean | number | string>;
+    timelineLengthBefore: number;
+    quotaUsedBefore: number;
+    recentIdsBefore: string[];
+    seenOutcomeIndicesBefore?: number[];
+  };
+}
+
 
 
 

@@ -1,5 +1,6 @@
 import type { GameDataset } from '../data/registry';
 import { ensureAdoptionState, stepAdoptionYear } from './adoption';
+import { stepCountriesMacroYear } from './countries';
 import {
   calculateJobAnnualIncomeBreakdown,
   getAnnualLivingExpenseToman,
@@ -7,8 +8,18 @@ import {
   hasReachedFinancialFreedomMilestone,
   stepMacroYear,
 } from './economy';
+import { ensureEmigrationState, stepAbroadYearEconomyAndResidency } from './emigration';
+import { ensureFxState, stepFxRates } from './fx';
 import { toPersianDigits } from './jalali';
 import { ensureJobCompassState, resolveWaitlistedJobsOnYearAdvance } from './jobCompass';
+import {
+  adoptExternalMoneyTomanOverride,
+  ensureLedgerState,
+  reconcileLegacyMoneyDelta,
+  recordLedgerYearSnapshot,
+  resolvePendingTransfersOnYearAdvance,
+} from './ledger';
+import { ensureActivityRuntimeState } from './recommendation';
 import { SeededRNG } from './rng';
 import {
   applyHiddenStatDelta,
@@ -85,6 +96,67 @@ function cloneState(state: GameState): GameState {
         }
       : undefined,
     jobCompass: state.jobCompass ? ensureJobCompassState(state) : undefined,
+    fxState: state.fxState
+      ? {
+          usdRates: { ...state.fxState.usdRates },
+          fairUsdRates: { ...state.fxState.fairUsdRates },
+          cumulativePriceIndices: { ...state.fxState.cumulativePriceIndices },
+          history: state.fxState.history.map((h) => ({
+            ...h,
+            usdRates: { ...h.usdRates },
+            fairUsdRates: { ...h.fairUsdRates },
+          })),
+        }
+      : undefined,
+    ledger: state.ledger
+      ? {
+          ...state.ledger,
+          wallets: state.ledger.wallets.map((w) => ({ ...w })),
+          conversions: state.ledger.conversions.map((c) => ({ ...c })),
+          pendingTransfers: state.ledger.pendingTransfers.map((t) => ({ ...t })),
+          yearSnapshots: state.ledger.yearSnapshots.map((s) => ({ ...s })),
+        }
+      : undefined,
+    emigration: state.emigration
+      ? {
+          ...state.emigration,
+          shortlistedCountryIds: [...state.emigration.shortlistedCountryIds],
+          activeApplications: Object.fromEntries(
+            Object.entries(state.emigration.activeApplications).map(([k, v]) => [
+              k,
+              { ...v, stepsCompleted: [...v.stepsCompleted] },
+            ]),
+          ),
+          languageLevels: { ...state.emigration.languageLevels },
+          residency: {
+            ...state.emigration.residency,
+            checklistDoneIds: [...state.emigration.residency.checklistDoneIds],
+            credentialRelicensedTracks: [...state.emigration.residency.credentialRelicensedTracks],
+          },
+          travelHistory: state.emigration.travelHistory.map((t) => ({ ...t })),
+          lastReportCard: state.emigration.lastReportCard
+            ? { ...state.emigration.lastReportCard }
+            : undefined,
+        }
+      : undefined,
+    countryMacros: state.countryMacros
+      ? Object.fromEntries(
+          Object.entries(state.countryMacros).map(([k, v]) => [
+            k,
+            { ...v, history: v.history.map((h) => ({ ...h })) },
+          ]),
+        )
+      : undefined,
+    activityState: state.activityState
+      ? {
+          ...state.activityState,
+          favoriteIds: [...state.activityState.favoriteIds],
+          recentIds: [...state.activityState.recentIds],
+          seenOutcomeMap: Object.fromEntries(
+            Object.entries(state.activityState.seenOutcomeMap).map(([k, v]) => [k, [...v]]),
+          ),
+        }
+      : undefined,
   };
 }
 
@@ -204,14 +276,91 @@ export function advanceYear(save: SaveGame, dataset: GameDataset): SaveGame {
   nextState.turn += 1;
   nextState.player.age += 1;
   nextState.currentJalaliYear += 1;
+  nextState.activityState = ensureActivityRuntimeState(nextState);
   const age = nextState.player.age;
 
-  // 2. Step Macro Economy (Historical 1340-1405 or Scenario-based > 1405)
+  if (nextState.ledger) {
+    adoptExternalMoneyTomanOverride(nextState, dataset);
+  }
+  const moneyBeforeTick = nextState.player.moneyToman;
+
+  // 2. Step Macro Economy (Historical 1340-1405 or Scenario-based > 1405) + Multi-Currency FX
   const macroStep = stepMacroYear(nextState, nextState.currentJalaliYear, rng, dataset);
   nextState.inflationMultiplier = macroStep.nextMultiplier;
   nextState.lastInflationRate = macroStep.rate;
   for (const [k, v] of Object.entries(macroStep.macroFlags)) {
     nextState.flags[k] = v;
+  }
+
+  const prevFx = ensureFxState(nextState, dataset);
+  const fxRng = new SeededRNG(`${nextState.worldSeed ?? save.seed}:fx:${nextState.currentJalaliYear}`);
+  const histNow =
+    dataset.economy.historicalSeries.find((h) => h.year === nextState.currentJalaliYear) ??
+    dataset.economy.historicalSeries[dataset.economy.historicalSeries.length - 1];
+  const anchorYear = dataset.economy.baseline1405.meta.anchorYear;
+  const globalInf =
+    nextState.currentJalaliYear <= anchorYear
+      ? histNow.globalInflation.value
+      : 0.025 + fxRng.float(-0.008, 0.012);
+  const goldUsd =
+    nextState.currentJalaliYear <= anchorYear
+      ? histNow.globalGoldUSD.value
+      : (prevFx.history[prevFx.history.length - 1]?.goldUsdPerOz ?? 3850) *
+        (1 + globalInf + fxRng.float(-0.04, 0.06));
+  const oilShockRatio = fxRng.float(-0.18, 0.18);
+  const globalGrowthShockRatio = fxRng.float(-0.03, 0.03);
+
+  nextState.countryMacros = stepCountriesMacroYear({
+    state: nextState,
+    nextYear: nextState.currentJalaliYear,
+    fxRng,
+    oilShockRatio,
+    globalGrowthShockRatio,
+    dataset,
+  });
+
+  const countryInflationsByCurrency = {
+    TRY:
+      nextState.countryMacros.turkey?.lastInflationRate ??
+      dataset.countriesMacro.find((c) => c.id === 'turkey')?.macro.inflationRate.value ??
+      0.298,
+    EUR:
+      nextState.countryMacros.germany?.lastInflationRate ??
+      dataset.countriesMacro.find((c) => c.id === 'germany')?.macro.inflationRate.value ??
+      0.023,
+    GBP:
+      nextState.countryMacros.uk?.lastInflationRate ??
+      dataset.countriesMacro.find((c) => c.id === 'uk')?.macro.inflationRate.value ??
+      0.025,
+    CAD:
+      nextState.countryMacros.canada?.lastInflationRate ??
+      dataset.countriesMacro.find((c) => c.id === 'canada')?.macro.inflationRate.value ??
+      0.022,
+    AED:
+      nextState.countryMacros.uae?.lastInflationRate ??
+      dataset.countriesMacro.find((c) => c.id === 'uae')?.macro.inflationRate.value ??
+      0.028,
+  };
+  nextState.fxState = stepFxRates({
+    prevFx,
+    nextYear: nextState.currentJalaliYear,
+    iranInflationRate: macroStep.rate,
+    countryInflationsByCurrency,
+    globalInflationRate: globalInf,
+    oilShockRatio,
+    globalGrowthShockRatio,
+    goldUsdPerOz: Number(goldUsd.toFixed(2)),
+    iranMacroUsdOverride:
+      nextState.currentJalaliYear <= anchorYear ? macroStep.macroFlags.macro_usd : undefined,
+    rng: fxRng,
+    dataset,
+  });
+  if (nextState.currentJalaliYear > anchorYear) {
+    nextState.flags['macro_usd'] = Math.round(nextState.fxState.usdRates.IRT);
+  }
+  nextState.ledger = ensureLedgerState(nextState, dataset);
+  if (nextState.emigration) {
+    nextState.emigration = ensureEmigrationState(nextState);
   }
 
   // 3. Age NPCs, check natural mortality, and process estate inheritance
@@ -388,145 +537,170 @@ export function advanceYear(save: SaveGame, dataset: GameDataset): SaveGame {
     });
   }
 
-  // 5. Real-data economy tick (net job income & city-adjusted living expenses)
-  const annualExpense = getAnnualLivingExpenseToman(nextState, dataset);
-  if (nextState.player.job) {
-    const specialRef = isSpecialCareerJobId(nextState.player.job.jobId);
-    const specialDef = specialRef
-      ? dataset.specialCareers.find((c) => c.id === specialRef.careerId)
-      : undefined;
-    const jobDef = specialDef
-      ? undefined
-      : dataset.jobs.find((j) => j.id === nextState.player.job!.jobId);
+  // 5. Real-data economy tick (Iran vs Abroad Multi-Currency Residency)
+  if (nextState.player.countryId !== 'iran') {
+    stepAbroadYearEconomyAndResidency({
+      state: nextState,
+      nextYear: nextState.currentJalaliYear,
+      rng,
+      dataset,
+    });
+  } else {
+    const annualExpense = getAnnualLivingExpenseToman(nextState, dataset);
+    if (nextState.player.job) {
+      const specialRef = isSpecialCareerJobId(nextState.player.job.jobId);
+      const specialDef = specialRef
+        ? dataset.specialCareers.find((c) => c.id === specialRef.careerId)
+        : undefined;
+      const jobDef = specialDef
+        ? undefined
+        : dataset.jobs.find((j) => j.id === nextState.player.job!.jobId);
 
-    let netSalary = nextState.player.job.annualSalaryToman;
-    if (specialDef && specialRef) {
-      const skillState = getTalentSkillState(nextState, specialDef.requiredTalentId);
-      const breakdown = calculateSpecialCareerAnnualIncomeBreakdown({
-        career: specialDef,
-        stage: Math.max(1, skillState.careerStage || nextState.player.job.level),
-        state: nextState,
-        dataset,
-        rng,
-        allowTail: true,
-        isFallback: specialRef.isFallback,
-      });
-      netSalary = breakdown.netAnnual;
-      nextState.flags['last_job_gross'] = breakdown.grossAnnual;
-      nextState.flags['last_job_net'] = breakdown.netAnnual;
-      nextState.flags['last_job_deductions'] = breakdown.bimeh + breakdown.incomeTax;
-      if (breakdown.tailTriggered) {
-        nextState.timeline.push({
-          id: `turn_${nextState.turn}_job_tail`,
-          age,
-          jalaliYear: nextState.currentJalaliYear,
-          title: breakdown.tailTriggered.titleFa,
-          text: breakdown.tailTriggered.resultTextFa,
-          type: 'milestone',
-          statChanges: { happiness: 6, fame: 4 },
+      let netSalary = nextState.player.job.annualSalaryToman;
+      if (specialDef && specialRef) {
+        const skillState = getTalentSkillState(nextState, specialDef.requiredTalentId);
+        const breakdown = calculateSpecialCareerAnnualIncomeBreakdown({
+          career: specialDef,
+          stage: Math.max(1, skillState.careerStage || nextState.player.job.level),
+          state: nextState,
+          dataset,
+          rng,
+          allowTail: true,
+          isFallback: specialRef.isFallback,
         });
-        nextState.player.stats = applyStatDelta(nextState.player.stats, {
-          happiness: 6,
-          fame: 4,
+        netSalary = breakdown.netAnnual;
+        nextState.flags['last_job_gross'] = breakdown.grossAnnual;
+        nextState.flags['last_job_net'] = breakdown.netAnnual;
+        nextState.flags['last_job_deductions'] = breakdown.bimeh + breakdown.incomeTax;
+        if (breakdown.tailTriggered) {
+          nextState.timeline.push({
+            id: `turn_${nextState.turn}_job_tail`,
+            age,
+            jalaliYear: nextState.currentJalaliYear,
+            title: breakdown.tailTriggered.titleFa,
+            text: breakdown.tailTriggered.resultTextFa,
+            type: 'milestone',
+            statChanges: { happiness: 6, fame: 4 },
+          });
+          nextState.player.stats = applyStatDelta(nextState.player.stats, {
+            happiness: 6,
+            fame: 4,
+          });
+        }
+      } else if (jobDef) {
+        const aptitudeEdge = getOrdinaryJobAptitudeBonus(jobDef.track, nextState);
+        const maxLvl = Math.max(1, jobDef.ladder.length);
+        const basePos =
+          maxLvl > 1
+            ? 0.25 + ((Math.min(maxLvl, nextState.player.job.level) - 1) / (maxLvl - 1)) * 0.5
+            : 0.45;
+        const breakdown = calculateJobAnnualIncomeBreakdown({
+          job: jobDef,
+          level: nextState.player.job.level,
+          state: nextState,
+          dataset,
+          rng,
+          allowTail: true,
+          positionOverride01: aptitudeEdge > 0 ? Math.min(0.95, basePos + aptitudeEdge) : undefined,
         });
+        netSalary = breakdown.netAnnual;
+        nextState.flags['last_job_gross'] = breakdown.grossAnnual;
+        nextState.flags['last_job_net'] = breakdown.netAnnual;
+        nextState.flags['last_job_deductions'] =
+          breakdown.commission + breakdown.runningCosts + breakdown.bimeh + breakdown.incomeTax;
+        if (breakdown.tailTriggered) {
+          nextState.timeline.push({
+            id: `turn_${nextState.turn}_job_tail`,
+            age,
+            jalaliYear: nextState.currentJalaliYear,
+            title: breakdown.tailTriggered.titleFa,
+            text: breakdown.tailTriggered.resultTextFa,
+            type: 'milestone',
+            statChanges: { happiness: 6 },
+          });
+          nextState.player.stats = applyStatDelta(nextState.player.stats, { happiness: 6 });
+        }
+        const prevTrackExp =
+          typeof nextState.flags[`track_exp_${jobDef.track}`] === 'number'
+            ? (nextState.flags[`track_exp_${jobDef.track}`] as number)
+            : 0;
+        nextState.flags[`track_exp_${jobDef.track}`] = prevTrackExp + 1;
       }
-    } else if (jobDef) {
-      const aptitudeEdge = getOrdinaryJobAptitudeBonus(jobDef.track, nextState);
-      const maxLvl = Math.max(1, jobDef.ladder.length);
-      const basePos =
-        maxLvl > 1
-          ? 0.25 + ((Math.min(maxLvl, nextState.player.job.level) - 1) / (maxLvl - 1)) * 0.5
-          : 0.45;
-      const breakdown = calculateJobAnnualIncomeBreakdown({
-        job: jobDef,
-        level: nextState.player.job.level,
-        state: nextState,
-        dataset,
-        rng,
-        allowTail: true,
-        positionOverride01: aptitudeEdge > 0 ? Math.min(0.95, basePos + aptitudeEdge) : undefined,
-      });
-      netSalary = breakdown.netAnnual;
-      nextState.flags['last_job_gross'] = breakdown.grossAnnual;
-      nextState.flags['last_job_net'] = breakdown.netAnnual;
-      nextState.flags['last_job_deductions'] =
-        breakdown.commission + breakdown.runningCosts + breakdown.bimeh + breakdown.incomeTax;
-      if (breakdown.tailTriggered) {
-        nextState.timeline.push({
-          id: `turn_${nextState.turn}_job_tail`,
-          age,
-          jalaliYear: nextState.currentJalaliYear,
-          title: breakdown.tailTriggered.titleFa,
-          text: breakdown.tailTriggered.resultTextFa,
-          type: 'milestone',
-          statChanges: { happiness: 6 },
-        });
-        nextState.player.stats = applyStatDelta(nextState.player.stats, { happiness: 6 });
+      const prevRoleYears =
+        typeof nextState.flags['job_years_in_role'] === 'number'
+          ? (nextState.flags['job_years_in_role'] as number)
+          : nextState.player.job.yearsInJob;
+      nextState.flags['job_years_in_role'] = prevRoleYears + 1;
+      nextState.player.job.annualSalaryToman = netSalary;
+      nextState.player.job.yearsInJob += 1;
+      nextState.player.moneyToman = Math.round(nextState.player.moneyToman + netSalary - annualExpense);
+
+      // Rare retiring-employer buyout offer (ONLY for loyal tenured employees; never automatic ownership)
+      if (
+        jobDef &&
+        jobDef.ownershipPath.allowed &&
+        jobDef.ownershipPath.employerOfferEligible &&
+        jobDef.ownershipPath.businessTypeId &&
+        !nextState.ownedBusiness &&
+        !nextState.flags['pending_employer_offer'] &&
+        !nextState.flags[`employer_offer_seen_${jobDef.id}`] &&
+        nextState.player.age >= 28 &&
+        nextState.player.job.yearsInJob >= 10 &&
+        nextState.player.hiddenStats.conscientiousness >= 50 &&
+        rng.chance(0.022)
+      ) {
+        const bizDef = dataset.businesses.businesses.find(
+          (b) => b.id === jobDef.ownershipPath.businessTypeId,
+        );
+        if (bizDef) {
+          const minWage = getMinWageMonthlyForState(nextState, dataset);
+          const fullPrice = Math.round(minWage * (jobDef.ownershipPath.capitalMinWageMultiple.min + 12));
+          const discountedPrice = Math.round(fullPrice * 0.65);
+          nextState.flags[`employer_offer_seen_${jobDef.id}`] = true;
+          nextState.flags['pending_employer_offer'] = JSON.stringify({
+            businessTypeId: bizDef.id,
+            businessNameFa: `${bizDef.titleFa} (واگذاری کارفرما)`,
+            jobId: jobDef.id,
+            discountedPriceToman: discountedPrice,
+            fullPriceToman: fullPrice,
+            offeredYear: nextState.currentJalaliYear,
+          });
+          nextState.timeline.push({
+            id: `turn_${nextState.turn}_employer_offer`,
+            age,
+            jalaliYear: nextState.currentJalaliYear,
+            title: 'پیشنهاد واگذاری از طرف کارفرمای بازنشسته',
+            text: `صاحب کار قدیمی‌ات بعد از سال‌ها وفاداری و کار با تو، پیشنهاد خرید با تخفیفِ «${bizDef.titleFa}» را مطرح کرد. در بخش شغل می‌توانی بررسی کنی و تصمیم بگیری.`,
+            type: 'milestone',
+          });
+        }
       }
-      const prevTrackExp =
-        typeof nextState.flags[`track_exp_${jobDef.track}`] === 'number'
-          ? (nextState.flags[`track_exp_${jobDef.track}`] as number)
-          : 0;
-      nextState.flags[`track_exp_${jobDef.track}`] = prevTrackExp + 1;
+    } else if (annualExpense > 0) {
+      nextState.player.moneyToman = Math.round(nextState.player.moneyToman - annualExpense);
     }
-    const prevRoleYears =
-      typeof nextState.flags['job_years_in_role'] === 'number'
-        ? (nextState.flags['job_years_in_role'] as number)
-        : nextState.player.job.yearsInJob;
-    nextState.flags['job_years_in_role'] = prevRoleYears + 1;
-    nextState.player.job.annualSalaryToman = netSalary;
-    nextState.player.job.yearsInJob += 1;
-    nextState.player.moneyToman = Math.round(nextState.player.moneyToman + netSalary - annualExpense);
 
-    // Rare retiring-employer buyout offer (ONLY for loyal tenured employees; never automatic ownership)
-    if (
-      jobDef &&
-      jobDef.ownershipPath.allowed &&
-      jobDef.ownershipPath.employerOfferEligible &&
-      jobDef.ownershipPath.businessTypeId &&
-      !nextState.ownedBusiness &&
-      !nextState.flags['pending_employer_offer'] &&
-      !nextState.flags[`employer_offer_seen_${jobDef.id}`] &&
-      nextState.player.age >= 28 &&
-      nextState.player.job.yearsInJob >= 10 &&
-      nextState.player.hiddenStats.conscientiousness >= 50 &&
-      rng.chance(0.022)
-    ) {
-      const bizDef = dataset.businesses.businesses.find(
-        (b) => b.id === jobDef.ownershipPath.businessTypeId,
+    if (nextState.player.moneyToman < 0) {
+      nextState.player.debtToman = Math.round(
+        nextState.player.debtToman + Math.abs(nextState.player.moneyToman),
       );
-      if (bizDef) {
-        const minWage = getMinWageMonthlyForState(nextState, dataset);
-        const fullPrice = Math.round(minWage * (jobDef.ownershipPath.capitalMinWageMultiple.min + 12));
-        const discountedPrice = Math.round(fullPrice * 0.65);
-        nextState.flags[`employer_offer_seen_${jobDef.id}`] = true;
-        nextState.flags['pending_employer_offer'] = JSON.stringify({
-          businessTypeId: bizDef.id,
-          businessNameFa: `${bizDef.titleFa} (واگذاری کارفرما)`,
-          jobId: jobDef.id,
-          discountedPriceToman: discountedPrice,
-          fullPriceToman: fullPrice,
-          offeredYear: nextState.currentJalaliYear,
-        });
-        nextState.timeline.push({
-          id: `turn_${nextState.turn}_employer_offer`,
-          age,
-          jalaliYear: nextState.currentJalaliYear,
-          title: 'پیشنهاد واگذاری از طرف کارفرمای بازنشسته',
-          text: `صاحب کار قدیمی‌ات بعد از سال‌ها وفاداری و کار با تو، پیشنهاد خرید با تخفیفِ «${bizDef.titleFa}» را مطرح کرد. در بخش شغل می‌توانی بررسی کنی و تصمیم بگیری.`,
-          type: 'milestone',
-        });
-      }
+      nextState.player.moneyToman = 0;
     }
-  } else if (annualExpense > 0) {
-    nextState.player.moneyToman = Math.round(nextState.player.moneyToman - annualExpense);
+
+    // Reconcile IRT wallet mirror
+    reconcileLegacyMoneyDelta(nextState, moneyBeforeTick, dataset);
   }
 
-  if (nextState.player.moneyToman < 0) {
-    nextState.player.debtToman = Math.round(
-      nextState.player.debtToman + Math.abs(nextState.player.moneyToman),
-    );
-    nextState.player.moneyToman = 0;
+  // Settle queued cross-border transfers deterministically using fxRng
+  const transferNotes = resolvePendingTransfersOnYearAdvance(nextState, fxRng, dataset);
+  for (const tNote of transferNotes) {
+    nextState.timeline.push({
+      id: `turn_${nextState.turn}_transfer_${nextState.timeline.length}`,
+      age,
+      jalaliYear: nextState.currentJalaliYear,
+      title: 'وضعیت حواله ارزی',
+      text: tNote,
+      type: 'life',
+    });
   }
 
   // 5b. Adoption supervision, queue progression, and welfare center milestones
@@ -544,6 +718,9 @@ export function advanceYear(save: SaveGame, dataset: GameDataset): SaveGame {
       type: note.includes('تأیید شد') ? 'milestone' : 'life',
     });
   }
+
+  // Record annual ledger snapshot for real performance & currency benchmarks
+  recordLedgerYearSnapshot(nextState, dataset);
 
   // 6. Achievement checks (using real purchasing power for financial freedom!)
   if (age >= 100 && !nextState.unlockedAchievements.includes('centenarian')) {
@@ -634,6 +811,7 @@ export function applyEventChoice(
     );
   }
   if (typeof effects.moneyToman === 'number' && Number.isFinite(effects.moneyToman)) {
+    const moneyBeforeEvent = nextState.player.moneyToman;
     const adjustedMoney = Math.round(effects.moneyToman * nextState.inflationMultiplier);
     nextState.player.moneyToman = Math.round(nextState.player.moneyToman + adjustedMoney);
     if (nextState.player.moneyToman < 0) {
@@ -641,6 +819,9 @@ export function applyEventChoice(
         nextState.player.debtToman + Math.abs(nextState.player.moneyToman),
       );
       nextState.player.moneyToman = 0;
+    }
+    if (nextState.ledger) {
+      reconcileLegacyMoneyDelta(nextState, moneyBeforeEvent);
     }
   }
   if (effects.setFlags) {

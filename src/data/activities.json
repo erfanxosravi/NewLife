@@ -9,17 +9,15 @@
     "effectHintFa": "سلامت +۴، شادی +۲",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["جسمی", "رایگان", "روزمره"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 85,
-        "resultTextFa": "سه روز در هفته پیاده‌روی و نرمش کردی و نفس و انرژی بدنت حسابی بالا رفت.",
-        "stats": { "health": 4, "happiness": 2, "mentalHealth": 2 }
-      },
-      {
-        "weight": 15,
-        "resultTextFa": "چند جلسه اول کمی مچ پایت گرفت، اما با گرم‌کردن درست دوباره روال را پیدا کردی.",
-        "stats": { "health": 1, "happiness": -1 }
-      }
+      { "id": "re_1", "weight": 40, "resultTextFa": "سه روز در هفته پیاده‌روی و نرمش کردی و نفس و انرژی بدنت حسابی بالا رفت.", "stats": { "health": 4, "happiness": 2, "mentalHealth": 2 }, "memoryTextFa": "با دویدن صبحگاهی سرحال‌تر شدی." },
+      { "id": "re_2", "weight": 20, "resultTextFa": "در پارک محله هم‌مسیرهای تازه‌ای پیدا کردی و تمرین گروهی انگیزه‌ات را دوچندان کرد.", "stats": { "health": 4, "happiness": 3, "fame": 1 } },
+      { "id": "re_3", "weight": 15, "resultTextFa": "چند جلسه اول کمی مچ پایت گرفت، اما با گرم‌کردن درست دوباره روال را پیدا کردی.", "stats": { "health": 2, "happiness": -1 } },
+      { "id": "re_4", "weight": 15, "resultTextFa": "مسافت دویدن هفتگی‌ات را ثبت کردی و رکورد شخصی تازه‌ای زدی.", "stats": { "health": 5, "mentalHealth": 3 } },
+      { "id": "re_5", "weight": 10, "resultTextFa": "روزهای بارانی هم تمرین کششی در خانه را رها نکردی و بدنت انعطاف بیشتری گرفت.", "stats": { "health": 3, "looks": 1, "mentalHealth": 2 } }
     ]
   },
   {
@@ -32,12 +30,14 @@
     "effectHintFa": "سلامت +۴، ظاهر +۲",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["تغذیه", "تناسب"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "شیرینی و فست‌فود را کم کردی و به جایش میوه و پروتئین بیشتر خوردی؛ سبک‌تر و سرحال‌تری.",
-        "stats": { "health": 4, "looks": 2, "happiness": -1 }
-      }
+      { "id": "hd_1", "weight": 35, "resultTextFa": "شیرینی و فست‌فود را کم کردی و به جایش میوه و پروتئین بیشتر خوردی؛ سبک‌تر و سرحال‌تری.", "stats": { "health": 4, "looks": 2, "happiness": 1 } },
+      { "id": "hd_2", "weight": 25, "resultTextFa": "آشپزی خانگی و وعده‌های سالم باعث شد خواب شبانه‌ات منظم‌تر شود.", "stats": { "health": 4, "mentalHealth": 3 } },
+      { "id": "hd_3", "weight": 15, "resultTextFa": "هفته‌های اول هوس غذاهای چرب اذیتت کرد اما کم‌کم ذائقه‌ات تغییر کرد.", "stats": { "health": 3, "looks": 2, "happiness": -1 } },
+      { "id": "hd_4", "weight": 15, "resultTextFa": "مشاور تغذیه برنامه‌ای دقیق نوشت و سطح انرژی روزانه‌ات به‌طور محسوس بالا رفت.", "stats": { "health": 5, "looks": 3, "intelligence": 1 } },
+      { "id": "hd_5", "weight": 10, "resultTextFa": "نوشیدن آب کافی و سبزیجات تازه پوست و شادابی‌ات را بهتر کرد.", "stats": { "health": 3, "looks": 3, "happiness": 2 } }
     ]
   },
   {
@@ -50,17 +50,14 @@
     "effectHintFa": "سلامت +۵، پیشگیری",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["پزشکی", "پیشگیری"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 80,
-        "resultTextFa": "آزمایش‌های خون و چکاپ سالانه خیالت را راحت کرد و کمبود ویتامینت با مکمل برطرف شد.",
-        "stats": { "health": 5, "mentalHealth": 3 }
-      },
-      {
-        "weight": 20,
-        "resultTextFa": "پزشک تذکر داد استرس و کم‌خوابی را جدی بگیری و کمی بیشتر استراحت کنی.",
-        "stats": { "health": 3, "mentalHealth": 1 }
-      }
+      { "id": "mc_1", "weight": 35, "resultTextFa": "آزمایش‌های خون و چکاپ سالانه خیالت را راحت کرد و کمبود ویتامینت با مکمل برطرف شد.", "stats": { "health": 5, "mentalHealth": 3 } },
+      { "id": "mc_2", "weight": 20, "resultTextFa": "پزشک تذکر داد استرس و کم‌خوابی را جدی بگیری و کمی بیشتر استراحت کنی.", "stats": { "health": 3, "mentalHealth": 1 } },
+      { "id": "mc_3", "weight": 20, "resultTextFa": "نتایج قلب و فشار خون عالی بود و انگیزه گرفتی سبک زندگی سالم را ادامه بدهی.", "stats": { "health": 5, "happiness": 3 } },
+      { "id": "mc_4", "weight": 15, "resultTextFa": "مورد کوچکی در آزمایش به موقع شناسایی شد و پیش از دردسر درمان گردید.", "stats": { "health": 6, "mentalHealth": 2 } },
+      { "id": "mc_5", "weight": 10, "resultTextFa": "معطلی مطب کمی خسته‌کننده بود اما پرونده سلامتی‌ات به‌روز شد.", "stats": { "health": 4, "happiness": -1 } }
     ]
   },
   {
@@ -73,17 +70,14 @@
     "effectHintFa": "درمان بیماری و +۸ سلامت",
     "riskLabelFa": "متوسط",
     "contentTag": "mild",
+    "tags": ["درمان", "اورژانسی"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 90,
-        "resultTextFa": "درمان تخصصی به موقع انجام شد و بخش زیادی از ضعف جسمی‌ات برطرف شد.",
-        "stats": { "health": 8, "happiness": -2 }
-      },
-      {
-        "weight": 10,
-        "resultTextFa": "روند درمان طولانی و خسته‌کننده بود، اما وضعیتت پایدار ماند.",
-        "stats": { "health": 4, "mentalHealth": -3 }
-      }
+      { "id": "hv_1", "weight": 40, "resultTextFa": "درمان تخصصی به موقع انجام شد و بخش زیادی از ضعف جسمی‌ات برطرف شد.", "stats": { "health": 9, "happiness": 1 }, "memoryTextFa": "با مراقبت درمانی به موقع توان بدنت برگشت." },
+      { "id": "hv_2", "weight": 20, "resultTextFa": "پزشک معالج داروها را تنظیم کرد و دوره نقاهت را در آرامش گذراندی.", "stats": { "health": 7, "mentalHealth": 2 } },
+      { "id": "hv_3", "weight": 15, "resultTextFa": "روند درمان طولانی و خسته‌کننده بود، اما وضعیتت پایدار ماند.", "stats": { "health": 6, "mentalHealth": -2 } },
+      { "id": "hv_4", "weight": 15, "resultTextFa": "فیزیوتراپی و مراقبت پرستاری کمک کرد خیلی سریع‌تر به روال عادی برگردی.", "stats": { "health": 8, "happiness": 2 } },
+      { "id": "hv_5", "weight": 10, "resultTextFa": "بخشی از هزینه با پوشش بیمه جبران شد و حالت رو به بهبود رفت.", "stats": { "health": 7, "mentalHealth": 3 }, "moneyToman": 3000000 }
     ]
   },
   {
@@ -93,15 +87,17 @@
     "costToman": 8000000,
     "cooldownYears": 1,
     "minAge": 14,
-    "effectHintFa": "سلامت روان +۷",
+    "effectHintFa": "سلامت روان +۷، شادی +۳",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["روان", "آرامش"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "گفتگو با مشاور کمک کرد گره‌های ذهنی‌ات را بشناسی و فشار روانی‌ات خیلی سبک‌تر شود.",
-        "stats": { "mentalHealth": 7, "happiness": 3 }
-      }
+      { "id": "th_1", "weight": 35, "resultTextFa": "گفتگو با مشاور کمک کرد گره‌های ذهنی‌ات را بشناسی و فشار روانی‌ات خیلی سبک‌تر شود.", "stats": { "mentalHealth": 7, "happiness": 3 } },
+      { "id": "th_2", "weight": 25, "resultTextFa": "تکنیک‌های مدیریت اضطراب را تمرین کردی و واکنش‌هایت آرام‌تر و سنجیده‌تر شد.", "stats": { "mentalHealth": 6, "intelligence": 2 } },
+      { "id": "th_3", "weight": 15, "resultTextFa": "یاد گرفتی مرزهای سالم‌تری در روابطت بگذاری و کمتر فرسوده شوی.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "th_4", "weight": 15, "resultTextFa": "روبه‌رو شدن با خاطره‌های قدیمی کمی سخت بود، اما بعدش حس رهایی داشتی.", "stats": { "mentalHealth": 5, "happiness": 1 } },
+      { "id": "th_5", "weight": 10, "resultTextFa": "تمرین ذهن‌آگاهی کیفیت تمرکز و خواب شبانه‌ات را بهتر کرد.", "stats": { "mentalHealth": 6, "health": 2 } }
     ]
   },
   {
@@ -114,17 +110,55 @@
     "effectHintFa": "سلامت روان +۴، سلامت +۳",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["خواب", "رایگان"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 75,
-        "resultTextFa": "گوشی را نیم ساعت قبل خواب کنار گذاشتی و صبح‌ها با انرژی بیدار شدی.",
-        "stats": { "health": 3, "mentalHealth": 4, "intelligence": 1 }
-      },
-      {
-        "weight": 25,
-        "resultTextFa": "چند شب اول سخت بود، اما بالاخره ساعت بدنت تنظیم شد.",
-        "stats": { "health": 2, "mentalHealth": 2 }
-      }
+      { "id": "sh_1", "weight": 35, "resultTextFa": "گوشی را نیم ساعت قبل خواب کنار گذاشتی و صبح‌ها با انرژی بیدار شدی.", "stats": { "health": 3, "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "sh_2", "weight": 25, "resultTextFa": "چند شب اول سخت بود، اما بالاخره ساعت بدنت تنظیم شد.", "stats": { "health": 3, "mentalHealth": 3 } },
+      { "id": "sh_3", "weight": 15, "resultTextFa": "نوشیدن کافئین دیرهنگام را کنار گذاشتی و اضطراب عصرت پایین آمد.", "stats": { "health": 2, "mentalHealth": 5 } },
+      { "id": "sh_4", "weight": 15, "resultTextFa": "پوست صورتت شاداب‌تر شد و کبودی زیر چشم‌ها کم شد.", "stats": { "health": 3, "looks": 2, "happiness": 2 } },
+      { "id": "sh_5", "weight": 10, "resultTextFa": "سحرخیزی به تو فرصت داد صبح‌ها بی‌عجله برنامه‌ریزی کنی.", "stats": { "mentalHealth": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_dental_care",
+    "titleFa": "مراقبت دندانپزشکی و جرم‌گیری",
+    "category": "health",
+    "costToman": 4800000,
+    "cooldownYears": 1,
+    "minAge": 6,
+    "effectHintFa": "سلامت +۳، ظاهر +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["سلامت", "زیبایی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "dc_1", "weight": 35, "resultTextFa": "پوسیدگی‌های کوچک پیش از عصب‌کشی پر شدند و لبخندت مرتب‌تر شد.", "stats": { "health": 3, "looks": 3, "happiness": 2 } },
+      { "id": "dc_2", "weight": 25, "resultTextFa": "جرم‌گیری حرفه‌ای و توصیه‌های بهداشتی باعث شد خیالت از سلامت دهان راحت شود.", "stats": { "health": 3, "looks": 2 } },
+      { "id": "dc_3", "weight": 15, "resultTextFa": "صدای ابزار دندانپزشکی کمی دلهره آورد اما سریع و بی‌درد تمام شد.", "stats": { "health": 3, "mentalHealth": 1 } },
+      { "id": "dc_4", "weight": 15, "resultTextFa": "همکارها و دوستانت متوجه تمیزی و درخشش لبخندت شدند.", "stats": { "looks": 4, "happiness": 3 } },
+      { "id": "dc_5", "weight": 10, "resultTextFa": "درد خفیف دندان عقل را پیش از تشدید کنترل کردی.", "stats": { "health": 4, "mentalHealth": 2 } }
+    ]
+  },
+  {
+    "id": "act_hammam_massage",
+    "titleFa": "سونا، ماساژ و ریکاوری بدن",
+    "category": "health",
+    "costToman": 3200000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "سلامت روان +۴، سلامت +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آرامش", "اسپا"],
+    "seasonTags": ["winter"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "hm_1", "weight": 35, "resultTextFa": "گرفتگی شانه‌ها و کمرت با یک جلسه ماساژ اصولی باز شد و نفس عمیق کشیدی.", "stats": { "health": 3, "mentalHealth": 4, "happiness": 2 } },
+      { "id": "hm_2", "weight": 25, "resultTextFa": "سونا و استخر آب‌گرم خستگی چند ماه کار پرفشار را از تنت بیرون کشید.", "stats": { "health": 2, "mentalHealth": 5 } },
+      { "id": "hm_3", "weight": 15, "resultTextFa": "پس از جلسه احساس سبکی داشتی و شبش خواب عمیقی رفتی.", "stats": { "health": 3, "mentalHealth": 3, "looks": 1 } },
+      { "id": "hm_4", "weight": 15, "resultTextFa": "مربی حرکات اصلاحی بهت چند تمرین برای ستون فقرات یاد داد.", "stats": { "health": 4, "intelligence": 1 } },
+      { "id": "hm_5", "weight": 10, "resultTextFa": "کمی گرمای سونا فشارت را پایین آورد اما با استراحت و شربت سریع سرحال شدی.", "stats": { "health": 1, "mentalHealth": 3 } }
     ]
   },
   {
@@ -137,12 +171,14 @@
     "effectHintFa": "شادی +۴، سلامت روان +۲",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["شهر", "فرهنگی"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "یک فیلم خوب روی پرده سینما و یک فنجان قهوه گرم حال و هوایت را تازه کرد.",
-        "stats": { "happiness": 4, "mentalHealth": 2 }
-      }
+      { "id": "cc_1", "weight": 35, "resultTextFa": "یک فیلم خوب روی پرده سینما و یک فنجان قهوه گرم حال و هوایت را تازه کرد.", "stats": { "happiness": 4, "mentalHealth": 2 } },
+      { "id": "cc_2", "weight": 25, "resultTextFa": "فیلم پر از گفتگوهای تفکربرانگیز بود و تا چند روز درباره‌اش فکر می‌کردی.", "stats": { "happiness": 3, "intelligence": 2, "mentalHealth": 2 } },
+      { "id": "cc_3", "weight": 15, "resultTextFa": "در کافه کتاب محله با آدم‌های هم‌فکر گپ کوتاهی زدی.", "stats": { "happiness": 4, "fame": 1 } },
+      { "id": "cc_4", "weight": 15, "resultTextFa": "فیلم کمی کسل‌کننده بود اما شیرینی و فضای دنج کافه جبرانش کرد.", "stats": { "happiness": 2, "mentalHealth": 2 } },
+      { "id": "cc_5", "weight": 10, "resultTextFa": "سینمای روباز شبانه خاطره‌ای ماندگار از این فصل برایت ساخت.", "stats": { "happiness": 5, "mentalHealth": 3 } }
     ]
   },
   {
@@ -155,17 +191,15 @@
     "effectHintFa": "سلامت +۳، شادی +۴",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["طبیعت", "اقتصادی"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 90,
-        "resultTextFa": "چای آتشی در دل طبیعت و هوای پاک کوهستان خستگی کل ماه را شست و برد.",
-        "stats": { "health": 3, "happiness": 4, "mentalHealth": 3 }
-      },
-      {
-        "weight": 10,
-        "resultTextFa": "مسیر برگشت کمی لغزنده بود و خسته شدی، ولی منظره قله ارزشش را داشت.",
-        "stats": { "health": 1, "happiness": 2 }
-      }
+      { "id": "hp_1", "weight": 35, "resultTextFa": "چای آتشی در دل طبیعت و هوای پاک کوهستان خستگی کل ماه را شست و برد.", "stats": { "health": 3, "happiness": 4, "mentalHealth": 3 } },
+      { "id": "hp_2", "weight": 25, "resultTextFa": "طلوع آفتاب از بالای یال کوه روحیه‌ات را به کلی عوض کرد.", "stats": { "happiness": 5, "mentalHealth": 4 } },
+      { "id": "hp_3", "weight": 15, "resultTextFa": "مسیر برگشت کمی لغزنده بود و خسته شدی، ولی منظره قله ارزشش را داشت.", "stats": { "health": 2, "happiness": 2 } },
+      { "id": "hp_4", "weight": 15, "resultTextFa": "تور کوهنوردی منظم و جمع گرم باعث شد آخر هفته بی‌نظیری بگذرانی.", "stats": { "health": 3, "happiness": 4, "fame": 1 } },
+      { "id": "hp_5", "weight": 10, "resultTextFa": "عکاسی از چشمه‌ها و درخت‌های کوهستانی ذوق هنری‌ات را بیدار کرد.", "stats": { "mentalHealth": 4, "intelligence": 1 } }
     ]
   },
   {
@@ -178,35 +212,118 @@
     "effectHintFa": "هوش +۳، سلامت روان +۳",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["فرهنگی", "آرام"],
+    "seasonTags": ["yalda", "winter"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "چند رمان ماندگار خواندی و شب‌ها با موسیقی آرام ذهن خودت را مرتب کردی.",
-        "stats": { "intelligence": 3, "mentalHealth": 3, "happiness": 2 }
-      }
+      { "id": "mr_1", "weight": 35, "resultTextFa": "چند رمان ماندگار خواندی و شب‌ها با موسیقی آرام ذهن خودت را مرتب کردی.", "stats": { "intelligence": 3, "mentalHealth": 3, "happiness": 2 } },
+      { "id": "mr_2", "weight": 20, "resultTextFa": "کتابی فلسفی و خوش‌خوان دیدت نسبت به زندگی روزمره را عمیق‌تر کرد.", "stats": { "intelligence": 4, "mentalHealth": 2 } },
+      { "id": "mr_3", "weight": 20, "resultTextFa": "آلبوم‌های موسیقی سنتی و کلاسیک فضای خانه را دل‌نشین کردند.", "stats": { "mentalHealth": 4, "happiness": 3 } },
+      { "id": "mr_4", "weight": 15, "resultTextFa": "یادداشت‌برداری از کتاب‌ها دایره واژگان و قدرت استدلالت را بالا برد.", "stats": { "intelligence": 4, "fame": 1 } },
+      { "id": "mr_5", "weight": 10, "resultTextFa": "شب‌های بارانی با یک چای دارچین و رمان تازه در کمترین هزینه بیشترین آرامش را داد.", "stats": { "happiness": 4, "mentalHealth": 3 } }
     ]
   },
   {
-    "id": "act_social_media",
-    "titleFa": "فعالیت در شبکه‌های اجتماعی",
+    "id": "act_board_games",
+    "titleFa": "دورهمی بازی‌های رومیزی و فکری",
     "category": "leisure",
-    "costToman": 0,
+    "costToman": 900000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۴، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["اجتماعی", "فکری"],
+    "seasonTags": ["yalda", "winter"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "bg_1", "weight": 35, "resultTextFa": "یک شب پر از خنده و رقابت سالم دور میز بازی‌های استراتژیک گذشت.", "stats": { "happiness": 5, "intelligence": 2 } },
+      { "id": "bg_2", "weight": 20, "resultTextFa": "در شطرنج و بازی‌های تاکتیکی چند دست پیاپی بردی و حسابی تحسین شدی.", "stats": { "intelligence": 3, "happiness": 3, "fame": 1 } },
+      { "id": "bg_3", "weight": 20, "resultTextFa": "کافه بردگیم محله به پاتوق خوب و بی‌استرس آخر هفته‌هایت تبدیل شد.", "stats": { "happiness": 4, "mentalHealth": 3 } },
+      { "id": "bg_4", "weight": 15, "resultTextFa": "بازی تیمی با دوستان قدیمی روابطتان را صمیمی‌تر کرد.", "stats": { "happiness": 4, "mentalHealth": 2 } },
+      { "id": "bg_5", "weight": 10, "resultTextFa": "تا دیروقت بیدار ماندی و فردایش کمی خواب‌آلود بودی، اما ارزشش را داشت.", "stats": { "happiness": 4, "health": -1 } }
+    ]
+  },
+  {
+    "id": "act_theater_concert",
+    "titleFa": "تماشای تئاتر و کنسرت موسیقی",
+    "category": "leisure",
+    "costToman": 4200000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "شادی +۵، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["هنری", "شبانه"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tc_1", "weight": 35, "resultTextFa": "اجرای زنده پرانرژی روی صحنه مو بر تنت راست کرد و روحیه‌ات را پرواز داد.", "stats": { "happiness": 5, "mentalHealth": 4 } },
+      { "id": "tc_2", "weight": 25, "resultTextFa": "نمایشنامه قوی و بازی درخشان بازیگران تا ساعت‌ها موضوع بحثتان بود.", "stats": { "happiness": 4, "intelligence": 2, "mentalHealth": 2 } },
+      { "id": "tc_3", "weight": 15, "resultTextFa": "در لابی سالن با چند چهره فرهنگی سلام و علیک کوتاهی داشتی.", "stats": { "happiness": 3, "fame": 2 } },
+      { "id": "tc_4", "weight": 15, "resultTextFa": "آکوستیک سالن متوسط بود اما هیجان جمع تماشاگران شب زیبایی ساخت.", "stats": { "happiness": 4, "mentalHealth": 1 } },
+      { "id": "tc_5", "weight": 10, "resultTextFa": "موسیقی تلفیقی تازه برایت الهام‌بخش بود و پلی‌لیست جدید ساختی.", "stats": { "happiness": 4, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_museum_gallery",
+    "titleFa": "بازدید از موزه و گالری هنری",
+    "category": "leisure",
+    "costToman": 600000,
+    "cooldownYears": 1,
+    "minAge": 7,
+    "effectHintFa": "هوش +۳، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["تاریخی", "آرامش"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "mg_1", "weight": 35, "resultTextFa": "تماشای آثار تاریخی و نقاشی‌ها سکوتی عمیق و لذت‌بخش به ذهنت داد.", "stats": { "intelligence": 3, "mentalHealth": 4, "happiness": 2 } },
+      { "id": "mg_2", "weight": 25, "resultTextFa": "راهنمای موزه داستان‌های شنیدنی پشت آثار را تعریف کرد و خیلی یاد گرفتی.", "stats": { "intelligence": 4, "happiness": 2 } },
+      { "id": "mg_3", "weight": 15, "resultTextFa": "نمایشگاه عکاسی معاصر زاویه دید تازه‌ای به فضای شهری بهت داد.", "stats": { "intelligence": 2, "mentalHealth": 3 } },
+      { "id": "mg_4", "weight": 15, "resultTextFa": "پیاده‌روی آرام در باغ موزه و ثبت عکس‌های خوب حالت را جا آورد.", "stats": { "happiness": 3, "mentalHealth": 3 } },
+      { "id": "mg_5", "weight": 10, "resultTextFa": "یک کتابچه نفیس از فروشگاه موزه خریدی و کلکسیونت کامل‌تر شد.", "stats": { "intelligence": 3, "happiness": 2 } }
+    ]
+  },
+  {
+    "id": "act_home_cooking_feast",
+    "titleFa": "آشپزی خلاقانه و مهمانی خانگی",
+    "category": "leisure",
+    "costToman": 2800000,
     "cooldownYears": 1,
     "minAge": 14,
-    "effectHintFa": "جایگاه اجتماعی +۳، ریسک ذهن",
-    "riskLabelFa": "متوسط",
+    "effectHintFa": "شادی +۵، جایگاه +۲",
+    "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["خانه", "دورهمی"],
+    "seasonTags": ["yalda", "ramadan"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 65,
-        "resultTextFa": "چند محتوای جذاب منتشر کردی و دنبال‌کننده‌هایت بیشتر شدند.",
-        "stats": { "fame": 4, "happiness": 2, "mentalHealth": -2 }
-      },
-      {
-        "weight": 35,
-        "resultTextFa": "ساعت‌ها گشت‌وگذار بی‌هدف در صفحه‌ها فقط تمرکز و اعصابت را خسته کرد.",
-        "stats": { "mentalHealth": -4, "happiness": -2, "fame": 1 }
-      }
+      { "id": "hc_1", "weight": 35, "resultTextFa": "دستپختت حسابی گل کرد و مهمان‌ها از عطر غذا و صمیمیت خانه تعریف کردند.", "stats": { "happiness": 5, "fame": 2, "mentalHealth": 3 } },
+      { "id": "hc_2", "weight": 25, "resultTextFa": "شیرینی‌پزی و نان خانگی آخر هفته حس گرم کودکی را زنده کرد.", "stats": { "happiness": 4, "mentalHealth": 4 } },
+      { "id": "hc_3", "weight": 15, "resultTextFa": "شستن ظرف‌های بعد مهمانی کمی خسته‌کننده بود، اما گپ‌زدن دور سفره می‌ارزید.", "stats": { "happiness": 4, "health": -1 } },
+      { "id": "hc_4", "weight": 15, "resultTextFa": "یک دستور غذای جدید بین‌المللی را امتحان کردی و عالی از آب درآمد.", "stats": { "happiness": 4, "intelligence": 2 } },
+      { "id": "hc_5", "weight": 10, "resultTextFa": "تهیه غذای نذری یا افطاری ساده با همسایه‌ها دلگرمی قشنگی ساخت.", "stats": { "mentalHealth": 4, "fame": 2, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_video_gaming",
+    "titleFa": "تورهای بازی ویدیویی و واقعیت مجازی",
+    "category": "leisure",
+    "costToman": 1200000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۴، تمرکز",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بازی", "دیجیتال"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "vg_1", "weight": 35, "resultTextFa": "چند بازی داستانی جذاب را تمام کردی و با دوستانت شب‌های پرهیجانی داشتی.", "stats": { "happiness": 4, "mentalHealth": 2 } },
+      { "id": "vg_2", "weight": 25, "resultTextFa": "بازی‌های معمایی سرعت تصمیم‌گیری و هماهنگی دست و چشمت را بالا برد.", "stats": { "intelligence": 3, "happiness": 3 } },
+      { "id": "vg_3", "weight": 15, "resultTextFa": "زیادی پای صفحه نمایش ماندی و کمی چشم‌هایت خسته شد.", "stats": { "happiness": 3, "health": -2 } },
+      { "id": "vg_4", "weight": 15, "resultTextFa": "در یک رقابت دوستانه آنلاین اول شدی و کلی کری‌خوانی شیرین داشتید.", "stats": { "happiness": 5, "fame": 1 } },
+      { "id": "vg_5", "weight": 10, "resultTextFa": "یک بازی آرامش‌بخش بدون استرس اعصابت را بعد از یک سال سخت راحت کرد.", "stats": { "mentalHealth": 4, "happiness": 2 } }
     ]
   },
   {
@@ -219,17 +336,15 @@
     "effectHintFa": "شادی +۷، سلامت روان +۵",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["داخلی", "طبیعت"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 85,
-        "resultTextFa": "بوی نم باران و جنگل و ماهی کبابی کنار دریا جان تازه‌ای به تو بخشید.",
-        "stats": { "happiness": 7, "mentalHealth": 5 }
-      },
-      {
-        "weight": 15,
-        "resultTextFa": "ترافیک سنگین برگشت کمی خسته‌ات کرد، اما خاطره‌های خوبش ماندگار شد.",
-        "stats": { "happiness": 4, "mentalHealth": 1 }
-      }
+      { "id": "tn_1", "weight": 35, "resultTextFa": "بوی نم باران و جنگل و ماهی کبابی کنار دریا جان تازه‌ای به تو بخشید.", "stats": { "happiness": 7, "mentalHealth": 5 }, "memoryTextFa": "هوای جنگل‌های شمال روحت را تازه کرد." },
+      { "id": "tn_2", "weight": 20, "resultTextFa": "کلبه چوبی در ییلاق‌های ماسال منظره‌ای رویایی بالای ابرها به تو هدیه داد.", "stats": { "happiness": 7, "mentalHealth": 6, "health": 1 } },
+      { "id": "tn_3", "weight": 20, "resultTextFa": "ترافیک سنگین برگشت کمی خسته‌ات کرد، اما خاطره‌های خوبش ماندگار شد.", "stats": { "happiness": 4, "mentalHealth": 2 } },
+      { "id": "tn_4", "weight": 15, "resultTextFa": "خرید از بازارهای محلی گیلان و مازندران سفره رنگینی ساخت.", "stats": { "happiness": 6, "mentalHealth": 4 } },
+      { "id": "tn_5", "weight": 10, "resultTextFa": "دوچرخه‌سواری در مسیر جنگلی انرژی بدنت را هم حسابی بالا برد.", "stats": { "happiness": 5, "health": 3, "mentalHealth": 4 } }
     ]
   },
   {
@@ -242,12 +357,15 @@
     "effectHintFa": "سلامت روان +۶، شادی +۴",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["زیارتی", "داخلی"],
+    "seasonTags": ["nowruz", "ramadan"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "فضای آرام حرم، زیارت شبانه و خرید سوغاتی زعفران آرامش عمیقی به دلت آورد.",
-        "stats": { "mentalHealth": 6, "happiness": 4 }
-      }
+      { "id": "tm_1", "weight": 35, "resultTextFa": "فضای آرام حرم، زیارت شبانه و خرید سوغاتی زعفران آرامش عمیقی به دلت آورد.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "tm_2", "weight": 25, "resultTextFa": "سفر ریلی راحت و گشت‌وگذار در طرقبه و شاندیز سفر خانوادگی گرمی رقم زد.", "stats": { "happiness": 5, "mentalHealth": 5 } },
+      { "id": "tm_3", "weight": 15, "resultTextFa": "دیدار از آرامگاه فردوسی در توس غرور و شوق فرهنگی خاصی بخشید.", "stats": { "intelligence": 2, "mentalHealth": 4, "happiness": 4 } },
+      { "id": "tm_4", "weight": 15, "resultTextFa": "شلوغی تعطیلات کمی برای اسکان زحمت داشت اما حال دلت خیلی سبک شد.", "stats": { "mentalHealth": 5, "happiness": 3 } },
+      { "id": "tm_5", "weight": 10, "resultTextFa": "یک گفتگوی صمیمی با همسفرهای جدید امیدت به آینده را تازه کرد.", "stats": { "mentalHealth": 6, "happiness": 5 } }
     ]
   },
   {
@@ -260,12 +378,15 @@
     "effectHintFa": "شادی +۶، هوش +۲",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["تاریخی", "داخلی"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "قدم‌زدن در کوچه‌های تاریخی و بافت قدیمی شهر پر از ذوق و عکس‌های یادگاری شد.",
-        "stats": { "happiness": 6, "intelligence": 2, "mentalHealth": 4 }
-      }
+      { "id": "ts_1", "weight": 35, "resultTextFa": "قدم‌زدن در کوچه‌های تاریخی و بافت قدیمی شهر پر از ذوق و عکس‌های یادگاری شد.", "stats": { "happiness": 6, "intelligence": 2, "mentalHealth": 4 } },
+      { "id": "ts_2", "weight": 25, "resultTextFa": "بهارنارنج شیراز و حافظیه شب شعر فراموش‌نشدنی برایت ساخت.", "stats": { "happiness": 7, "mentalHealth": 5 } },
+      { "id": "ts_3", "weight": 15, "resultTextFa": "تماشای کاشی‌کاری‌های میدان نقش جهان و نوشیدن چای در حجره‌ها دل‌انگیز بود.", "stats": { "happiness": 6, "intelligence": 3 } },
+      { "id": "ts_4", "weight": 15, "resultTextFa": "پیاده‌روی طولانی در تخت‌جمشید با راهنمای تاریخ‌دان کلی دانشت را بالا برد.", "stats": { "intelligence": 4, "health": 1, "happiness": 5 } },
+      { "id": "ts_5", "weight": 10, "resultTextFa": "سوغاتی‌های صنایع دستی و شیرینی‌های سنتی خانواده را سر ذوق آورد.", "stats": { "happiness": 6, "fame": 1 } }
     ]
   },
   {
@@ -278,12 +399,78 @@
     "effectHintFa": "شادی +۸، جایگاه +۲",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["ساحلی", "پروازی"],
+    "seasonTags": ["winter", "nowruz"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "دوچرخه‌سواری دور جزیره و آب‌های نیلگون خلیج فارس خستگی یک سال را از تنت برد.",
-        "stats": { "happiness": 8, "mentalHealth": 5, "fame": 2 }
-      }
+      { "id": "tk_1", "weight": 35, "resultTextFa": "دوچرخه‌سواری دور جزیره و آب‌های نیلگون خلیج فارس خستگی یک سال را از تنت برد.", "stats": { "happiness": 8, "mentalHealth": 5, "fame": 2 } },
+      { "id": "tk_2", "weight": 25, "resultTextFa": "غواصی در آب‌های زلال مرجانی تجربه‌ای شگفت‌انگیز و پرهیجان بود.", "stats": { "happiness": 8, "health": 2, "mentalHealth": 4 } },
+      { "id": "tk_3", "weight": 15, "resultTextFa": "غروب آفتاب کنار کشتی یونانی و موسیقی ساحلی حال و هوات را عالی کرد.", "stats": { "happiness": 7, "mentalHealth": 5 } },
+      { "id": "tk_4", "weight": 15, "resultTextFa": "رطوبت هوا اولش کمی گرم بود ولی شب‌های زنده و پرانرژی جبرانش کرد.", "stats": { "happiness": 6, "mentalHealth": 3 } },
+      { "id": "tk_5", "weight": 10, "resultTextFa": "تفریحات دریایی و قایق‌سواری آدرنالین و نشاطت را به اوج رساند.", "stats": { "happiness": 8, "health": 1, "fame": 2 } }
+    ]
+  },
+  {
+    "id": "act_travel_qeshm_south",
+    "titleFa": "سفر بوم‌گردی به قشم و هرمز",
+    "category": "travel",
+    "costToman": 16000000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "شادی +۷، سلامت روان +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بوم‌گردی", "طبیعت"],
+    "seasonTags": ["winter", "yalda"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tq_1", "weight": 35, "resultTextFa": "ساحل سرخ هرمز، دره ستارگان و مهمان‌نوازی مردم خونگرم جنوب شگفت‌زده‌ات کرد.", "stats": { "happiness": 7, "mentalHealth": 5, "intelligence": 2 } },
+      { "id": "tq_2", "weight": 25, "resultTextFa": "قایق‌سواری میان جنگل حرا و تماشای دلفین‌ها رویایی‌ترین بخش سفر بود.", "stats": { "happiness": 8, "mentalHealth": 5 } },
+      { "id": "tq_3", "weight": 15, "resultTextFa": "اقامت در خانه بوم‌گردی با موسیقی محلی جنوب شب گرمی برایت ساخت.", "stats": { "happiness": 6, "mentalHealth": 6 } },
+      { "id": "tq_4", "weight": 15, "resultTextFa": "معماری صخره‌ای تنگه چاهکو را پیاده طی کردی و استقامت بدنت بیشتر شد.", "stats": { "health": 2, "happiness": 6 } },
+      { "id": "tq_5", "weight": 10, "resultTextFa": "غذاهای دریایی تند و تازه ذائقه‌ات را غافلگیر کرد.", "stats": { "happiness": 6, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_travel_desert_camp",
+    "titleFa": "کویرگردی و رصد ستارگان شبانه",
+    "category": "travel",
+    "costToman": 7500000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت روان +۶، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["کویر", "رصد"],
+    "seasonTags": ["yalda", "nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "td_1", "weight": 35, "resultTextFa": "سکوت مطلق رمل‌های کویر مصر و تماشای کهکشان راه شیری ذهن آشفته‌ات را آرام کرد.", "stats": { "mentalHealth": 7, "happiness": 5 } },
+      { "id": "td_2", "weight": 25, "resultTextFa": "راهنمای نجوم با تلسکوپ صورت‌های فلکی را نشان داد و شگفت‌زده شدی.", "stats": { "intelligence": 3, "mentalHealth": 5, "happiness": 4 } },
+      { "id": "td_3", "weight": 15, "resultTextFa": "شبانگاه کنار آتش در کاروانسرای قدیمی شعر خواندید و چای نوشیدید.", "stats": { "happiness": 5, "mentalHealth": 5 } },
+      { "id": "td_4", "weight": 15, "resultTextFa": "بادی شن‌ها را بلند کرد و زودتر به اقامتگاه برگشتید، ولی تجربه کویر خاص بود.", "stats": { "mentalHealth": 3, "happiness": 3 } },
+      { "id": "td_5", "weight": 10, "resultTextFa": "پابرهنه روی شن‌های خنک صبحگاهی راه رفتن تمام تنش‌ها را رها کرد.", "stats": { "health": 2, "mentalHealth": 6 } }
+    ]
+  },
+  {
+    "id": "act_travel_west_iran",
+    "titleFa": "سفر به طبیعت غرب ایران و اورامان",
+    "category": "travel",
+    "costToman": 13500000,
+    "cooldownYears": 1,
+    "minAge": 6,
+    "effectHintFa": "شادی +۶، سلامت روان +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["کوهستانی", "فرهنگی"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tw_1", "weight": 35, "resultTextFa": "پله‌کان‌های سنگی اورامان و رودخانه خروشان سیروان هوش از سرت برد.", "stats": { "happiness": 7, "mentalHealth": 5 } },
+      { "id": "tw_2", "weight": 25, "resultTextFa": "موسیقی کُردی و مهمان‌نوازی پرشور اهالی لبخند دائمی به لبت آورد.", "stats": { "happiness": 6, "mentalHealth": 4, "fame": 1 } },
+      { "id": "tw_3", "weight": 15, "resultTextFa": "تماشای آبشارها و قایق‌سواری در دریاچه زریوار آرامش خالصی بخشید.", "stats": { "happiness": 6, "mentalHealth": 6 } },
+      { "id": "tw_4", "weight": 15, "resultTextFa": "جاده کوهستانی پرپیچ‌وخم کمی خسته‌کننده بود اما هوای پاک جبران کرد.", "stats": { "health": 2, "happiness": 4 } },
+      { "id": "tw_5", "weight": 10, "resultTextFa": "بازدید از غار علیصدر یا بیستون فصل تازه‌ای از تاریخ را پیش رویت گذاشت.", "stats": { "intelligence": 3, "happiness": 5 } }
     ]
   },
   {
@@ -296,12 +483,15 @@
     "effectHintFa": "شادی +۹، هوش +۳، جایگاه +۴",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["بین‌المللی", "فرهنگی"],
+    "seasonTags": ["summer", "nowruz"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "دیدن فرهنگ تازه و سفر چندروزه خارج از کشور دیدت به دنیا را بازتر کرد.",
-        "stats": { "happiness": 9, "intelligence": 3, "fame": 4, "mentalHealth": 4 }
-      }
+      { "id": "ta_1", "weight": 35, "resultTextFa": "دیدن فرهنگ تازه و سفر چندروزه خارج از کشور دیدت به دنیا را بازتر کرد.", "stats": { "happiness": 9, "intelligence": 3, "fame": 4, "mentalHealth": 4 } },
+      { "id": "ta_2", "weight": 20, "resultTextFa": "هم‌صحبتی با مسافرانی از چند کشور مختلف اعتمادبه‌نفس زبان و ارتباطت را بالا برد.", "stats": { "intelligence": 4, "happiness": 7, "fame": 3 } },
+      { "id": "ta_3", "weight": 20, "resultTextFa": "مدیریت حمل‌ونقل شهری و بازدید از موزه‌های مطرح تجربه‌ای ارزشمند ساخت.", "stats": { "intelligence": 3, "happiness": 8, "mentalHealth": 3 } },
+      { "id": "ta_4", "weight": 15, "resultTextFa": "تاخیر پرواز برگشت کمی اذیتت کرد اما عکس‌ها و خاطره‌های سفر عالی بودند.", "stats": { "happiness": 6, "fame": 3 } },
+      { "id": "ta_5", "weight": 10, "resultTextFa": "امتحان غذاهای محلی و گشت‌وگذار در بازارهای سنتی مقصد غافلگیرکننده بود.", "stats": { "happiness": 8, "mentalHealth": 4 } }
     ]
   },
   {
@@ -314,17 +504,157 @@
     "effectHintFa": "سلامت +۵، ظاهر +۴",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["قدرتی", "فیتنس"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 90,
-        "resultTextFa": "تمرین منظم با برنامه درست فرم بدنت را خیلی بهتر کرد و اعتمادبه‌نفست بالا رفت.",
-        "stats": { "health": 5, "looks": 4, "happiness": 3 }
-      },
-      {
-        "weight": 10,
-        "resultTextFa": "زیر وزنه کمی به شانه‌ات فشار آمد و مجبور شدی دو هفته استراحت کنی.",
-        "stats": { "health": -2, "looks": 1 }
-      }
+      { "id": "gs_1", "weight": 35, "resultTextFa": "تمرین منظم با برنامه درست فرم بدنت را خیلی بهتر کرد و اعتمادبه‌نفست بالا رفت.", "stats": { "health": 5, "looks": 4, "happiness": 3 } },
+      { "id": "gs_2", "weight": 25, "resultTextFa": "قدرت عضلانی و استقامتت به رکوردی رسید که خودت هم باورت نمی‌شد.", "stats": { "health": 6, "looks": 3, "mentalHealth": 3 } },
+      { "id": "gs_3", "weight": 15, "resultTextFa": "زیر وزنه کمی به شانه‌ات فشار آمد و مجبور شدی دو هفته استراحت کنی.", "stats": { "health": -1, "looks": 2 } },
+      { "id": "gs_4", "weight": 15, "resultTextFa": "دوستان باشگاهی باعث شدند حتی روزهای بی‌حوصله هم تمرین را جا نندازی.", "stats": { "health": 4, "happiness": 4, "looks": 3 } },
+      { "id": "gs_5", "weight": 10, "resultTextFa": "تمرین هوازی پس از وزنه چربی اضافی را کم کرد و اندامت متناسب‌تر شد.", "stats": { "health": 5, "looks": 4 } }
+    ]
+  },
+  {
+    "id": "act_swimming_pool",
+    "titleFa": "شنا و ورزش‌های آبی منظم",
+    "category": "sport",
+    "costToman": 4800000,
+    "cooldownYears": 1,
+    "minAge": 6,
+    "effectHintFa": "سلامت +۵، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آبی", "کم‌فشار"],
+    "seasonTags": ["summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sp_1", "weight": 35, "resultTextFa": "تکنیک کرال و قورباغه را اصلاح کردی و بدون فشار به مفاصل نفس‌گیری‌ات عالی شد.", "stats": { "health": 5, "mentalHealth": 4, "looks": 2 } },
+      { "id": "sp_2", "weight": 25, "resultTextFa": "صدای آرام آب و ریتم منظم شنا استرس کاری را به صفر رساند.", "stats": { "health": 4, "mentalHealth": 5 } },
+      { "id": "sp_3", "weight": 15, "resultTextFa": "چهارشنبه و جمعه‌ها در لاین سریع‌تر استخر رکورد جدید زدی.", "stats": { "health": 5, "happiness": 3 } },
+      { "id": "sp_4", "weight": 15, "resultTextFa": "کلر آب کمی پوستت را خشک کرد اما بدنت سبک و پرانرژی شد.", "stats": { "health": 4, "mentalHealth": 2 } },
+      { "id": "sp_5", "weight": 10, "resultTextFa": "مربی استخر تکنیک شیرجه و تنفس عمیق را با حوصله یادت داد.", "stats": { "health": 4, "looks": 2, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_football_futsal",
+    "titleFa": "فوتسال و فوتبال تیمی هفتگی",
+    "category": "sport",
+    "costToman": 2200000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت +۴، شادی +۵",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["تیمی", "هیجان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ff_1", "weight": 35, "resultTextFa": "بازی تیمی پرهیجان با چند گل دیدنی شب بی‌نظیری با رفقا ساخت.", "stats": { "health": 4, "happiness": 5, "fame": 1 } },
+      { "id": "ff_2", "weight": 25, "resultTextFa": "همکاری در پاسکاری و چابکی در زمین نفس و سرعت واکنشت را بالا برد.", "stats": { "health": 4, "happiness": 4, "mentalHealth": 2 } },
+      { "id": "ff_3", "weight": 15, "resultTextFa": "تورنی دوستانه بین محله‌ها برگزار کردید و تیمتان به فینال رسید.", "stats": { "happiness": 6, "fame": 2, "health": 3 } },
+      { "id": "ff_4", "weight": 15, "resultTextFa": "در یک برخورد ساده زانویت کمی کبود شد اما سریع خوب شد و ادامه دادی.", "stats": { "health": 1, "happiness": 3 } },
+      { "id": "ff_5", "weight": 10, "resultTextFa": "پاتوق چای بعد از سوت پایان به اندازه خود مسابقه دل‌چسب بود.", "stats": { "happiness": 5, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_martial_arts",
+    "titleFa": "تمرین هنرهای رزمی و دفاع شخصی",
+    "category": "sport",
+    "costToman": 5200000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت +۵، سلامت روان +۳",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["انضباط", "دفاع"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ma_1", "weight": 35, "resultTextFa": "نظم، تعادل و تمرکز تنفسی هنرهای رزمی اعتمادبه‌نفس آرامی به تو داد.", "stats": { "health": 5, "mentalHealth": 4, "looks": 2 } },
+      { "id": "ma_2", "weight": 25, "resultTextFa": "آزمون کمربند را با موفقیت گذراندی و مربی از انضباطت تمجید کرد.", "stats": { "health": 4, "happiness": 4, "fame": 2 } },
+      { "id": "ma_3", "weight": 15, "resultTextFa": "تمرین مبارزه سبک چابکی و خونسردی‌ات زیر فشار را تقویت کرد.", "stats": { "health": 4, "mentalHealth": 4 } },
+      { "id": "ma_4", "weight": 15, "resultTextFa": "گرفتگی عضلات بعد تمرین سنگین بود ولی استقامت بدنت جهش کرد.", "stats": { "health": 4, "happiness": 1 } },
+      { "id": "ma_5", "weight": 10, "resultTextFa": "آداب احترام در سالن تمرین ذهن پراکنده را متمرکز و منظم کرد.", "stats": { "mentalHealth": 5, "intelligence": 1 } }
+    ]
+  },
+  {
+    "id": "act_cycling_tour",
+    "titleFa": "دوچرخه‌سواری جاده و شهر",
+    "category": "sport",
+    "costToman": 1400000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت +۴، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["طبیعت", "استقامتی"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ct_1", "weight": 35, "resultTextFa": "مسیرهای طولانی صبحگاهی با دوچرخه ریه و پاهایت را حسابی قوی کرد.", "stats": { "health": 5, "happiness": 4, "mentalHealth": 3 } },
+      { "id": "ct_2", "weight": 25, "resultTextFa": "به یک گروه دوچرخه‌سواری محلی پیوستی و پایان هفته بیرون شهر رکاب زدید.", "stats": { "health": 4, "happiness": 5 } },
+      { "id": "ct_3", "weight": 15, "resultTextFa": "پنچر شدن لاستیک وسط جاده معطلت کرد اما تعمیرش را هم یاد گرفتی.", "stats": { "health": 3, "intelligence": 1, "happiness": 1 } },
+      { "id": "ct_4", "weight": 15, "resultTextFa": "باد خنک هنگام رکاب‌زدن در مسیر درختی بهترین حس آزادی را داد.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "ct_5", "weight": 10, "resultTextFa": "جایگزین‌کردن دوچرخه برای مسیرهای کوتاه رفت‌وآمد کلی در هزینه‌هایت صرفه‌جویی کرد.", "stats": { "health": 4, "happiness": 3 }, "moneyToman": 1500000 }
+    ]
+  },
+  {
+    "id": "act_yoga_pilates",
+    "titleFa": "کلاس یوگا، پیلاتس و مدیتیشن",
+    "category": "sport",
+    "costToman": 4200000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت روان +۵، سلامت +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["انعطاف", "تنفس"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "yp_1", "weight": 35, "resultTextFa": "حرکات کششی و تنفس دیافراگمی قوز کمر را کم کرد و آرامشت را دو برابر کرد.", "stats": { "health": 3, "mentalHealth": 6, "looks": 2 } },
+      { "id": "yp_2", "weight": 25, "resultTextFa": "عضلات مرکزی بدنت محکم شد و دیگر سر کار خستگی کمر نمی‌گیری.", "stats": { "health": 4, "looks": 2, "mentalHealth": 3 } },
+      { "id": "yp_3", "weight": 15, "resultTextFa": "مدیتیشن پایان کلاس ذهنت را از شلوغی روزمره خالی کرد.", "stats": { "mentalHealth": 6, "happiness": 3 } },
+      { "id": "yp_4", "weight": 15, "resultTextFa": "حرکات تعادلی اوایل لرزان بودند اما بعد از دو ماه مثل موم نرم شدی.", "stats": { "health": 3, "happiness": 3 } },
+      { "id": "yp_5", "weight": 10, "resultTextFa": "حالت ایستادن و راه رفتنت باوقارتر و متعادل‌تر شد.", "stats": { "looks": 3, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_climbing_wall",
+    "titleFa": "سنگ‌نوردی سالنی و صخره‌نوردی",
+    "category": "sport",
+    "costToman": 3800000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت +۴، هوش +۲، شادی +۳",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["تمرکز", "چالش"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cw_1", "weight": 35, "resultTextFa": "حل مسیرهای پیچیده دیواره مثل شطرنج جسمی بود؛ هم قدرت و هم تمرکزت بالا رفت.", "stats": { "health": 4, "intelligence": 2, "happiness": 4 } },
+      { "id": "cw_2", "weight": 25, "resultTextFa": "قدرت پنجه و بازوهایت چشمگیر شد و به ارتفاع‌های بالاتر رسیدی.", "stats": { "health": 5, "looks": 2 } },
+      { "id": "cw_3", "weight": 15, "resultTextFa": "ترس از ارتفاع را در محیط ایمن سالن تا حد زیادی شکست دادی.", "stats": { "mentalHealth": 5, "happiness": 3 } },
+      { "id": "cw_4", "weight": 15, "resultTextFa": "پوست دستت کمی تاول زد اما رسیدن به بالای دیواره لذتی وصف‌ناپذیر داشت.", "stats": { "health": 2, "happiness": 4 } },
+      { "id": "cw_5", "weight": 10, "resultTextFa": "هم‌طناب خوب باعث شد اعتماد تیمی و حس امنیتت بالا برود.", "stats": { "mentalHealth": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_tennis_badminton",
+    "titleFa": "ورزش راکتی (بدمینتون یا تنیس)",
+    "category": "sport",
+    "costToman": 4500000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت +۴، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["راکتی", "سرعت"],
+    "seasonTags": ["summer", "nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tb_1", "weight": 35, "resultTextFa": "رالی‌های سریع و پرش‌های چابک سرعت عمل و ضربان قلبت را به حد ایده آل رساند.", "stats": { "health": 4, "happiness": 4, "looks": 2 } },
+      { "id": "tb_2", "weight": 25, "resultTextFa": "ست سوم را با اختلاف دو امتیاز بردی و از هیجان نمی‌توانستی لبخند نزنی.", "stats": { "happiness": 5, "mentalHealth": 3 } },
+      { "id": "tb_3", "weight": 15, "resultTextFa": "بازی دونفره با همکارها استرس کاری را بیرون زمین گذاشت.", "stats": { "mentalHealth": 4, "happiness": 3, "fame": 1 } },
+      { "id": "tb_4", "weight": 15, "resultTextFa": "سرویس‌هایت با تمرین دقیق‌تر شدند و کمتر خطا می‌دهی.", "stats": { "health": 3, "intelligence": 1, "happiness": 3 } },
+      { "id": "tb_5", "weight": 10, "resultTextFa": "خشکی مچ دست روزهای اول را با کش‌های محافظ برطرف کردی.", "stats": { "health": 2, "happiness": 2 } }
     ]
   },
   {
@@ -334,15 +664,157 @@
     "costToman": 4000000,
     "cooldownYears": 1,
     "minAge": 12,
-    "effectHintFa": "هوش +۵، کمی خستگی",
+    "effectHintFa": "هوش +۵، مهارت عملی",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["تخصصی", "رزومه"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "دوره را با تمرین عملی تمام کردی و یک برگ برنده تازه به رزومه‌ات اضافه شد.",
-        "stats": { "intelligence": 5, "mentalHealth": -2, "fame": 1 }
-      }
+      { "id": "oc_1", "weight": 35, "resultTextFa": "دوره را با تمرین عملی تمام کردی و یک برگ برنده تازه به رزومه‌ات اضافه شد.", "stats": { "intelligence": 5, "mentalHealth": -1, "fame": 2 } },
+      { "id": "oc_2", "weight": 25, "resultTextFa": "پروژه پایانی دوره را منتشر کردی و بازخورد مثبت متخصص‌ها را گرفتی.", "stats": { "intelligence": 5, "happiness": 3, "fame": 2 } },
+      { "id": "oc_3", "weight": 15, "resultTextFa": "کدنویسی یا نرم‌افزار جدید اولش گیج‌کننده بود، اما کم‌کم دستت راه افتاد.", "stats": { "intelligence": 4, "mentalHealth": -2 } },
+      { "id": "oc_4", "weight": 15, "resultTextFa": "یک کارفرما نمونه تمرین تو را دید و یک پروژه کوچک پاره وقت پیشنهاد داد.", "stats": { "intelligence": 4, "happiness": 4 }, "moneyToman": 8000000 },
+      { "id": "oc_5", "weight": 10, "resultTextFa": "گواهینامه پایان دوره اعتمادبه‌نفست برای مسیر شغلی بعدی را محکم کرد.", "stats": { "intelligence": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_language_study",
+    "titleFa": "مطالعه و تمرین زبان دوم",
+    "category": "learning",
+    "costToman": 5500000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "هوش +۵، جایگاه +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["زبان", "بین‌المللی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ls_1", "weight": 35, "resultTextFa": "با گوش دادن به پادکست و مکالمه روزانه، روان‌تر و بدون ترس صحبت می‌کنی.", "stats": { "intelligence": 5, "happiness": 3, "fame": 2 } },
+      { "id": "ls_2", "weight": 25, "resultTextFa": "بالاخره فیلم‌ها را بدون زیرنویس متوجه شدی و از پیشرفتت کیف کردی.", "stats": { "intelligence": 4, "happiness": 4 } },
+      { "id": "ls_3", "weight": 15, "resultTextFa": "حفظ لغات و گرامر کمی خسته‌ات کرد اما نمره آزمون آزمایشی‌ات بالا رفت.", "stats": { "intelligence": 5, "mentalHealth": -2 } },
+      { "id": "ls_4", "weight": 15, "resultTextFa": "در یک گروه بحث آنلاین با زبان‌آموزان دیگر تمرین کردی.", "stats": { "intelligence": 4, "fame": 2, "happiness": 2 } },
+      { "id": "ls_5", "weight": 10, "resultTextFa": "مطالعه کتاب‌های اصلی به زبان دوم دروازه منابع تازه‌ای را به رویت باز کرد.", "stats": { "intelligence": 6 } }
+    ]
+  },
+  {
+    "id": "act_podcast_seminar",
+    "titleFa": "شرکت در همایش و کارگاه تخصصی",
+    "category": "learning",
+    "costToman": 3000000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "هوش +۴، جایگاه +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["شبکه‌سازی", "تخصص"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ps_1", "weight": 35, "resultTextFa": "سخنرانی‌ها و گفتگوی بین پنل‌ها با هم‌رشته‌ها ایده‌های ارزشمندی بهت داد.", "stats": { "intelligence": 4, "fame": 3, "happiness": 2 } },
+      { "id": "ps_2", "weight": 25, "resultTextFa": "در استراحت بین نشست‌ها با چند مدیر حرفه‌ای کارت ویزیت ردوبدل کردی.", "stats": { "fame": 4, "intelligence": 2, "happiness": 3 } },
+      { "id": "ps_3", "weight": 15, "resultTextFa": "یک پرسش دقیق پرسیدی که توجه سخنران و جمع را جلب کرد.", "stats": { "fame": 4, "intelligence": 3 } },
+      { "id": "ps_4", "weight": 15, "resultTextFa": "بخشی از مطالب تکراری بود اما نظم‌دهی فکری خوبی برای سال آینده گرفتی.", "stats": { "intelligence": 2, "mentalHealth": 1 } },
+      { "id": "ps_5", "weight": 10, "resultTextFa": "کارگاه عملی کنار همایش یک تکنیک کاربردی سریع یادت داد.", "stats": { "intelligence": 4, "happiness": 2 } }
+    ]
+  },
+  {
+    "id": "act_coding_workshop",
+    "titleFa": "اردو و بوت‌کمپ کدنویسی و فناوری",
+    "category": "learning",
+    "costToman": 9500000,
+    "cooldownYears": 1,
+    "minAge": 15,
+    "effectHintFa": "هوش +۶، جایگاه +۲",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["فناوری", "فشرده"],
+    "quotaCost": 2,
+    "outcomes": [
+      { "id": "cw2_1", "weight": 35, "resultTextFa": "در یک هکاتون ۴۸ ساعته تیمتان محصول اولیه‌ای ساخت که داورها تحسینش کردند.", "stats": { "intelligence": 6, "fame": 3, "happiness": 4, "mentalHealth": -2 } },
+      { "id": "cw2_2", "weight": 25, "resultTextFa": "یادگیری ابزارهای مهندسی و کار تیمی سرعت حل مسئله‌ات را چند برابر کرد.", "stats": { "intelligence": 6, "fame": 2 } },
+      { "id": "cw2_3", "weight": 15, "resultTextFa": "بی‌خوابی شب رفع خطا خسته‌ات کرد اما بالاخره کد تمیز اجرا شد.", "stats": { "intelligence": 5, "health": -1, "happiness": 3 } },
+      { "id": "cw2_4", "weight": 15, "resultTextFa": "پاداش برگزیدگان کارگاه سهمی از جایزه تیمی را نصیبت کرد.", "stats": { "intelligence": 5, "fame": 3, "happiness": 5 }, "moneyToman": 14000000 },
+      { "id": "cw2_5", "weight": 10, "resultTextFa": "منتور باتجربه کدهایت را بازبینی کرد و اشتباهات پنهانت را یاد گرفتی.", "stats": { "intelligence": 6, "mentalHealth": 1 } }
+    ]
+  },
+  {
+    "id": "act_finance_literacy",
+    "titleFa": "یادگیری سواد مالی و تحلیل اقتصاد",
+    "category": "learning",
+    "costToman": 2500000,
+    "cooldownYears": 1,
+    "minAge": 15,
+    "effectHintFa": "هوش +۴، کنترل بودجه",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["اقتصاد", "مدیریت"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "fl_1", "weight": 35, "resultTextFa": "نشت هزینه‌های ریز ماهانه را پیدا کردی و منطق سبد دارایی برایت شفاف شد.", "stats": { "intelligence": 4, "mentalHealth": 3, "happiness": 2 } },
+      { "id": "fl_2", "weight": 25, "resultTextFa": "از تله هیجانی خرید و فروش دوری کردی و جدول بودجه سالانه نوشتی.", "stats": { "intelligence": 5, "mentalHealth": 2 } },
+      { "id": "fl_3", "weight": 15, "resultTextFa": "درک تفاوت بازده اسمی و واقعی تصمیم‌های سرمایه‌گذاری‌ات را پخته‌تر کرد.", "stats": { "intelligence": 5, "fame": 1 } },
+      { "id": "fl_4", "weight": 15, "resultTextFa": "متوجه اشتباهات مالی سال‌های قبل شدی؛ اولش حرص خوردی ولی الان مسلط‌تری.", "stats": { "intelligence": 4, "mentalHealth": -1 } },
+      { "id": "fl_5", "weight": 10, "resultTextFa": "با اصلاح اشتراک‌ها و مخارج اضافی مقداری پس‌انداز فوری آزاد شد.", "stats": { "intelligence": 3, "happiness": 3 }, "moneyToman": 4000000 }
+    ]
+  },
+  {
+    "id": "act_public_speaking",
+    "titleFa": "کلاس فن بیان و سخنرانی",
+    "category": "learning",
+    "costToman": 4200000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه +۴، هوش +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["ارتباطات", "اعتماد"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "psp_1", "weight": 35, "resultTextFa": "روی سن جلوی جمع بدون لرزش صدا ارائه دادی و حضار تشویقت کردند.", "stats": { "fame": 4, "happiness": 4, "intelligence": 2 } },
+      { "id": "psp_2", "weight": 25, "resultTextFa": "تکنیک‌های زبان بدن و مکث به‌جا در مذاکره‌های کاری به کارت آمد.", "stats": { "fame": 3, "intelligence": 3, "looks": 2 } },
+      { "id": "psp_3", "weight": 15, "resultTextFa": "صدابرداری تمرین‌های اول عجیب به نظر می‌رسید، اما سریع اصلاح شد.", "stats": { "intelligence": 3, "mentalHealth": 2 } },
+      { "id": "psp_4", "weight": 15, "resultTextFa": "قدرت متقاعدکردن و دفاع از ایده‌ات در جلسات به شکل محسوسی بهتر شد.", "stats": { "fame": 4, "intelligence": 3 } },
+      { "id": "psp_5", "weight": 10, "resultTextFa": "در رویداد پایان دوره بهترین سخنرانی کوتاه کلاس را اجرا کردی.", "stats": { "fame": 5, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_science_club",
+    "titleFa": "مطالعه علمی، رصدخانه و پژوهش",
+    "category": "learning",
+    "costToman": 1600000,
+    "cooldownYears": 1,
+    "minAge": 9,
+    "effectHintFa": "هوش +۵، سلامت روان +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["علم", "پژوهش"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sc_1", "weight": 35, "resultTextFa": "شرکت در باشگاه علمی و انجام آزمایش‌های تازه حس کنجکاوی‌ات را شعله‌ور کرد.", "stats": { "intelligence": 5, "happiness": 3, "mentalHealth": 2 } },
+      { "id": "sc_2", "weight": 25, "resultTextFa": "مقاله‌ها و مستندهای علمی معتبری خواندی و نگاه تحلیلی‌ات دقیق‌تر شد.", "stats": { "intelligence": 5, "mentalHealth": 2 } },
+      { "id": "sc_3", "weight": 15, "resultTextFa": "یک پرسش سخت پژوهشی روزها درگیرت کرد تا بالاخره جوابش را یافتی.", "stats": { "intelligence": 6, "happiness": 2 } },
+      { "id": "sc_4", "weight": 15, "resultTextFa": "در نشست نقد علمی با استادها نظرت مطرح شد و تحسین شنیدی.", "stats": { "intelligence": 4, "fame": 3 } },
+      { "id": "sc_5", "weight": 10, "resultTextFa": "بازدید از آزمایشگاه دانشگاهی مسیر علاقه‌مندی آینده‌ات را روشن‌تر کرد.", "stats": { "intelligence": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_first_aid_course",
+    "titleFa": "آموزش کمک‌های اولیه و امداد",
+    "category": "learning",
+    "costToman": 1200000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "هوش +۳، جایگاه +۳، سلامت +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["امداد", "کاربردی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "fa_1", "weight": 35, "resultTextFa": "احیای قلبی و بستن زخم را عملی تمرین کردی و گواهینامه امدادگر داوطلب گرفتی.", "stats": { "intelligence": 3, "fame": 3, "health": 2, "mentalHealth": 2 } },
+      { "id": "fa_2", "weight": 25, "resultTextFa": "آگاهی از واکنش درست در بحران اضطراب شرایط پیش‌بینی‌نشده را کم کرد.", "stats": { "mentalHealth": 4, "intelligence": 3 } },
+      { "id": "fa_3", "weight": 15, "resultTextFa": "در یک حادثه کوچک خیابانی توانستی با آرامش کمک اولیه بدهی.", "stats": { "fame": 4, "happiness": 5 } },
+      { "id": "fa_4", "weight": 15, "resultTextFa": "کیف کمک‌های اولیه خانگی و خودرو را کامل و استاندارد تجهیز کردی.", "stats": { "health": 2, "mentalHealth": 3 } },
+      { "id": "fa_5", "weight": 10, "resultTextFa": "مانور عملی بسیار واقعی و آموزنده بود و روحیه مسئولیت‌پذیری‌ات بالا رفت.", "stats": { "intelligence": 3, "fame": 2 } }
     ]
   },
   {
@@ -352,15 +824,1135 @@
     "costToman": 5000000,
     "cooldownYears": 1,
     "minAge": 14,
-    "effectHintFa": "جایگاه +۵، شادی +۴",
+    "effectHintFa": "جایگاه +۵، شادی +۴، روان +۵",
     "riskLabelFa": "کم",
     "contentTag": "mild",
+    "tags": ["همدلی", "اجتماعی"],
+    "seasonTags": ["ramadan", "nowruz"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 100,
-        "resultTextFa": "همکاری در بسته معیشتی و کمک به خانواده‌های نیازمند حس ارزشمندی عمیقی به تو داد.",
-        "stats": { "fame": 5, "happiness": 4, "mentalHealth": 5 }
-      }
+      { "id": "cv_1", "weight": 35, "resultTextFa": "همکاری در بسته معیشتی و کمک به خانواده‌های نیازمند حس ارزشمندی عمیقی به تو داد.", "stats": { "fame": 5, "happiness": 4, "mentalHealth": 5 } },
+      { "id": "cv_2", "weight": 25, "resultTextFa": "کودکان مرکز حمایتی با لبخندشان تمام خستگی روزهای سختت را پاک کردند.", "stats": { "happiness": 6, "mentalHealth": 5, "fame": 3 } },
+      { "id": "cv_3", "weight": 15, "resultTextFa": "در کمپین اهدای خون و پشتیبانی خیریه کنار داوطلب‌های پرتلاش کار کردی.", "stats": { "fame": 4, "mentalHealth": 4, "health": 1 } },
+      { "id": "cv_4", "weight": 15, "resultTextFa": "دیدن رنج بعضی خانواده‌ها دلت را سوزاند اما حس مفیدبودن آرامش‌بخش بود.", "stats": { "mentalHealth": 3, "fame": 4, "happiness": 2 } },
+      { "id": "cv_5", "weight": 10, "resultTextFa": "هماهنگی دقیق تو باعث شد کمک‌ها خیلی سریع‌تر به دست نیازمندان برسد.", "stats": { "fame": 5, "intelligence": 1, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_tree_planting",
+    "titleFa": "کاشت نهال و پاکسازی طبیعت",
+    "category": "charity",
+    "costToman": 400000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت روان +۴، جایگاه +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["محیط‌زیست", "داوطلبی"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tp_1", "weight": 35, "resultTextFa": "چند نهال مقاوم در دامنه تپه کاشتید و زباله‌های مسیر گردشگری را جمع کردید.", "stats": { "mentalHealth": 4, "fame": 3, "health": 2, "happiness": 3 } },
+      { "id": "tp_2", "weight": 25, "resultTextFa": "گروه دوستداران طبیعت از همتت عکس یادگاری گرفت و حس همبستگی ایجاد شد.", "stats": { "fame": 4, "happiness": 4 } },
+      { "id": "tp_3", "weight": 15, "resultTextFa": "بیل‌زدن زیر آفتاب خسته‌کننده بود ولی دیدن ردیف نهال‌ها دلت را گرم کرد.", "stats": { "health": 2, "mentalHealth": 4, "happiness": 3 } },
+      { "id": "tp_4", "weight": 15, "resultTextFa": "با اصول نگهداری گیاهان بومی و آبیاری قطره‌ای آشنا شدی.", "stats": { "intelligence": 2, "mentalHealth": 3 } },
+      { "id": "tp_5", "weight": 10, "resultTextFa": "پیاده‌روی صبحگاهی در دل کمپین زیست‌محیطی حال بدنت را هم بهتر کرد.", "stats": { "health": 3, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_school_supplies_drive",
+    "titleFa": "تهیه کیف و لوازم‌التحریر برای دانش‌آموزان",
+    "category": "charity",
+    "costToman": 6500000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "شادی +۶، جایگاه +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آموزش", "نیکوکاری"],
+    "seasonTags": ["summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sd_1", "weight": 35, "resultTextFa": "چندین بسته کامل دفتر و کتاب قبل مهر به دست بچه‌های مناطق کم‌برخوردار رسید.", "stats": { "happiness": 6, "fame": 5, "mentalHealth": 4 } },
+      { "id": "sd_2", "weight": 25, "resultTextFa": "دوستانت هم به پویشت پیوستند و تعداد بسته‌ها دو برابر شد.", "stats": { "fame": 6, "happiness": 5 } },
+      { "id": "sd_3", "weight": 15, "resultTextFa": "نقاشی قدردانی یکی از دانش‌آموزان تا سال‌ها روی میزت ماند.", "stats": { "mentalHealth": 6, "happiness": 5 } },
+      { "id": "sd_4", "weight": 15, "resultTextFa": "پیداکردن عمده‌فروش منصف زمان برد ولی بیشترین کیفیت را با بودجه‌ات خریدی.", "stats": { "intelligence": 1, "happiness": 4, "fame": 4 } },
+      { "id": "sd_5", "weight": 10, "resultTextFa": "احساس برکت و انگیزه کار بیشتر بعد از این اقدام درونت زنده شد.", "stats": { "mentalHealth": 5, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_elderly_visit",
+    "titleFa": "سرکشی و هم‌صحبتی در خانه سالمندان",
+    "category": "charity",
+    "costToman": 1200000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت روان +۵، شادی +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["انسان‌دوستی", "معنوی"],
+    "seasonTags": ["yalda", "nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ev_1", "weight": 35, "resultTextFa": "شنیدن قصه‌های قدیمی و نوشیدن چای با پدربزرگ‌ها و مادربزرگ‌ها دلت را نرم کرد.", "stats": { "mentalHealth": 5, "happiness": 4, "fame": 2 } },
+      { "id": "ev_2", "weight": 25, "resultTextFa": "دعای خیر و لبخند صمیمی سالمندان گرمای عجیبی به روحیه‌ات داد.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "ev_3", "weight": 15, "resultTextFa": "تضاد گذر عمر کمی به فکر فروت برد و قدر زمان با خانواده‌ات را بیشتر دانستی.", "stats": { "intelligence": 2, "mentalHealth": 4 } },
+      { "id": "ev_4", "weight": 15, "resultTextFa": "با خواندن چند غزل حافظ و موسیقی ملایم جمعی شاد ساختید.", "stats": { "happiness": 5, "fame": 3 } },
+      { "id": "ev_5", "weight": 10, "resultTextFa": "شیرینی و میوه تازه روز ساده اقامتگاه را تبدیل به جشن کرد.", "stats": { "happiness": 4, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_free_tutoring",
+    "titleFa": "تدریس رایگان به نوجوانان محله",
+    "category": "charity",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "جایگاه +۴، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آموزش", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ft_1", "weight": 35, "resultTextFa": "کلاس‌های تقویتی رایگان باعث شد چند دانش‌آموز با اعتمادبه‌نفس امتحانشان را قبول شوند.", "stats": { "fame": 4, "intelligence": 2, "happiness": 5 } },
+      { "id": "ft_2", "weight": 25, "resultTextFa": "توضیح مفاهیم به دیگران سواد پایه خودت را هم محکم‌تر کرد.", "stats": { "intelligence": 3, "mentalHealth": 3, "fame": 3 } },
+      { "id": "ft_3", "weight": 15, "resultTextFa": "والدین شاگردها با احترام فراوان از زحمتت قدردانی کردند.", "stats": { "fame": 5, "happiness": 4 } },
+      { "id": "ft_4", "weight": 15, "resultTextFa": "هماهنگی ساعت کلاس‌ها کمی سخت بود اما نتیجه کار فوق‌العاده درآمد.", "stats": { "happiness": 3, "mentalHealth": 2 } },
+      { "id": "ft_5", "weight": 10, "resultTextFa": "یک کتابخانه کوچک کلاسی با کتاب‌های اهدایی راه‌اندازی کردید.", "stats": { "fame": 4, "intelligence": 2, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_blood_donation",
+    "titleFa": "اهدای خون و حمایت از بانک خون",
+    "category": "charity",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "maxAge": 65,
+    "effectHintFa": "سلامت روان +۳، جایگاه +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["سلامت", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "bd_1", "weight": 35, "resultTextFa": "اهدای خون با معاینه سلامت رایگان انجام شد و حس نجات جان انسانی شادابت کرد.", "stats": { "mentalHealth": 4, "fame": 3, "happiness": 3 } },
+      { "id": "bd_2", "weight": 25, "resultTextFa": "نتیجه آزمایش سلامت خونت هم عالی بود و آبمیوه و کیک بعدش چسبید.", "stats": { "health": 1, "mentalHealth": 3, "happiness": 3 } },
+      { "id": "bd_3", "weight": 15, "resultTextFa": "ساعت اول بعد اهدا کمی بی‌حوصله بودی، اما با استراحت خیلی زود سرحال شدی.", "stats": { "mentalHealth": 3, "fame": 2 } },
+      { "id": "bd_4", "weight": 15, "resultTextFa": "دو نفر از همکارانت با دیدن تجربه خوبت همراهت آمدند.", "stats": { "fame": 4, "happiness": 3 } },
+      { "id": "bd_5", "weight": 10, "resultTextFa": "پیامک قدردانی انتقال خون لبخند عمیقی به دلت نشاند.", "stats": { "happiness": 4, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_neighborhood_care",
+    "titleFa": "مشارکت در هیئت امنا و زیباسازی محله",
+    "category": "charity",
+    "costToman": 2500000,
+    "cooldownYears": 1,
+    "minAge": 20,
+    "effectHintFa": "جایگاه +۵، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["محله", "مدنی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "nc_1", "weight": 35, "resultTextFa": "با همت همسایه‌ها حیاط و کوچه رنگ‌آمیزی و گل‌کاری شد و همه می‌شناسندت.", "stats": { "fame": 5, "mentalHealth": 3, "happiness": 4 } },
+      { "id": "nc_2", "weight": 25, "resultTextFa": "یک اختلاف قدیمی روی مشاعات ساختمان با میانجی‌گری محترمانه تو حل شد.", "stats": { "fame": 5, "intelligence": 2, "mentalHealth": 3 } },
+      { "id": "nc_3", "weight": 15, "resultTextFa": "نصب سطل‌های تفکیک زباله در کوچه با استقبال همسایه‌ها همراه شد.", "stats": { "fame": 4, "happiness": 3 } },
+      { "id": "nc_4", "weight": 15, "resultTextFa": "تنظیم جلسات گاهی پرحاشیه بود، اما نتیجه کار امنیت و نظم کوچه را بالا برد.", "stats": { "fame": 4, "mentalHealth": 1 } },
+      { "id": "nc_5", "weight": 10, "resultTextFa": "روابط همسایگی صمیمی‌تر شد و در مواقع ضروری پشتیبان هم شدید.", "stats": { "mentalHealth": 4, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_micro_charity_fund",
+    "titleFa": "راه‌اندازی صندوق قرض‌الحسنه خانوادگی",
+    "category": "charity",
+    "costToman": 8000000,
+    "cooldownYears": 1,
+    "minAge": 22,
+    "effectHintFa": "جایگاه +۵، همدلی خانوادگی",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["حمایت", "مالی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "mf_1", "weight": 35, "resultTextFa": "اولین وام بدون بهره صندوق به یکی از اقوام برای شروع کارش کمک کرد.", "stats": { "fame": 5, "happiness": 5, "mentalHealth": 4 } },
+      { "id": "mf_2", "weight": 25, "resultTextFa": "اعضای فامیل با اعتماد کامل حسابداری صندوق را به تو سپردند.", "stats": { "fame": 5, "intelligence": 2 } },
+      { "id": "mf_3", "weight": 15, "resultTextFa": "صندوق به موقع برای هزینه درمان اضطراری یک آشنا گره‌گشا شد.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "mf_4", "weight": 15, "resultTextFa": "یک دیرکرد قسط کوچک را با صبوری و گفتگوی محترمانه حل کردی.", "stats": { "intelligence": 2, "fame": 3 } },
+      { "id": "mf_5", "weight": 10, "resultTextFa": "جلسه قرعه‌کشی ماهانه بهانه دیدوبازدید صمیمی همه شد.", "stats": { "happiness": 5, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_painting_sketch",
+    "titleFa": "کلاس نقاشی، طراحی و خوشنویسی",
+    "category": "arts_talent",
+    "costToman": 3800000,
+    "cooldownYears": 1,
+    "minAge": 7,
+    "effectHintFa": "سلامت روان +۵، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["تجسمی", "هنر"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pt_1", "weight": 35, "resultTextFa": "ساعت‌های پای بوم و مرکب ذهن پراکنده را آرام کرد و تابلوی قشنگی کشیدی.", "stats": { "mentalHealth": 5, "happiness": 4, "intelligence": 2 } },
+      { "id": "pt_2", "weight": 25, "resultTextFa": "استاد خط و نقاشی از ظرافت دستت تعریف کرد و کارهایت را در نمایشگاه آتلیه گذاشت.", "stats": { "fame": 3, "happiness": 5, "mentalHealth": 3 } },
+      { "id": "pt_3", "weight": 15, "resultTextFa": "کارهای اول آن‌طور که می‌خواستی نشد اما تمرین خط و سایه صبرت را بالا برد.", "stats": { "mentalHealth": 3, "intelligence": 2 } },
+      { "id": "pt_4", "weight": 15, "resultTextFa": "یکی از تابلوهایت را آشنای خوش‌ذوقی خرید و انگیزه‌ات دوچندان شد.", "stats": { "happiness": 5, "fame": 2 }, "moneyToman": 4500000 },
+      { "id": "pt_5", "weight": 10, "resultTextFa": "ترکیب رنگ‌ها و دقت به جزئیات حس زیبایی‌شناسی‌ات را بیدار کرد.", "stats": { "looks": 2, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_music_instrument_practice",
+    "titleFa": "نوازندگی و تمرین ساز (سه‌تار، گیتار یا پیانو)",
+    "category": "arts_talent",
+    "costToman": 5200000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت روان +۵، هوش +۳، جایگاه +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["موسیقی", "تمرین"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "mi_1", "weight": 35, "resultTextFa": "یک قطعه کامل را بدون خطا نواختی و شب‌ها با نوای ساز دلت آرام گرفت.", "stats": { "mentalHealth": 5, "intelligence": 3, "happiness": 4 } },
+      { "id": "mi_2", "weight": 25, "resultTextFa": "در جمع دوستان قطعه کوتاهی اجرا کردی و همه از استعدادت غافلگیر شدند.", "stats": { "fame": 3, "happiness": 5 } },
+      { "id": "mi_3", "weight": 15, "resultTextFa": "تکرار نت‌ها و تمرین ریتم حافظه و هماهنگی مغزت را تقویت کرد.", "stats": { "intelligence": 4, "mentalHealth": 3 } },
+      { "id": "mi_4", "weight": 15, "resultTextFa": "نوک انگشتانت اولش کمی زخم شد اما صدادهی سازت خیلی گرم‌تر شد.", "stats": { "mentalHealth": 3, "happiness": 3 } },
+      { "id": "mi_5", "weight": 10, "resultTextFa": "بداهه‌نوازی در غروب بارانی حال‌وهوای شاعرانه‌ای به خانه‌ات آورد.", "stats": { "mentalHealth": 6, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_photography_cinema",
+    "titleFa": "عکاسی هنری و ساخت فیلم کوتاه",
+    "category": "arts_talent",
+    "costToman": 4600000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه +۳، هوش +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["دوربین", "خلاقیت"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pc_1", "weight": 35, "resultTextFa": "در کوچه‌های قدیمی قاب‌های نابی ثبت کردی که در صفحه هنری بازتاب خوبی گرفت.", "stats": { "fame": 3, "intelligence": 3, "happiness": 4 } },
+      { "id": "pc_2", "weight": 25, "resultTextFa": "فیلم کوتاه دو دقیقه‌ای‌ات در یک جشنواره دانشجویی/محلی شایسته تقدیر شد.", "stats": { "fame": 5, "happiness": 5, "intelligence": 2 } },
+      { "id": "pc_3", "weight": 15, "resultTextFa": "تدوین و نورپردازی حسابی زمان برد اما چشم هنری‌ات تیزبین‌تر شد.", "stats": { "intelligence": 4, "mentalHealth": 1 } },
+      { "id": "pc_4", "weight": 15, "resultTextFa": "عکاسی پرتره از دوستان هدیه‌های ماندگاری برایتان ساخت.", "stats": { "happiness": 4, "looks": 1, "fame": 2 } },
+      { "id": "pc_5", "weight": 10, "resultTextFa": "فروش چند قطعه عکس چاپی بخشی از هزینه تجهیزاتت را برگرداند.", "stats": { "fame": 3, "happiness": 4 }, "moneyToman": 5000000 }
+    ]
+  },
+  {
+    "id": "act_creative_writing",
+    "titleFa": "کارگاه داستان‌نویسی و شعر",
+    "category": "arts_talent",
+    "costToman": 1800000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "هوش +۴، سلامت روان +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["ادبیات", "نگارش"],
+    "seasonTags": ["yalda"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cw3_1", "weight": 35, "resultTextFa": "داستان کوتاهت را در جمع خواندی و نقدهای سازنده به پختگی قلمت کمک کرد.", "stats": { "intelligence": 4, "mentalHealth": 4, "fame": 2 } },
+      { "id": "cw3_2", "weight": 25, "resultTextFa": "یادداشت‌نویسی احساسی گره‌های قدیمی ذهنت را روی کاغذ باز کرد.", "stats": { "mentalHealth": 6, "happiness": 3 } },
+      { "id": "cw3_3", "weight": 15, "resultTextFa": "یک مجله ادبی آنلاین یکی از روایت‌هایت را برای انتشار پذیرفت.", "stats": { "fame": 4, "happiness": 5, "intelligence": 2 } },
+      { "id": "cw3_4", "weight": 15, "resultTextFa": "پیداکردن کلمه درست گاهی کلافه‌ات می‌کرد ولی سواد ادبی‌ات خیلی بالا رفت.", "stats": { "intelligence": 5 } },
+      { "id": "cw3_5", "weight": 10, "resultTextFa": "دفترچه یادداشت‌هایت پر از طرح‌های زیبا برای داستان‌های آینده شد.", "stats": { "mentalHealth": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_pottery_crafts",
+    "titleFa": "سفالگری، سرامیک و صنایع دستی",
+    "category": "arts_talent",
+    "costToman": 3400000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت روان +۵، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["کارگاه", "لمسی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pcr_1", "weight": 35, "resultTextFa": "کار با چرخ سفال و گل رس مثل مدیتیشن تمام اضطراب کار را از سرت بیرون کرد.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "pcr_2", "weight": 25, "resultTextFa": "یک دست لیوان و کاسه سرامیکی لعاب‌دار با دست‌های خودت ساختی.", "stats": { "happiness": 5, "mentalHealth": 4, "looks": 1 } },
+      { "id": "pcr_3", "weight": 15, "resultTextFa": "چند بار گل روی چرخ خراب شد و از نو ساختی؛ صبر و ظرافتت بیشتر شد.", "stats": { "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "pcr_4", "weight": 15, "resultTextFa": "کارهایت را به دوستانت هدیه دادی و همه عاشق هنر دست‌سازت شدند.", "stats": { "happiness": 5, "fame": 2 } },
+      { "id": "pcr_5", "weight": 10, "resultTextFa": "فضای کارگاه دنج و بوی خاک مرطوب خاطره‌ای گرم از این سال ساخت.", "stats": { "mentalHealth": 5, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_acting_improv",
+    "titleFa": "تئاتر بداهه و باشگاه بازیگری",
+    "category": "arts_talent",
+    "costToman": 4400000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه +۴، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["صحنه", "بیان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ai_1", "weight": 35, "resultTextFa": "بازی در نقش‌های مختلف خجالتت را ریخت و انعطاف رفتاری‌ات را بالا برد.", "stats": { "fame": 4, "happiness": 4, "looks": 2 } },
+      { "id": "ai_2", "weight": 25, "resultTextFa": "بداهه‌پردازی کمدی کل گروه را از خنده ریسه برد.", "stats": { "happiness": 6, "fame": 3, "mentalHealth": 3 } },
+      { "id": "ai_3", "weight": 15, "resultTextFa": "تمرین حس و بیان دیالوگ باعث شد در جمع‌های عادی هم رساتر حرف بزنی.", "stats": { "fame": 3, "intelligence": 2 } },
+      { "id": "ai_4", "weight": 15, "resultTextFa": "استرس قبل بالا رفتن روی صحنه اولش شدید بود ولی بعدش لذتبخش شد.", "stats": { "mentalHealth": 3, "happiness": 3 } },
+      { "id": "ai_5", "weight": 10, "resultTextFa": "یک اجرای نمایشی جمع‌وجور با بلیت‌فروشی کوچک برگزار کردید.", "stats": { "fame": 5, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_vocal_choir",
+    "titleFa": "آواز سنتی، پاپ یا گروه هم‌سرایی",
+    "category": "arts_talent",
+    "costToman": 3600000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۴، سلامت روان +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["صدا", "گروهی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "vc_1", "weight": 35, "resultTextFa": "تمرین تنفس و سلفژ حجم صدایت را باز کرد و هم‌خوانی در گروه کر دلت را شاد کرد.", "stats": { "happiness": 4, "mentalHealth": 5, "health": 1 } },
+      { "id": "vc_2", "weight": 25, "resultTextFa": "آشنایی با ردیف آوازی یا تکنیک‌های جدید اعتمادبه‌نفس عجیبی بهت بخشید.", "stats": { "intelligence": 2, "happiness": 4, "fame": 2 } },
+      { "id": "vc_3", "weight": 15, "resultTextFa": "اجرای فصلی گروه در فرهنگسرا با تشویق گرم خانواده‌ها روبه‌رو شد.", "stats": { "fame": 4, "happiness": 5 } },
+      { "id": "vc_4", "weight": 15, "resultTextFa": "تمرین مداوم گاهی تارهای صوتی‌ات را خسته کرد، ولی استراحت و چای ولرم کمک کرد.", "stats": { "mentalHealth": 3, "happiness": 2 } },
+      { "id": "vc_5", "weight": 10, "resultTextFa": "هماهنگی صدا با ده نفر دیگر حس تعلق و صمیمیت کم‌نظیری ایجاد کرد.", "stats": { "mentalHealth": 5, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_woodworking_diy",
+    "titleFa": "نجاری هنری و ساخت دکور دست‌ساز",
+    "category": "arts_talent",
+    "costToman": 3900000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "هوش +۳، سلامت روان +۴",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["چوب", "کارفنی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "wd_1", "weight": 35, "resultTextFa": "یک قفسه و میز چوبی محکم و خوش‌تراش برای اتاق خودت ساختی.", "stats": { "intelligence": 3, "mentalHealth": 4, "happiness": 5 } },
+      { "id": "wd_2", "weight": 25, "resultTextFa": "بوی چوب گردو و تراش رنده تمرکز ذهنیت را عمیق و آرام کرد.", "stats": { "mentalHealth": 5, "happiness": 3 } },
+      { "id": "wd_3", "weight": 15, "resultTextFa": "یک اتصالی را دو بار اندازه زدی و اشتباه بریدی، اما درس خوبی گرفتی.", "stats": { "intelligence": 2, "mentalHealth": 1 } },
+      { "id": "wd_4", "weight": 15, "resultTextFa": "وسایل چوبی خانه را تعمیر و بازسازی کردی و کلی در هزینه صرفه‌جویی شد.", "stats": { "happiness": 4 }, "moneyToman": 4200000 },
+      { "id": "wd_5", "weight": 10, "resultTextFa": "دوستت از میز دست‌سازت خوشش آمد و یک سفارش کوچک بهت داد.", "stats": { "fame": 2, "happiness": 4 }, "moneyToman": 5500000 }
+    ]
+  },
+  {
+    "id": "act_adopt_pet_care",
+    "titleFa": "نگهداری و مراقبت از حیوان خانگی",
+    "category": "pets",
+    "costToman": 6000000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۶، سلامت روان +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["خانگی", "عاطفی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ap_1", "weight": 35, "resultTextFa": "بازگشت به خانه با استقبال پرذوق حیوان خانگی‌ات تمام تنهایی و استرس روز را آب کرد.", "stats": { "happiness": 6, "mentalHealth": 6 } },
+      { "id": "ap_2", "weight": 25, "resultTextFa": "برنامه منظم غذا و نگهداری، حس مسئولیت‌پذیری و مهربانی‌ات را بیشتر کرد.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "ap_3", "weight": 15, "resultTextFa": "شیطنت‌هایش یکی دو بار مبل و پرده را خط انداخت اما خیلی زود با هم رفیق شدید.", "stats": { "happiness": 5, "mentalHealth": 3 } },
+      { "id": "ap_4", "weight": 15, "resultTextFa": "مراجعه مرتب واکسیناسیون در کلینیک باعث شد سلامت کامل بماند.", "stats": { "mentalHealth": 4, "happiness": 4 } },
+      { "id": "ap_5", "weight": 10, "resultTextFa": "عکس‌ها و فیلم‌های بامزه‌اش کلی لبخند بین آشنایان آورد.", "stats": { "happiness": 5, "fame": 2 } }
+    ]
+  },
+  {
+    "id": "act_pet_walk_park",
+    "titleFa": "پیاده‌روی روزانه با سگ یا حیوان خانگی",
+    "category": "pets",
+    "costToman": 800000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت +۳، شادی +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["پارک", "تحرک"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pw_1", "weight": 35, "resultTextFa": "گردش هر روز عصر با حیوان خانگی باعث شد هم تو تحرک داشته باشی و هم او شاد بماند.", "stats": { "health": 4, "happiness": 5, "mentalHealth": 3 } },
+      { "id": "pw_2", "weight": 25, "resultTextFa": "در پارک با چند صاحب حیوان دیگر آشنا شدی و تجربه‌های مفیدی تبادل کردید.", "stats": { "happiness": 4, "fame": 2, "mentalHealth": 3 } },
+      { "id": "pw_3", "weight": 15, "resultTextFa": "باران ناگهانی وسط پیاده‌روی خیستان کرد و تبدیل به یک خاطره خنده‌دار شد.", "stats": { "happiness": 4, "health": 1 } },
+      { "id": "pw_4", "weight": 15, "resultTextFa": "قلاده‌گردانی منظم تمرکز و آرامش پیاده‌روی‌های صبحی را دو برابر کرد.", "stats": { "health": 3, "mentalHealth": 4 } },
+      { "id": "pw_5", "weight": 10, "resultTextFa": "پیدا کردن مسیرهای سایه‌دار و ساکت کنار پارک حسابی حالت را جا آورد.", "stats": { "mentalHealth": 4, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_vet_checkup",
+    "titleFa": "چکاپ دامپزشکی و مراقبت تخصصی",
+    "category": "pets",
+    "costToman": 3200000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "سلامت روان +۴، پیشگیری",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["دامپزشکی", "پیشگیری"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "vc2_1", "weight": 35, "resultTextFa": "واکسیناسیون، تغذیه مناسب و معاینه کامل خیالت را از سلامت هم‌خانه‌ای کوچک راحت کرد.", "stats": { "mentalHealth": 4, "happiness": 3 } },
+      { "id": "vc2_2", "weight": 25, "resultTextFa": "دامپزشک رژیم بهتری تجویز کرد و پشم و انرژی حیوان خیلی براق‌تر و بیشتر شد.", "stats": { "happiness": 4, "mentalHealth": 3 } },
+      { "id": "vc2_3", "weight": 15, "resultTextFa": "نگرانی از یک حساسیت پوستی کوچک با یک پماد ساده سریع برطرف شد.", "stats": { "mentalHealth": 5, "happiness": 2 } },
+      { "id": "vc2_4", "weight": 15, "resultTextFa": "نگهداشتنش روی میز معاینه کمی دردسر داشت اما سریع تمام شد.", "stats": { "mentalHealth": 3, "happiness": 2 } },
+      { "id": "vc2_5", "weight": 10, "resultTextFa": "نکات مراقبت دندانی که یاد گرفتی جلوی هزینه‌های آینده را گرفت.", "stats": { "intelligence": 1, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_pet_training",
+    "titleFa": "آموزش فرمان‌پذیری و رفتار به حیوان خانگی",
+    "category": "pets",
+    "costToman": 2800000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "شادی +۴، هوش +۲، روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["تربیت", "صبر"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pt2_1", "weight": 35, "resultTextFa": "حالا با اشاره دست می‌نشیند و صبر می‌کند؛ تمرین‌های تشویقی جواب داد.", "stats": { "happiness": 5, "mentalHealth": 3, "intelligence": 2 } },
+      { "id": "pt2_2", "weight": 25, "resultTextFa": "خرابکاری داخل خانه متوقف شد و همزیستی‌تان خیلی آرام‌تر و تمیزتر گشت.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "pt2_3", "weight": 15, "resultTextFa": "مربی رفتارشناس نشان داد خطای ارتباطی از سمت ما بوده و سریع اصلاح شد.", "stats": { "intelligence": 3, "mentalHealth": 3 } },
+      { "id": "pt2_4", "weight": 15, "resultTextFa": "هفته‌های اول کمی لجبازی می‌کرد ولی بالاخره با تداوم رام و فرمان‌بردار شد.", "stats": { "mentalHealth": 3, "happiness": 3 } },
+      { "id": "pt2_5", "weight": 10, "resultTextFa": "میهمان‌ها از ادب و شیرین‌کاری‌های باهوشانه حیوانت ذوق‌زده شدند.", "stats": { "happiness": 5, "fame": 2 } }
+    ]
+  },
+  {
+    "id": "act_aquarium_birds",
+    "titleFa": "راه‌اندازی آکواریوم گیاهی یا مراقبت از پرنده",
+    "category": "pets",
+    "costToman": 4500000,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت روان +۵، شادی +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آرامش", "طبیعت‌خانگی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ab_1", "weight": 35, "resultTextFa": "تماشای آب شفاف، گیاهان سبز و صدای آرام فیلتر یا چهچهه صبحگاهی آرامش‌بخش شد.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "ab_2", "weight": 25, "resultTextFa": "تنظیم چرخه آب و گیاهان آکواریوم صبر و دانش زیست‌محیطی‌ات را بالا برد.", "stats": { "intelligence": 2, "mentalHealth": 4 } },
+      { "id": "ab_3", "weight": 15, "resultTextFa": "تمیزکردن هفتگی وقت‌گیر بود اما زیبایی گوشه پذیرایی همه‌چیز را جبران کرد.", "stats": { "happiness": 4, "mentalHealth": 3 } },
+      { "id": "ab_4", "weight": 15, "resultTextFa": "تکثیر چند ماهی کوچک یا جیک‌جیک تازه کلی ذوق به خانه آورد.", "stats": { "happiness": 5, "mentalHealth": 4 } },
+      { "id": "ab_5", "weight": 10, "resultTextFa": "شب‌ها تماشای نور ملایم آکواریوم به خوابت کمک شایانی کرد.", "stats": { "mentalHealth": 5, "health": 1 } }
+    ]
+  },
+  {
+    "id": "act_shelter_volunteer",
+    "titleFa": "داوطلبی در پناهگاه و غذارسانی اصولی",
+    "category": "pets",
+    "costToman": 1500000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "سلامت روان +۴، جایگاه +۳",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["حمایت", "داوطلب"],
+    "seasonTags": ["winter"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sv_1", "weight": 35, "resultTextFa": "کمک به نگهداری حیوانات آسیب‌دیده در پناهگاه حس عمیق شفقت و انسانیت بخشید.", "stats": { "mentalHealth": 5, "fame": 3, "happiness": 4 } },
+      { "id": "sv_2", "weight": 25, "resultTextFa": "دو قلاده حیوان با کمک پست‌های معرفی تو سرپرست مهربان پیدا کردند.", "stats": { "happiness": 6, "fame": 4 } },
+      { "id": "sv_3", "weight": 15, "resultTextFa": "نظافت و جابه‌جایی کیسه‌های غذا خسته‌ات کرد اما تیم خوبی شکل گرفت.", "stats": { "health": 2, "mentalHealth": 3, "fame": 2 } },
+      { "id": "sv_4", "weight": 15, "resultTextFa": "در روزهای برفی زمستان پناهگاه گرم و غذای کافی برایشان فراهم شد.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "sv_5", "weight": 10, "resultTextFa": "آشنایی با حامیان محیط زیست دایره دوستان خوش‌قلب‌ات را بزرگ‌تر کرد.", "stats": { "fame": 3, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_pet_grooming",
+    "titleFa": "آرایش، شست‌وشو و نظافت حیوان خانگی",
+    "category": "pets",
+    "costToman": 1400000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۴، بهداشت",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بهداشت", "مراقبت"],
+    "seasonTags": ["summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pg_1", "weight": 35, "resultTextFa": "حیوان خانگی‌ات تمیز و معطر و سرحال از گرومینگ برگشت و کل خانه تمیز ماند.", "stats": { "happiness": 4, "mentalHealth": 3 } },
+      { "id": "pg_2", "weight": 25, "resultTextFa": "کوتاه‌کردن ناخن و برس‌کشی مرتب ریزش مو را در فصل گرما خیلی کم کرد.", "stats": { "mentalHealth": 4, "health": 1 } },
+      { "id": "pg_3", "weight": 15, "resultTextFa": "اولش از سشوار کمی ترسید اما با تشویقی خیلی سریع آرام گرفت.", "stats": { "happiness": 3, "mentalHealth": 2 } },
+      { "id": "pg_4", "weight": 15, "resultTextFa": "یاد گرفتی خودت در خانه با آرامش شانه بزنی و هزینه‌ات نصف شد.", "stats": { "intelligence": 1, "happiness": 3 } },
+      { "id": "pg_5", "weight": 10, "resultTextFa": "ظاهر مرتبش حسابی دلبرتر از همیشه شد و کلی عکس گرفتی.", "stats": { "happiness": 5 } }
+    ]
+  },
+  {
+    "id": "act_terarium_garden",
+    "titleFa": "ساخت تراریوم و باغچه حیات کوچک در خانه",
+    "category": "pets",
+    "costToman": 1900000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت روان +۵، شادی +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["طبیعت", "خانگی"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tg_1", "weight": 35, "resultTextFa": "یک اکوسیستم شیشه‌ای پر از خزه و گیاه رطوبتی کنارت داری که هر روز جان می‌گیرد.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "tg_2", "weight": 25, "resultTextFa": "پروانه و پرنده‌ها دوباره به بالکن سبز و گل‌کاری‌شده‌ات سر می‌زنند.", "stats": { "happiness": 5, "mentalHealth": 4 } },
+      { "id": "tg_3", "weight": 15, "resultTextFa": "نگهداری گیاهان حساس اولش کمی دقت می‌خواست ولی زود دستت آمد.", "stats": { "intelligence": 2, "mentalHealth": 3 } },
+      { "id": "tg_4", "weight": 15, "resultTextFa": "تصفیه هوا و رطوبت مطبوع گیاهان کیفیت خواب اتاقت را بالا برد.", "stats": { "health": 2, "mentalHealth": 4 } },
+      { "id": "tg_5", "weight": 10, "resultTextFa": "قلمه‌زدن و هدیه‌دادن گلدان کوچک به همسایه‌ها باعث لبخندشان شد.", "stats": { "happiness": 4, "fame": 2 } }
+    ]
+  },
+  {
+    "id": "act_social_media",
+    "titleFa": "تولید محتوا در شبکه‌های اجتماعی",
+    "category": "social_digital",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه +۴، ریسک ذهن",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["دیجیتال", "شهرت"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sm_1", "weight": 35, "resultTextFa": "چند محتوای جذاب و آموزنده منتشر کردی و دنبال‌کننده‌هایت به‌شدت بیشتر شدند.", "stats": { "fame": 5, "happiness": 3, "mentalHealth": -1 } },
+      { "id": "sm_2", "weight": 20, "resultTextFa": "یک ویدئوی کوتاهت پربازدید شد و پیشنهاد همکاری تبلیغاتی کوچکی گرفتی.", "stats": { "fame": 6, "happiness": 4 }, "moneyToman": 6000000 },
+      { "id": "sm_3", "weight": 20, "resultTextFa": "ساعت‌ها گشت‌وگذار بی‌هدف در صفحه‌ها فقط تمرکز و اعصابت را خسته کرد.", "stats": { "mentalHealth": -4, "happiness": -2, "fame": 1 } },
+      { "id": "sm_4", "weight": 15, "resultTextFa": "با هم‌فکرهای حوزه‌ات یک اجتماع صمیمی و فعال ساختی.", "stats": { "fame": 4, "happiness": 3, "intelligence": 1 } },
+      { "id": "sm_5", "weight": 10, "resultTextFa": "حاشیه‌های نظرات منفی کمی اذیتت کرد ولی یاد گرفتی چطور مدیریتش کنی.", "stats": { "fame": 3, "mentalHealth": -2, "intelligence": 1 } }
+    ]
+  },
+  {
+    "id": "act_podcast_blog",
+    "titleFa": "راه‌اندازی پادکست یا خبرنامه تخصصی",
+    "category": "social_digital",
+    "costToman": 2400000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "جایگاه +۴، هوش +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["صوتی", "تحلیل"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pb_1", "weight": 35, "resultTextFa": "دوازده قسمت منظم ضبط و منتشر کردی و مخاطبان وفاداری پیدا کردی.", "stats": { "fame": 4, "intelligence": 3, "happiness": 4 } },
+      { "id": "pb_2", "weight": 25, "resultTextFa": "مصاحبه با متخصصان مختلف روابط و اعتبارت را به‌شدت تقویت کرد.", "stats": { "fame": 5, "intelligence": 3 } },
+      { "id": "pb_3", "weight": 15, "resultTextFa": "تنظیم صدا و ادیت اولش کند بود اما هر قسمت حرفه‌ای‌تر از قبلی شد.", "stats": { "intelligence": 3, "mentalHealth": 1 } },
+      { "id": "pb_4", "weight": 15, "resultTextFa": "یک حامی مالی کوچک هزینه میزبانی و ابزار ضبط را پوشش داد.", "stats": { "fame": 4, "happiness": 4 }, "moneyToman": 5000000 },
+      { "id": "pb_5", "weight": 10, "resultTextFa": "پیام‌های تشکر شنونده‌ها حس ارزشمندی کم‌نظیری داد.", "stats": { "happiness": 5, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_digital_detox",
+    "titleFa": "پاکسازی دیجیتال و دوری از خبرهای استرس‌زا",
+    "category": "social_digital",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت روان +۷، خواب بهتر",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آرامش", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "dd_1", "weight": 35, "resultTextFa": "اعلان‌های مزاحم را بستی و زمان اسکرین را نصف کردی؛ آرامش ذهنت برگشت.", "stats": { "mentalHealth": 7, "happiness": 4 } },
+      { "id": "dd_2", "weight": 25, "resultTextFa": "وقت آزاد جدیدت را صرف خانواده و کتاب کردی و کیفیت زندگی‌ات بالا رفت.", "stats": { "mentalHealth": 6, "intelligence": 2, "happiness": 3 } },
+      { "id": "dd_3", "weight": 15, "resultTextFa": "دو روز اول مدام سراغ گوشی می‌رفتی اما بعد از یک هفته آزاد و سبک شدی.", "stats": { "mentalHealth": 5, "happiness": 3 } },
+      { "id": "dd_4", "weight": 15, "resultTextFa": "خشکی چشم و گردن‌درد ناشی از گوشی‌نگاه‌کردن خیلی کم شد.", "stats": { "health": 3, "mentalHealth": 4 } },
+      { "id": "dd_5", "weight": 10, "resultTextFa": "بازگشت تمرکز عمیق بهت کمک کرد کارهای معوق را با سرعت تمام کنی.", "stats": { "intelligence": 3, "mentalHealth": 5 } }
+    ]
+  },
+  {
+    "id": "act_networking_events",
+    "titleFa": "کافه شبکه‌سازی و جمع‌های حرفه‌ای",
+    "category": "social_digital",
+    "costToman": 1800000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "جایگاه +۵، فرصت کاری",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["ارتباطات", "کار"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ne_1", "weight": 35, "resultTextFa": "در یک رویداد دوستانه با چند مدیر و کارآفرین هم‌صحبت شدی و جایش را باز کردی.", "stats": { "fame": 5, "happiness": 3, "intelligence": 1 } },
+      { "id": "ne_2", "weight": 25, "resultTextFa": "آشنایی با یک متخصص هم‌مسیر مسیر آینده کاری‌ات را شفاف‌تر کرد.", "stats": { "fame": 4, "intelligence": 3, "mentalHealth": 2 } },
+      { "id": "ne_3", "weight": 15, "resultTextFa": "گپ‌های کوچک جمعی اولش برایت خشک بود اما یک همکار خوب پیدا کردی.", "stats": { "fame": 3, "happiness": 2 } },
+      { "id": "ne_4", "weight": 15, "resultTextFa": "به‌روزرسانی پروفایل حرفه‌ای و حضور فعال پیشنهاد مشاوره کوچکی آورد.", "stats": { "fame": 4, "happiness": 3 }, "moneyToman": 4500000 },
+      { "id": "ne_5", "weight": 10, "resultTextFa": "اعتمادبه‌نفس معرفی خودت در ۳۰ ثانیه بسیار قوی‌تر شد.", "stats": { "fame": 4, "looks": 1 } }
+    ]
+  },
+  {
+    "id": "act_personal_brand",
+    "titleFa": "مرتب‌سازی رزومه، پورتفولیو و برند شخصی",
+    "category": "social_digital",
+    "costToman": 2100000,
+    "cooldownYears": 1,
+    "minAge": 17,
+    "effectHintFa": "جایگاه +۴، شانس شغلی",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["شغلی", "دیجیتال"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pbr_1", "weight": 35, "resultTextFa": "نمونه‌کارها و رزومه دو زبانه و تمیزی ساختی که در بازار کار حسابی چشم می‌گیرد.", "stats": { "fame": 4, "intelligence": 2, "happiness": 3 } },
+      { "id": "pbr_2", "weight": 25, "resultTextFa": "عکاسی حرفه‌ای پرتره و چیدمان دقیق سوابق ظاهری بسیار موقر ساخت.", "stats": { "fame": 4, "looks": 3 } },
+      { "id": "pbr_3", "weight": 15, "resultTextFa": "از چند همکار قدیمی توصیه‌نامه معتبر گرفتی و اعتبارت بالا رفت.", "stats": { "fame": 5, "mentalHealth": 2 } },
+      { "id": "pbr_4", "weight": 15, "resultTextFa": "نوشتن دستاوردهای واقعی زمان‌بر بود اما خودت هم به توانایی‌ات بیشتر باور آوردی.", "stats": { "mentalHealth": 3, "intelligence": 2 } },
+      { "id": "pbr_5", "weight": 10, "resultTextFa": "چند فراخوان مصاحبه از سوی شرکت‌های خوب به زودی سراغت آمد.", "stats": { "fame": 4, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_open_source_collab",
+    "titleFa": "مشارکت در پروژه‌های آزاد و ویکی‌پدیای فارسی",
+    "category": "social_digital",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "هوش +۴، جایگاه +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["دانش", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "os_1", "weight": 35, "resultTextFa": "چند مقاله معتبر و بسته کد مفید به جامعه فارسی‌زبان اضافه کردی.", "stats": { "intelligence": 4, "fame": 4, "happiness": 3 } },
+      { "id": "os_2", "weight": 25, "resultTextFa": "همکاری با برنامه‌نویس‌ها و ویراستارهای داوطلب کلی نکته تازه یادت داد.", "stats": { "intelligence": 5, "fame": 2 } },
+      { "id": "os_3", "weight": 15, "resultTextFa": "بحث و بررسی سر ویرایش دقیق کمی طولانی شد اما کیفیت نتیجه عالی بود.", "stats": { "intelligence": 3, "mentalHealth": 1 } },
+      { "id": "os_4", "weight": 15, "resultTextFa": "یک شرکت معتبر مشارکت‌های آزاد تو را تحسین کرد.", "stats": { "fame": 5, "happiness": 4 } },
+      { "id": "os_5", "weight": 10, "resultTextFa": "ساخت محتوای ماندگار حس مشارکت اجتماعی مفیدی بهت داد.", "stats": { "mentalHealth": 4, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_cyber_privacy",
+    "titleFa": "ایمن‌سازی حساب‌ها، پشتیبان‌گیری و حریم خصوصی",
+    "category": "social_digital",
+    "costToman": 500000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "هوش +۳، سلامت روان +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["امنیت", "فناوری"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cp_1", "weight": 35, "resultTextFa": "احراز هویت دو مرحله‌ای و رمزهای امن را فعال کردی و عکس‌های قدیمی را بکاپ گرفتی.", "stats": { "mentalHealth": 4, "intelligence": 3 } },
+      { "id": "cp_2", "weight": 25, "resultTextFa": "جلوی یک پیامک فیشینگ جعلی را به موقع گرفتی و نزدیکانت را هم آگاه کردی.", "stats": { "intelligence": 3, "fame": 2, "mentalHealth": 3 } },
+      { "id": "cp_3", "weight": 15, "resultTextFa": "مرتب‌کردن هزاران فایل و ایمیل قدیمی مثل خانه‌تکانی دیجیتال حس سبکی داد.", "stats": { "mentalHealth": 5, "happiness": 2 } },
+      { "id": "cp_4", "weight": 15, "resultTextFa": "یک کلید امنیتی ساده و نظم رمزها استرس هک یا فراموشی را از بین برد.", "stats": { "mentalHealth": 4, "intelligence": 2 } },
+      { "id": "cp_5", "weight": 10, "resultTextFa": "آشنایی با قوانین امنیت سایبری اعتمادبه‌نفس دیجیتالت را افزایش داد.", "stats": { "intelligence": 4, "happiness": 2 } }
+    ]
+  },
+  {
+    "id": "act_streaming_community",
+    "titleFa": "اجرای زنده یا گپ‌وگفت تعاملی با مخاطبان",
+    "category": "social_digital",
+    "costToman": 1200000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "جایگاه +۵، شادی +۳",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["پخش‌زنده", "تعاملی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sc2_1", "weight": 35, "resultTextFa": "پرسش‌وپاسخ زنده خیلی پرانرژی پیش رفت و چند مخاطب ثابت پیدا کردی.", "stats": { "fame": 5, "happiness": 4 } },
+      { "id": "sc2_2", "weight": 25, "resultTextFa": "حمایت مالی جزئی مخاطبان و پیام‌های محبت‌آمیز شوقت را بالا برد.", "stats": { "fame": 4, "happiness": 5 }, "moneyToman": 3500000 },
+      { "id": "sc2_3", "weight": 15, "resultTextFa": "قطعی اینترنت وسط برنامه کمی کلافت کرد اما سریع جبرانش کردی.", "stats": { "fame": 2, "mentalHealth": -2 } },
+      { "id": "sc2_4", "weight": 15, "resultTextFa": "یک نشست مشترک با دوست هم‌صنف جذابیت برنامه را دوچندان کرد.", "stats": { "fame": 5, "happiness": 4 } },
+      { "id": "sc2_5", "weight": 10, "resultTextFa": "تمرین بداهه جلوی دوربین بیان و واکنش سریع‌ت را صیقل داد.", "stats": { "intelligence": 2, "fame": 3 } }
+    ]
+  },
+  {
+    "id": "act_freelance_side_gig",
+    "titleFa": "انجام پروژه فریلنسری و کار جانبی",
+    "category": "business_trade",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "درآمد جانبی + تجربه عملی",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["درآمد", "آزاد"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "fg_1", "weight": 35, "resultTextFa": "چند سفارش کوچک آخر هفته را با کیفیت تحویل دادی و دستمزد خوبی گرفتی.", "stats": { "fame": 2, "intelligence": 2, "mentalHealth": -2 }, "moneyToman": 16000000 },
+      { "id": "fg_2", "weight": 25, "resultTextFa": "مشتری از سرعت عملت راضی بود و یک قرارداد دوره بعدی هم سپرد.", "stats": { "happiness": 4, "fame": 3 }, "moneyToman": 22000000 },
+      { "id": "fg_3", "weight": 15, "resultTextFa": "کارفرمای بدقلق چند بار ویرایش خواست، ولی بالاخره تسویه حساب شد.", "stats": { "mentalHealth": -3, "intelligence": 2 }, "moneyToman": 11000000 },
+      { "id": "fg_4", "weight": 15, "resultTextFa": "تجربه مستقیم با مشتری مهارت مذاکره و قیمت‌گذاری‌ات را قوی‌تر کرد.", "stats": { "intelligence": 3, "fame": 2 }, "moneyToman": 14000000 },
+      { "id": "fg_5", "weight": 10, "resultTextFa": "کار جانبی فشارت را بالا برد اما اندوخته‌ات رشد چشمگیری کرد.", "stats": { "health": -1, "happiness": 3 }, "moneyToman": 25000000 }
+    ]
+  },
+  {
+    "id": "act_ecommerce_shop",
+    "titleFa": "فروش اینترنتی محصولات کوچک و دست‌ساز",
+    "category": "business_trade",
+    "costToman": 15000000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "تجارت خُرد + امکان سود",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["فروش", "آنلاین"],
+    "seasonTags": ["nowruz", "yalda"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ec_1", "weight": 35, "resultTextFa": "بسته‌های ارسالی در تعطیلات عالی فروش رفت و سود خالص خوبی برایت ماند.", "stats": { "happiness": 5, "fame": 3, "intelligence": 2 }, "moneyToman": 28000000 },
+      { "id": "ec_2", "weight": 25, "resultTextFa": "یاد گرفتی عکس‌برداری محصول و ارسال سریع را مدیریت کنی.", "stats": { "intelligence": 3, "fame": 2 }, "moneyToman": 20000000 },
+      { "id": "ec_3", "weight": 15, "resultTextFa": "هزینه بسته‌بندی و ارسال بالا بود؛ با سود جزئی سر به سر بیرون آمدی.", "stats": { "intelligence": 2, "mentalHealth": -1 }, "moneyToman": 15500000 },
+      { "id": "ec_4", "weight": 15, "resultTextFa": "چند مرجوعی پیش آمد و سودت کمتر از انتظار شد، اما مشتری‌ها راضی ماندند.", "stats": { "mentalHealth": -2, "fame": 2 }, "moneyToman": 12000000 },
+      { "id": "ec_5", "weight": 10, "resultTextFa": "یک پکیج پرطرفدار پیدا کردی که فروشش چند برابر پیش‌بینی شد.", "stats": { "happiness": 6, "fame": 4 }, "moneyToman": 36000000 }
+    ]
+  },
+  {
+    "id": "act_bazaar_research",
+    "titleFa": "بازارگردی تخصصی و بررسی فرصت‌های صنفی",
+    "category": "business_trade",
+    "costToman": 1000000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "هوش +۴، بینش بازار",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بازار", "تحقیق"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "br_1", "weight": 35, "resultTextFa": "چند روز سر زدن به عمده‌فروشی‌ها و گپ با کسبه قدیمی چشم بازارت را باز کرد.", "stats": { "intelligence": 4, "fame": 2 } },
+      { "id": "br_2", "weight": 25, "resultTextFa": "متوجه شکاف قیمتی جالبی بین تولید و مصرف شدی و ایده‌هایی نوشتی.", "stats": { "intelligence": 5, "happiness": 2 } },
+      { "id": "br_3", "weight": 15, "resultTextFa": "بسیاری از کسبه از رکود فصلی گفتند و دید واقع‌بینانه‌تری به ریسک کار پیدا کردی.", "stats": { "intelligence": 3, "mentalHealth": 1 } },
+      { "id": "br_4", "weight": 15, "resultTextFa": "یک تامین‌کننده منصف و خوش‌قول شناختی که در آینده به کارت می‌آید.", "stats": { "fame": 3, "intelligence": 3 } },
+      { "id": "br_5", "weight": 10, "resultTextFa": "پیاده‌روی مفصل در بازار بزرگ هم اطلاعات خوبی داد و هم حال‌وهوایت عوض شد.", "stats": { "health": 1, "intelligence": 3, "happiness": 2 } }
+    ]
+  },
+  {
+    "id": "act_small_wholesale_flip",
+    "titleFa": "خرید عمده فصلی و فروش خرده‌فروشی",
+    "category": "business_trade",
+    "costToman": 22000000,
+    "cooldownYears": 1,
+    "minAge": 20,
+    "effectHintFa": "معامله فصلی با ریسک متوسط",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["تجارت", "فصلی"],
+    "seasonTags": ["nowruz", "summer"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "wf_1", "weight": 35, "resultTextFa": "خرید به‌موقع کالاهای پرمصرف فصل در بازار شب عید یا تابستان سود خوبی ساخت.", "stats": { "happiness": 5, "intelligence": 2 }, "moneyToman": 34000000 },
+      { "id": "wf_2", "weight": 25, "resultTextFa": "بخشی را نقدی و بخشی را در غرفه دوستان فروختی و سود متعادلی بردی.", "stats": { "intelligence": 3, "fame": 2 }, "moneyToman": 28000000 },
+      { "id": "wf_3", "weight": 15, "resultTextFa": "کالاها کمی دیرتر فروش رفتند و به سختی با تخفیف نقدشان کردی.", "stats": { "mentalHealth": -2, "intelligence": 2 }, "moneyToman": 19000000 },
+      { "id": "wf_4", "weight": 15, "resultTextFa": "حاشیه سود دقیقاً اندازه تورم جابه‌جا شد؛ درس مهمی درباره سرمایه در گردش گرفتی.", "stats": { "intelligence": 3 }, "moneyToman": 24000000 },
+      { "id": "wf_5", "weight": 10, "resultTextFa": "شناخت سلیقه خریدار باعث شد کل موجودی ظرف ده روز تمام شود.", "stats": { "happiness": 6, "fame": 3 }, "moneyToman": 40000000 }
+    ]
+  },
+  {
+    "id": "act_angel_micro_partner",
+    "titleFa": "سرمایه‌گذاری خُرد در کارگاه یک آشنا",
+    "category": "business_trade",
+    "costToman": 35000000,
+    "cooldownYears": 1,
+    "minAge": 21,
+    "effectHintFa": "شراکت محدود، بازده متغیر",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "tags": ["شراکت", "کارآفرینی"],
+    "quotaCost": 2,
+    "outcomes": [
+      { "id": "am_1", "weight": 35, "resultTextFa": "توسعه دستگاه‌های کارگاه جواب داد و سهم سود سالانه‌ات با احترام پرداخت شد.", "stats": { "happiness": 6, "fame": 3 }, "moneyToman": 52000000 },
+      { "id": "am_2", "weight": 25, "resultTextFa": "مدیریت حساب‌وکتاب شفاف شریک باعث شد سرمایه‌ات حفظ شود و رشد متعادلی بکند.", "stats": { "intelligence": 2, "mentalHealth": 2 }, "moneyToman": 44000000 },
+      { "id": "am_3", "weight": 15, "resultTextFa": "تاخیر در سفارش‌های کارگاه سود امسال را عقب انداخت، اما اصل سرمایه محفوظ ماند.", "stats": { "mentalHealth": -2 }, "moneyToman": 35000000 },
+      { "id": "am_4", "weight": 15, "resultTextFa": "هزینه تعمیرات پیش‌بینی‌نشده بخشی از بازده سال را خورد.", "stats": { "mentalHealth": -3, "intelligence": 2 }, "moneyToman": 28000000 },
+      { "id": "am_5", "weight": 10, "resultTextFa": "کارگاه به یک مشتری شرکتی بزرگ وصل شد و سود جهشی نصیبت گردید.", "stats": { "happiness": 7, "fame": 4 }, "moneyToman": 65000000 }
+    ]
+  },
+  {
+    "id": "act_consulting_session",
+    "titleFa": "ارائه مشاوره تخصصی به کسب‌وکارهای کوچک",
+    "category": "business_trade",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 22,
+    "minIntelligence": 55,
+    "effectHintFa": "جایگاه +۴، حق‌الزحمه مشاوره",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["مشاوره", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cs_1", "weight": 35, "resultTextFa": "راهکار عملی تو هزینه یک فروشگاه را کاهش داد و حق‌المشاوره محترمانه‌ای گرفتی.", "stats": { "fame": 4, "intelligence": 2, "happiness": 3 }, "moneyToman": 15000000 },
+      { "id": "cs_2", "weight": 25, "resultTextFa": "مشتری بعد از اجرای پیشنهادت تو را به دو کسب‌وکار دیگر هم معرفی کرد.", "stats": { "fame": 5, "happiness": 4 }, "moneyToman": 18000000 },
+      { "id": "cs_3", "weight": 15, "resultTextFa": "مقاومت صاحب‌کار در برابر تغییر کمی خسته‌ات کرد اما بالاخره قانع شد.", "stats": { "intelligence": 3, "mentalHealth": -1 }, "moneyToman": 10000000 },
+      { "id": "cs_4", "weight": 15, "resultTextFa": "یک گزارش تحلیلی تمیز تحویل دادی و اعتبار تخصصی‌ات بالا رفت.", "stats": { "fame": 4, "intelligence": 3 }, "moneyToman": 12000000 },
+      { "id": "cs_5", "weight": 10, "resultTextFa": "همراهی موفق با استارتاپ محلی نامت را سر زبان‌ها انداخت.", "stats": { "fame": 5, "happiness": 4 }, "moneyToman": 20000000 }
+    ]
+  },
+  {
+    "id": "act_rental_gear_side",
+    "titleFa": "اجاره ابزار یا تجهیزات تخصصی بلااستفاده",
+    "category": "business_trade",
+    "costToman": 8000000,
+    "cooldownYears": 1,
+    "minAge": 19,
+    "effectHintFa": "درآمد غیرفعال خرد",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["تجهیزات", "درآمد"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "rg_1", "weight": 35, "resultTextFa": "با قرارداد تمیز و ودیعه معتبر تجهیزاتت در طول سال اجاره رفت و درآمد ساخت.", "stats": { "happiness": 4, "intelligence": 1 }, "moneyToman": 14000000 },
+      { "id": "rg_2", "weight": 25, "resultTextFa": "متقاضی‌های آخر هفته زیاد بودند و سرمایه اولیه‌ات با سود برگشت.", "stats": { "happiness": 4, "fame": 2 }, "moneyToman": 16000000 },
+      { "id": "rg_3", "weight": 15, "resultTextFa": "هزینه سرویس و نگهداری وسط سال کمی از سود را کم کرد.", "stats": { "intelligence": 2 }, "moneyToman": 10500000 },
+      { "id": "rg_4", "weight": 15, "resultTextFa": "استفاده منظم مشتریان قابل اعتماد بدون هیچ خسارتی انجام شد.", "stats": { "mentalHealth": 2, "happiness": 3 }, "moneyToman": 13000000 },
+      { "id": "rg_5", "weight": 10, "resultTextFa": "تقاضای بالا بهت نشان داد کدام ابزارها بازار اجاره پررونق‌تری دارند.", "stats": { "intelligence": 3, "happiness": 3 }, "moneyToman": 15000000 }
+    ]
+  },
+  {
+    "id": "act_startup_meetup",
+    "titleFa": "ارائه ایده در رویداد استارتاپی",
+    "category": "business_trade",
+    "costToman": 2500000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "جایگاه +۵، هوش +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["استارتاپ", "شبکه"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "sm2_1", "weight": 35, "resultTextFa": "داورها به مدل درآمدی ایده‌ات نمره بالایی دادند و سرمایه‌گذارها شماره گرفتند.", "stats": { "fame": 5, "intelligence": 3, "happiness": 4 } },
+      { "id": "sm2_2", "weight": 25, "resultTextFa": "ایرادهای طرحت در جلسه نقد روشن شد و از اشتباه پرهزینه آینده جلوگیری کرد.", "stats": { "intelligence": 5, "mentalHealth": 2 } },
+      { "id": "sm2_3", "weight": 15, "resultTextFa": "یک هم‌بنیان‌گذار فنی باانگیزه در حاشیه رویداد پیدا کردی.", "stats": { "fame": 4, "happiness": 4 } },
+      { "id": "sm2_4", "weight": 15, "resultTextFa": "پرزنت سه دقیقه‌ای وسط سالن پر از استرس بود ولی قوی تمامش کردی.", "stats": { "fame": 4, "mentalHealth": 1 } },
+      { "id": "sm2_5", "weight": 10, "resultTextFa": "جایزه نقدی تشویقی بخش استعدادیابی نصیب تیمتان شد.", "stats": { "fame": 5, "happiness": 5 }, "moneyToman": 18000000 }
+    ]
+  },
+  {
+    "id": "act_tax_compliance",
+    "titleFa": "مشاوره مالیاتی و شفاف‌سازی حساب‌ها",
+    "category": "legal_civic",
+    "costToman": 3500000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "سلامت روان +۵، پیشگیری جریمه",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["مالیات", "قانون"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "tc2_1", "weight": 35, "resultTextFa": "اظهارنامه و مدارک به‌موقع و درست ثبت شد و از جرایم احتمالی کاملاً در امان ماندی.", "stats": { "mentalHealth": 5, "intelligence": 2, "happiness": 2 } },
+      { "id": "tc2_2", "weight": 25, "resultTextFa": "مشاور مالیاتی چند معافیت قانونی را پیدا کرد و مالیاتت کمتر از برآورد شد.", "stats": { "mentalHealth": 4, "happiness": 4 }, "moneyToman": 6000000 },
+      { "id": "tc2_3", "weight": 15, "resultTextFa": "جمع‌کردن فاکتورهای پراکنده حوصله‌سربر بود اما حساب و کتابت آینه شد.", "stats": { "mentalHealth": 4, "intelligence": 2 } },
+      { "id": "tc2_4", "weight": 15, "resultTextFa": "سوابق بیمه و مالیاتی‌ات بدون نقص شد و برای کارهای بانکی و سفر آماده شدی.", "stats": { "mentalHealth": 5, "fame": 1 } },
+      { "id": "tc2_5", "weight": 10, "resultTextFa": "پرونده قدیمی معوق با تقسیط رسمی بسته شد و فکرت آزاد گردید.", "stats": { "mentalHealth": 6, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_contract_review",
+    "titleFa": "بازبینی قراردادها نزد وکیل و مشاور حقوقی",
+    "category": "legal_civic",
+    "costToman": 4200000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "هوش +۳، سلامت روان +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["حقوقی", "قرارداد"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cr_1", "weight": 35, "resultTextFa": "وکیل دو بند پرریسک در قرارداد کاری/اجاره‌ات را اصلاح کرد و جلوی ضرر بزرگ را گرفت.", "stats": { "intelligence": 3, "mentalHealth": 5, "happiness": 2 } },
+      { "id": "cr_2", "weight": 25, "resultTextFa": "اصول نوشتن رسید معتبر، سفته و تعهدنامه را برای معاملات آینده یاد گرفتی.", "stats": { "intelligence": 4, "mentalHealth": 3 } },
+      { "id": "cr_3", "weight": 15, "resultTextFa": "بابت امضا نکردن یک متن مبهم اولش معطل شدی اما بعداً فهمیدی چقدر به‌جا بود.", "stats": { "mentalHealth": 5, "intelligence": 2 } },
+      { "id": "cr_4", "weight": 15, "resultTextFa": "طرف مقابل با دیدن متن حرفه‌ای و مستند خیلی منظم‌تر به تعهدش پایبند ماند.", "stats": { "fame": 2, "mentalHealth": 4 } },
+      { "id": "cr_5", "weight": 10, "resultTextFa": "حق‌الزحمه جزئی اما اطمینان کامل حقوقی برای کل سال نصیبت شد.", "stats": { "mentalHealth": 4, "happiness": 2 } }
+    ]
+  },
+  {
+    "id": "act_passport_docs",
+    "titleFa": "به‌روزرسانی گذرنامه، ترجمه و اسناد رسمی",
+    "category": "legal_civic",
+    "costToman": 2800000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "آمادگی سفر و مدارک",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["مدارک", "سفر"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pd_1", "weight": 35, "resultTextFa": "گذرنامه و مدارک هویتی و ترجمه رسمی آماده شدند؛ هر وقت بخواهی سفر یا اقدام می‌کنی.", "stats": { "mentalHealth": 4, "happiness": 3 } },
+      { "id": "pd_2", "weight": 25, "resultTextFa": "نوبت‌گیری اینترنتی دفاتر کار را بدون معطلی و صف طولانی تمام کرد.", "stats": { "happiness": 3, "mentalHealth": 3 } },
+      { "id": "pd_3", "weight": 15, "resultTextFa": "رفع مغایرت کوچک در سوابق هویتی الآن تمام شد تا بعداً دردسر نشود.", "stats": { "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "pd_4", "weight": 15, "resultTextFa": "پرونده سوابق شغلی و تحصیلی را در پوشه‌ای مرتب بایگانی کردی.", "stats": { "mentalHealth": 3, "intelligence": 2 } },
+      { "id": "pd_5", "weight": 10, "resultTextFa": "امضای دیجیتال و گواهی ثنا و سامانه‌های الکترونیکت فعال شد.", "stats": { "intelligence": 2, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_civic_participation",
+    "titleFa": "شرکت در انجمن مدنی، شورا یا کارگروه شهری",
+    "category": "legal_civic",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "جایگاه +۵، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "social",
+    "tags": ["مدنی", "رایگان"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "cp2_1", "weight": 35, "resultTextFa": "در نشست‌های برنامه‌ریزی محلی شرکت کردی و پیشنهاد بهبود فضای سبز پذیرفته شد.", "stats": { "fame": 5, "intelligence": 2, "happiness": 3 } },
+      { "id": "cp2_2", "weight": 25, "resultTextFa": "آشنایی با سازوکار بودجه شهری و قوانین شورا دیدت را روشن‌تر کرد.", "stats": { "intelligence": 4, "fame": 3 } },
+      { "id": "cp2_3", "weight": 15, "resultTextFa": "پیگیری امور اداری کمی صبر و نامه‌نگاری می‌خواست اما بالاخره ثمر داد.", "stats": { "fame": 4, "mentalHealth": 1 } },
+      { "id": "cp2_4", "weight": 15, "resultTextFa": "به عنوان نماینده داوطلب کارگروه ترافیک و پارک انتخاب شدی.", "stats": { "fame": 5, "happiness": 4 } },
+      { "id": "cp2_5", "weight": 10, "resultTextFa": "همدلی با دیگر شهروندان فعال حس مسئولیت اجتماعی قشنگی ساخت.", "stats": { "mentalHealth": 3, "fame": 3 } }
+    ]
+  },
+  {
+    "id": "act_insurance_audit",
+    "titleFa": "بازبینی بیمه عمر، درمان تکمیلی و حوادث",
+    "category": "legal_civic",
+    "costToman": 5500000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "سلامت روان +۵، سلامت +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بیمه", "امنیت"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ia_1", "weight": 35, "resultTextFa": "پوشش بیمه تکمیلی و حوادث را به‌روز کردی و خیالت از مخارج غیرمنتظره راحت شد.", "stats": { "mentalHealth": 5, "health": 2 } },
+      { "id": "ia_2", "weight": 25, "resultTextFa": "بابت پوشش دندانپزشکی یا آزمایشگاه چند فاکتور معوق را هم پس گرفتی.", "stats": { "happiness": 4, "mentalHealth": 3 }, "moneyToman": 4000000 },
+      { "id": "ia_3", "weight": 15, "resultTextFa": "مقایسه دقیق سقف تعهدات باعث شد طرح بسیار به‌صرفه‌تری انتخاب کنی.", "stats": { "intelligence": 3, "mentalHealth": 4 } },
+      { "id": "ia_4", "weight": 15, "resultTextFa": "اصلاح اشتباه جزئی در دفترچه بیمه قبل از نیاز واقعی انجام شد.", "stats": { "mentalHealth": 4 } },
+      { "id": "ia_5", "weight": 10, "resultTextFa": "آرامش خاطر برای خانواده ارزشمندترین دستاورد این کار بود.", "stats": { "mentalHealth": 5, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_clean_record_clearance",
+    "titleFa": "رسیدگی به پرونده‌های معوق و سوءپیشینه",
+    "category": "legal_civic",
+    "costToman": 9000000,
+    "cooldownYears": 2,
+    "minAge": 18,
+    "effectHintFa": "بهبود پرونده حقوقی و آرامش",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["قانونی", "بازسازی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "crc_1", "weight": 35, "resultTextFa": "تخلف‌های قدیمی پس از گذشت مهلت قانونی و پرداخت دیون ثبت و مختومه شدند.", "stats": { "mentalHealth": 6, "happiness": 4, "fame": 2 }, "criminalRecordDelta": -1 },
+      { "id": "crc_2", "weight": 25, "resultTextFa": "گواهی جدید وضعیت حقوقی‌ات پاک و منظم صادر شد.", "stats": { "mentalHealth": 5, "happiness": 4 } },
+      { "id": "crc_3", "weight": 15, "resultTextFa": "پیگیری در دادسرا و دفاتر قضایی چند روزی زمان برد اما نتیجه‌بخش بود.", "stats": { "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "crc_4", "weight": 15, "resultTextFa": "جریمه دیرکرد قدیمی تقسیط و با حسن نیت تسویه گردید.", "stats": { "mentalHealth": 4, "fame": 1 } },
+      { "id": "crc_5", "weight": 10, "resultTextFa": "مسیر حقوقی‌ات برای استخدام یا دریافت گواهینامه شفاف‌تر شد.", "stats": { "happiness": 4, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_credit_score_boost",
+    "titleFa": "مرتب‌سازی اعتبار بانکی و پرونده تسهیلات",
+    "category": "legal_civic",
+    "costToman": 1000000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "اعتبار مالی + بهبود امتیاز",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["بانکی", "اعتبار"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "csb_1", "weight": 35, "resultTextFa": "بدهی‌های خُرد و چک‌های قدیمی بررسی و تسویه شد و اعتبار بانکی‌ات رتبه بالایی گرفت.", "stats": { "mentalHealth": 4, "intelligence": 2, "happiness": 3 } },
+      { "id": "csb_2", "weight": 25, "resultTextFa": "حذف کارت‌های بانکی راکد و فعال‌سازی حساب پشتیبان نظم خوبی آورد.", "stats": { "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "csb_3", "weight": 15, "resultTextFa": "یک کارمزد اشتباهی بانک پیگیری و به حسابت برگردانده شد.", "stats": { "happiness": 3, "intelligence": 2 }, "moneyToman": 1800000 },
+      { "id": "csb_4", "weight": 15, "resultTextFa": "حساب گردش مالی‌ات برای اخذ وام مسکن یا ضمانت آینده آماده شد.", "stats": { "mentalHealth": 3, "fame": 2 } },
+      { "id": "csb_5", "weight": 10, "resultTextFa": "از شرایط ضمانت بانکی و ریسک چک صیادی شناخت دقیق‌تری به دست آوردی.", "stats": { "intelligence": 4 } }
+    ]
+  },
+  {
+    "id": "act_estate_will_prep",
+    "titleFa": "ثبت محضری اسناد و تنظیم دارایی‌ها",
+    "category": "legal_civic",
+    "costToman": 3000000,
+    "cooldownYears": 1,
+    "minAge": 22,
+    "effectHintFa": "سلامت روان +۵، نظم اسناد",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["اسناد", "خانواده"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ewp_1", "weight": 35, "resultTextFa": "تمام سندها، وکالت‌نامه‌ها و فهرست دارایی‌ها با ثبت محضری مرتب و امن شد.", "stats": { "mentalHealth": 5, "happiness": 3 } },
+      { "id": "ewp_2", "weight": 25, "resultTextFa": "تبدیل قولنامه دستی به سند تک‌برگ یا رسمی خیال خودت و خانواده‌ات را راحت کرد.", "stats": { "mentalHealth": 6, "fame": 1 } },
+      { "id": "ewp_3", "weight": 15, "resultTextFa": "پیداکردن بایگانی قدیمی چند ساعت زمان برد اما همه چیز دیجیتال و امن شد.", "stats": { "mentalHealth": 4, "intelligence": 2 } },
+      { "id": "ewp_4", "weight": 15, "resultTextFa": "گفتگو با اعضای خانواده درباره حقوق قانونی همه، از سوءتفاهم‌های آینده جلوگیری کرد.", "stats": { "mentalHealth": 4, "happiness": 3 } },
+      { "id": "ewp_5", "weight": 10, "resultTextFa": "سردفتر راهنمایی مفیدی درباره قوانین ارث و صلح ارائه داد.", "stats": { "intelligence": 3, "mentalHealth": 3 } }
+    ]
+  },
+  {
+    "id": "act_wardrobe_style",
+    "titleFa": "بازسازی کمد لباس و استایل شخصی",
+    "category": "lifestyle_shop",
+    "costToman": 11000000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "ظاهر +۵، شادی +۴، جایگاه +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["پوشاک", "آراستگی"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ws_1", "weight": 35, "resultTextFa": "لباس‌های شیک و متناسب خریدی و در هر جمعی اعتمادبه‌نفس و وقارت به چشم می‌آید.", "stats": { "looks": 5, "happiness": 4, "fame": 2 } },
+      { "id": "ws_2", "weight": 25, "resultTextFa": "لباس‌های بلااستفاده قبلی را بخشیدی و کمد مینیمال و مرتبی ساختی.", "stats": { "looks": 3, "mentalHealth": 4, "happiness": 3 } },
+      { "id": "ws_3", "weight": 15, "resultTextFa": "خیاط خوش‌ذوق کت یا مانتو را دقیقاً اندازه قد و اندامت دوخت.", "stats": { "looks": 6, "happiness": 4 } },
+      { "id": "ws_4", "weight": 15, "resultTextFa": "در حراج آخر فصل دو دست لباس باکیفیت را به نصف قیمت شکار کردی.", "stats": { "looks": 4, "happiness": 5, "intelligence": 1 } },
+      { "id": "ws_5", "weight": 10, "resultTextFa": "ست‌کردن رنگ‌های تازه ظاهر همیشگی‌ات را شاداب‌تر نشان داد.", "stats": { "looks": 4, "mentalHealth": 2 } }
+    ]
+  },
+  {
+    "id": "act_grooming_skincare",
+    "titleFa": "روتین پوست و مو و پیرایش حرفه‌ای",
+    "category": "lifestyle_shop",
+    "costToman": 4200000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "ظاهر +۵، سلامت +۱",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["آراستگی", "پوست"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "gs2_1", "weight": 35, "resultTextFa": "مدل موی جدید و مراقبت اصولی پوست چهره‌ات را سرزنده و جوان‌تر نشان داد.", "stats": { "looks": 5, "happiness": 4, "health": 1 } },
+      { "id": "gs2_2", "weight": 25, "resultTextFa": "مشاوره تخصصی پوست باعث شد محصولات بی‌تأثیر را کنار بگذاری و روال ساده بگیری.", "stats": { "looks": 4, "intelligence": 1, "mentalHealth": 2 } },
+      { "id": "gs2_3", "weight": 15, "resultTextFa": "آرایشگر حرفه‌ای استایلی را انتخاب کرد که دقیقاً به فرم صورتت می‌آید.", "stats": { "looks": 5, "fame": 2 } },
+      { "id": "gs2_4", "weight": 15, "resultTextFa": "استفاده منظم از ضدآفتاب و مرطوب‌کننده طراوت پوستت را حفظ کرد.", "stats": { "looks": 3, "health": 2 } },
+      { "id": "gs2_5", "weight": 10, "resultTextFa": "تعریف‌های دوستان از چهره سرحالت روزت را ساخت.", "stats": { "looks": 4, "happiness": 4 } }
+    ]
+  },
+  {
+    "id": "act_home_redecorate",
+    "titleFa": "تغییر دکوراسیون و خانه‌تکانی اساسی",
+    "category": "lifestyle_shop",
+    "costToman": 8500000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "سلامت روان +۶، شادی +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["خانه", "نوسازی"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "hr_1", "weight": 35, "resultTextFa": "عوض کردن چیدمان، نورپردازی گرم و حذف وسایل اضافی خانه را دلباز و آرام کرد.", "stats": { "mentalHealth": 6, "happiness": 5 } },
+      { "id": "hr_2", "weight": 25, "resultTextFa": "گوشه‌ای دنج برای مطالعه و کار ساختی و بازده روزانه‌ات بالا رفت.", "stats": { "mentalHealth": 5, "intelligence": 2, "happiness": 3 } },
+      { "id": "hr_3", "weight": 15, "resultTextFa": "گردگیری و اسباب‌کشی مبل‌ها خسته‌ات کرد اما بوی تمیزی تمام خانه را پر کرد.", "stats": { "health": 1, "mentalHealth": 5, "happiness": 4 } },
+      { "id": "hr_4", "weight": 15, "resultTextFa": "فروش وسایل قدیمی بلااستفاده هم جا باز کرد و هم کمی پول برگرداند.", "stats": { "mentalHealth": 4, "happiness": 4 }, "moneyToman": 3800000 },
+      { "id": "hr_5", "weight": 10, "resultTextFa": "رنگ‌زدن یک دیوار با رنگ ملایم حال‌وهوای اتاق را از این رو به آن رو کرد.", "stats": { "happiness": 5, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_coffee_tea_tasting",
+    "titleFa": "تجهیز گوشه قهوه و دمنوش‌خانه خانگی",
+    "category": "lifestyle_shop",
+    "costToman": 3600000,
+    "cooldownYears": 1,
+    "minAge": 15,
+    "effectHintFa": "شادی +۴، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["خوراکی", "روزمره"],
+    "seasonTags": ["winter", "yalda"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "ctt_1", "weight": 35, "resultTextFa": "دم‌کردن قهوه تازه و دمنوش‌های گیاهی هر صبح را به یک آیین دوست‌داشتنی تبدیل کرد.", "stats": { "happiness": 4, "mentalHealth": 4 } },
+      { "id": "ctt_2", "weight": 25, "resultTextFa": "کمتر به کافه‌های گران می‌روی و با همین تجهیزات کلی صرفه‌جویی کردی.", "stats": { "happiness": 4, "intelligence": 1 }, "moneyToman": 2200000 },
+      { "id": "ctt_3", "weight": 15, "resultTextFa": "میهمان‌های خانه از طعم چای هل و قهوه‌های دست‌دمت حسابی لذت بردند.", "stats": { "happiness": 5, "fame": 2 } },
+      { "id": "ctt_4", "weight": 15, "resultTextFa": "آزمون و خطا روی درجه آسیاب بالاخره به طعم دقیق دلخواهت رسید.", "stats": { "intelligence": 2, "happiness": 3 } },
+      { "id": "ctt_5", "weight": 10, "resultTextFa": "شب‌های سرد با یک لیوان دمنوش آرامش‌بخش راحت‌تر به خواب رفتی.", "stats": { "mentalHealth": 5, "health": 1 } }
+    ]
+  },
+  {
+    "id": "act_minimalist_declutter",
+    "titleFa": "ساده‌زیستی و پاکسازی کمد و انباری",
+    "category": "lifestyle_shop",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت روان +۵، رایگان",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["نظم", "رایگان"],
+    "seasonTags": ["nowruz"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "md_1", "weight": 35, "resultTextFa": "جداکردن و اهدای وسایل بی‌مصرف انباری باعث شد ذهنت هم به طرز شگفت‌انگیزی سبک شود.", "stats": { "mentalHealth": 6, "happiness": 4 } },
+      { "id": "md_2", "weight": 25, "resultTextFa": "وسط وسایل قدیمی چند یادگاری و کتاب فراموش‌شده پیدا کردی و لبخند زدی.", "stats": { "happiness": 5, "mentalHealth": 4 } },
+      { "id": "md_3", "weight": 15, "resultTextFa": "پیداکردن هر وسیله‌ای در خانه الآن پنج ثانیه بیشتر زمان نمی‌برد.", "stats": { "mentalHealth": 4, "intelligence": 1 } },
+      { "id": "md_4", "weight": 15, "resultTextFa": "به جای خرید وسایل تکراری، تصمیم گرفتی فقط چیزهای بادوام بخری.", "stats": { "intelligence": 2, "mentalHealth": 4 } },
+      { "id": "md_5", "weight": 10, "resultTextFa": "دو کارتن وسیله سالم را به نیازمندان رساندی و جایش حس خوب نشست.", "stats": { "fame": 2, "happiness": 4, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_quality_dining",
+    "titleFa": "رستوران‌گردی و تجربه طعم‌های تازه",
+    "category": "lifestyle_shop",
+    "costToman": 4500000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "شادی +۵، سلامت روان +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["غذا", "تفریح"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "qd_1", "weight": 35, "resultTextFa": "یک شام بی‌نظیر در رستوران سنتی با موسیقی ملایم و غذای تازه خاطره قشنگی ساخت.", "stats": { "happiness": 5, "mentalHealth": 3 } },
+      { "id": "qd_2", "weight": 25, "resultTextFa": "غذاهای محلی شهر دیگری را امتحان کردی و یک پاتوق دنج جدید شناختی.", "stats": { "happiness": 5, "fame": 1 } },
+      { "id": "qd_3", "weight": 15, "resultTextFa": "غذا کمی تندتر از انتظار بود ولی دسر سنتی و چای زعفران همه‌چیز را جبران کرد.", "stats": { "happiness": 3, "mentalHealth": 2 } },
+      { "id": "qd_4", "weight": 15, "resultTextFa": "جشن کوچک خانوادگی سر یک میز گرم دل‌ها را به هم نزدیک‌تر کرد.", "stats": { "happiness": 6, "mentalHealth": 4 } },
+      { "id": "qd_5", "weight": 10, "resultTextFa": "نوشتن نقد محترمانه در صفحه رستوران‌ها با استقبال کاربران روبه‌رو شد.", "stats": { "fame": 2, "happiness": 3 } }
+    ]
+  },
+  {
+    "id": "act_ergonomic_setup",
+    "titleFa": "بهبود میز کار، نورپردازی و صندلی استاندارد",
+    "category": "lifestyle_shop",
+    "costToman": 9500000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "سلامت +۴، سلامت روان +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["ارگونومی", "بازدهی"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "es_1", "weight": 35, "resultTextFa": "صندلی ارگونومیک و نور مناسب مانیتور کمردرد و خستگی چشمت را کاملاً برطرف کرد.", "stats": { "health": 5, "mentalHealth": 4, "happiness": 3 } },
+      { "id": "es_2", "weight": 25, "resultTextFa": "نظم کابل‌ها و میز کار تمیز تمرکزت هنگام مطالعه و کار را دو برابر کرد.", "stats": { "intelligence": 2, "mentalHealth": 5 } },
+      { "id": "es_3", "weight": 15, "resultTextFa": "سرهم‌کردن پایه و میز یک عصر زمان برد اما نتیجه‌اش فوق‌العاده حرفه‌ای شد.", "stats": { "happiness": 4, "health": 3 } },
+      { "id": "es_4", "weight": 15, "resultTextFa": "پایه خنک‌کننده و صفحه‌کلید راحت مچ دستت را از فشار نجات داد.", "stats": { "health": 4, "mentalHealth": 3 } },
+      { "id": "es_5", "weight": 10, "resultTextFa": "تماشای میز مرتبت هر صبح انگیزه شروع روزت را بالا می‌برد.", "stats": { "happiness": 4, "mentalHealth": 4 } }
+    ]
+  },
+  {
+    "id": "act_perfume_accessories",
+    "titleFa": "خرید عطر امضا و اکسسوری کلاسیک",
+    "category": "lifestyle_shop",
+    "costToman": 6200000,
+    "cooldownYears": 1,
+    "minAge": 16,
+    "effectHintFa": "ظاهر +۴، جایگاه +۳، شادی +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "tags": ["شیک", "استایل"],
+    "quotaCost": 1,
+    "outcomes": [
+      { "id": "pa_1", "weight": 35, "resultTextFa": "عطر خوش‌رایحه و ساعت یا کیف مرتب حضورت در جمع را بسیار جذاب‌تر کرد.", "stats": { "looks": 4, "fame": 3, "happiness": 4 } },
+      { "id": "pa_2", "weight": 25, "resultTextFa": "در قرارهای رسمی از ظاهر آراسته و انتخاب دقیق عطر خودت تعریف شنیدی.", "stats": { "looks": 5, "fame": 3 } },
+      { "id": "pa_3", "weight": 15, "resultTextFa": "بین چند رایحه مختلف بهترین نت سازگار با فصل را پیدا کردی.", "stats": { "looks": 3, "happiness": 3 } },
+      { "id": "pa_4", "weight": 15, "resultTextFa": "ست‌کردن کمربند و کفش تمیز استایل همیشگی‌ات را چند پله بالاتر برد.", "stats": { "looks": 4, "mentalHealth": 2 } },
+      { "id": "pa_5", "weight": 10, "resultTextFa": "هر بار با زدن آن عطر حس تازگی و اعتمادبه‌نفس می‌گیری.", "stats": { "happiness": 4, "mentalHealth": 3, "looks": 3 } }
     ]
   },
   {
@@ -373,19 +1965,11 @@
     "effectHintFa": "هیجان لحظه‌ای · ریسک جریمه و پرونده",
     "riskLabelFa": "زیاد",
     "contentTag": "crime",
+    "tags": ["پرخطر"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 55,
-        "resultTextFa": "این بار با شانس قسر در رفتی، اما استرسش تا شب با تو ماند.",
-        "stats": { "happiness": 2, "mentalHealth": -3 }
-      },
-      {
-        "weight": 45,
-        "resultTextFa": "دوربین و گشت پلیس متوقفت کردند؛ جریمه سنگین و سابقه تخلف برایت ثبت شد.",
-        "stats": { "happiness": -6, "mentalHealth": -5, "fame": -5 },
-        "moneyToman": -12000000,
-        "criminalRecordDelta": 1
-      }
+      { "id": "mr2_1", "weight": 55, "resultTextFa": "این بار با شانس قسر در رفتی، اما استرسش تا شب با تو ماند.", "stats": { "happiness": 2, "mentalHealth": -3 } },
+      { "id": "mr2_2", "weight": 45, "resultTextFa": "دوربین و گشت پلیس متوقفت کردند؛ جریمه سنگین و سابقه تخلف برایت ثبت شد.", "stats": { "happiness": -6, "mentalHealth": -5, "fame": -5 }, "moneyToman": -12000000, "criminalRecordDelta": 1 }
     ]
   },
   {
@@ -398,18 +1982,11 @@
     "effectHintFa": "ریسک باخت پول یا برد تصادفی",
     "riskLabelFa": "زیاد",
     "contentTag": "crime",
+    "tags": ["پرخطر"],
+    "quotaCost": 1,
     "outcomes": [
-      {
-        "weight": 28,
-        "resultTextFa": "بخت با تو یار بود و مبلغی بیشتر از سرمایه‌ات برگشت، اما وسوسه ادامه‌اش خطرناک است.",
-        "stats": { "happiness": 4, "mentalHealth": -3 },
-        "moneyToman": 22000000
-      },
-      {
-        "weight": 72,
-        "resultTextFa": "پول را باختی و حس پشیمانی و عصبانیت کل هفته رهات نکرد.",
-        "stats": { "happiness": -7, "mentalHealth": -6 }
-      }
+      { "id": "gb_1", "weight": 28, "resultTextFa": "بخت با تو یار بود و مبلغی بیشتر از سرمایه‌ات برگشت، اما وسوسه ادامه‌اش خطرناک است.", "stats": { "happiness": 4, "mentalHealth": -3 }, "moneyToman": 22000000 },
+      { "id": "gb_2", "weight": 72, "resultTextFa": "پول را باختی و حس پشیمانی و عصبانیت کل هفته رهات نکرد.", "stats": { "happiness": -7, "mentalHealth": -6 } }
     ]
   }
 ]

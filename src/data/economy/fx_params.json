@@ -1,0 +1,4179 @@
+{
+  "meta": {
+    "baseCurrency": "USD",
+    "anchorYear": 1405,
+    "descriptionFa": "مدل ارزی جفت‌ارزهای دلاری با بازگشت به میانگین لگاریتمی تفاضل تورم، ریسک‌پریمیوم و پرش‌های دوره‌ای"
+  },
+  "usdPairModels": {
+    "IRT": {
+      "anchor1405UnitsPerUsd": {
+        "value": 271900,
+        "unit": "IRT/USD",
+        "asOf": "1405-08",
+        "source": "نرخ دلار بازار آزاد تهران — آبان ۱۴۰۵",
+        "confidence": "verified"
+      },
+      "kappa": {
+        "value": 0.28,
+        "unit": "per_year",
+        "asOf": "1405-08",
+        "source": "ضریب همگرایی سالانه به تعادل PPP تعدیل‌شده",
+        "confidence": "estimate"
+      },
+      "riskPremiumAnnual": {
+        "value": 0.035,
+        "unit": "ratio",
+        "asOf": "1405-08",
+        "source": "صرف ریسک ساختاری سالانه نرخ ارز نسبت به تفاضل تورم",
+        "confidence": "estimate"
+      },
+      "jumpProb": {
+        "value": 0.18,
+        "unit": "prob",
+        "asOf": "1405-08",
+        "source": "احتمال سالانه شوک جهشی نرخ ارز در سناریوهای تورمی",
+        "confidence": "estimate"
+      },
+      "jumpMeanLog": {
+        "value": 0.16,
+        "unit": "log_ratio",
+        "asOf": "1405-08",
+        "source": "میانگین جهش لگاریتمی هنگام بروز شوک ارزی",
+        "confidence": "estimate"
+      },
+      "jumpStdLog": {
+        "value": 0.08,
+        "unit": "log_ratio",
+        "asOf": "1405-08",
+        "source": "انحراف معیار شوک جهشی ارز",
+        "confidence": "estimate"
+      },
+      "noiseStd": {
+        "value": 0.055,
+        "unit": "log_ratio",
+        "asOf": "1405-08",
+        "source": "نوسان عادی سالانه نرخ ارز",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 95,
+        "unit": "bps",
+        "asOf": "1405-08",
+        "source": "شکاف خرید و فروش صرافی/بازار آزاد در تبدیل ریالی",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.008,
+        "unit": "ratio",
+        "asOf": "1405-08",
+        "source": "کارمزد صرافی در تبدیل ارز",
+        "confidence": "estimate"
+      }
+    },
+    "USD": {
+      "anchor1405UnitsPerUsd": {
+        "value": 1,
+        "unit": "USD/USD",
+        "asOf": "2026-10",
+        "source": "ارز مبنای سیستم",
+        "confidence": "verified"
+      },
+      "kappa": {
+        "value": 0,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "ارز مبنا ثابت ۱",
+        "confidence": "verified"
+      },
+      "riskPremiumAnnual": {
+        "value": 0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "ارز مبنا",
+        "confidence": "verified"
+      },
+      "jumpProb": {
+        "value": 0,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "ارز مبنا",
+        "confidence": "verified"
+      },
+      "jumpMeanLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "ارز مبنا",
+        "confidence": "verified"
+      },
+      "jumpStdLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "ارز مبنا",
+        "confidence": "verified"
+      },
+      "noiseStd": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "ارز مبنا",
+        "confidence": "verified"
+      },
+      "spreadBps": {
+        "value": 20,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف پایه مبادلات دلاری",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.003,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد استاندارد تبدیل دلاری",
+        "confidence": "estimate"
+      }
+    },
+    "TRY": {
+      "anchor1405UnitsPerUsd": {
+        "value": 45,
+        "unit": "TRY/USD",
+        "asOf": "2026-04",
+        "source": "رکورد ۴۵ لیر به دلار در آوریل ۲۰۲۶ و روند تدریجی کاهش ارزش",
+        "confidence": "verified"
+      },
+      "kappa": {
+        "value": 0.32,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "سرعت تطبیق نرخ ارز لیر به تفاضل تورم ترکیه و آمریکا",
+        "confidence": "estimate"
+      },
+      "riskPremiumAnnual": {
+        "value": 0.025,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "ریسک‌پریمیوم سالانه لیر ترکیه",
+        "confidence": "estimate"
+      },
+      "jumpProb": {
+        "value": 0.14,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "احتمال جهش مقطعی لیر در سال‌های پرنوسان",
+        "confidence": "estimate"
+      },
+      "jumpMeanLog": {
+        "value": 0.11,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "میانگین جهش لگاریتمی لیر",
+        "confidence": "estimate"
+      },
+      "jumpStdLog": {
+        "value": 0.06,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "انحراف معیار جهش لیر",
+        "confidence": "estimate"
+      },
+      "noiseStd": {
+        "value": 0.045,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان سالانه لیر",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 65,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف خرید و فروش لیر",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.006,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد تبدیل لیر",
+        "confidence": "estimate"
+      }
+    },
+    "EUR": {
+      "anchor1405UnitsPerUsd": {
+        "value": 0.92,
+        "unit": "EUR/USD",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ تعادلی یورو در برابر دلار (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "kappa": {
+        "value": 0.36,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "بازگشت ملایم به برابری قدرت خرید در برابر دلار",
+        "confidence": "estimate"
+      },
+      "riskPremiumAnnual": {
+        "value": 0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "جفت‌ارز پایدار بدون صرف ریسک تورمی بالا",
+        "confidence": "estimate"
+      },
+      "jumpProb": {
+        "value": 0.02,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "احتمال نادر شوک ارزی جهانی",
+        "confidence": "estimate"
+      },
+      "jumpMeanLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "شوک متقارن",
+        "confidence": "estimate"
+      },
+      "jumpStdLog": {
+        "value": 0.03,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "دامنه شوک محدود یورو",
+        "confidence": "estimate"
+      },
+      "noiseStd": {
+        "value": 0.035,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان سالانه ملایم جفت‌ارز یورو/دلار",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 25,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف مبادله یورو",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.004,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد تبدیل یورو",
+        "confidence": "estimate"
+      }
+    },
+    "GBP": {
+      "anchor1405UnitsPerUsd": {
+        "value": 0.78,
+        "unit": "GBP/USD",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ تعادلی پوند بریتانیا به دلار (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "kappa": {
+        "value": 0.34,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "بازگشت به میانگین PPP پوند",
+        "confidence": "estimate"
+      },
+      "riskPremiumAnnual": {
+        "value": 0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "جفت‌ارز پایدار",
+        "confidence": "estimate"
+      },
+      "jumpProb": {
+        "value": 0.02,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "احتمال نادر شوک اقتصادی",
+        "confidence": "estimate"
+      },
+      "jumpMeanLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "شوک متقارن",
+        "confidence": "estimate"
+      },
+      "jumpStdLog": {
+        "value": 0.035,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "دامنه محدود",
+        "confidence": "estimate"
+      },
+      "noiseStd": {
+        "value": 0.038,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان سالانه ملایم پوند",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 30,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف مبادله پوند",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.0045,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد تبدیل پوند",
+        "confidence": "estimate"
+      }
+    },
+    "CAD": {
+      "anchor1405UnitsPerUsd": {
+        "value": 1.38,
+        "unit": "CAD/USD",
+        "asOf": "2026-10",
+        "source": "برآورد نرخ برابری دلار کانادا به دلار آمریکا (۲۰۲۶)",
+        "confidence": "estimate"
+      },
+      "kappa": {
+        "value": 0.35,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "بازگشت به میانگین نرخ ارز کانادا",
+        "confidence": "estimate"
+      },
+      "riskPremiumAnnual": {
+        "value": 0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "جفت‌ارز پایدار",
+        "confidence": "estimate"
+      },
+      "jumpProb": {
+        "value": 0.02,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "احتمال شوک کالایی",
+        "confidence": "estimate"
+      },
+      "jumpMeanLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "شوک متقارن",
+        "confidence": "estimate"
+      },
+      "jumpStdLog": {
+        "value": 0.03,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "دامنه محدود",
+        "confidence": "estimate"
+      },
+      "noiseStd": {
+        "value": 0.035,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان سالانه دلار کانادا",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 30,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف مبادله دلار کانادا",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.0045,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد تبدیل دلار کانادا",
+        "confidence": "estimate"
+      }
+    },
+    "AED": {
+      "anchor1405UnitsPerUsd": {
+        "value": 3.6725,
+        "unit": "AED/USD",
+        "asOf": "2026-10",
+        "source": "نرخ رسمی ثابت بانک مرکزی امارات (۳٫۶۷۲۵ درهم به دلار)",
+        "confidence": "verified"
+      },
+      "kappa": {
+        "value": 0.92,
+        "unit": "per_year",
+        "asOf": "2026-10",
+        "source": "نگهداری پیوند رسمی ثابت به دلار",
+        "confidence": "verified"
+      },
+      "riskPremiumAnnual": {
+        "value": 0,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "برابری ثابت",
+        "confidence": "verified"
+      },
+      "jumpProb": {
+        "value": 0,
+        "unit": "prob",
+        "asOf": "2026-10",
+        "source": "برابری ثابت بدون جهش",
+        "confidence": "verified"
+      },
+      "jumpMeanLog": {
+        "value": 0,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "صفر",
+        "confidence": "verified"
+      },
+      "jumpStdLog": {
+        "value": 0.002,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان ناچیز حاشیه رسمی",
+        "confidence": "verified"
+      },
+      "noiseStd": {
+        "value": 0.002,
+        "unit": "log_ratio",
+        "asOf": "2026-10",
+        "source": "نوسان ناچیز بین‌بانکی",
+        "confidence": "verified"
+      },
+      "spreadBps": {
+        "value": 25,
+        "unit": "bps",
+        "asOf": "2026-10",
+        "source": "شکاف استاندارد درهم",
+        "confidence": "estimate"
+      },
+      "conversionFeePct": {
+        "value": 0.0035,
+        "unit": "ratio",
+        "asOf": "2026-10",
+        "source": "کارمزد تبدیل درهم",
+        "confidence": "estimate"
+      }
+    }
+  },
+  "transferChannels": [
+    {
+      "id": "bank_wire",
+      "titleFa": "حواله بانکی رسمی",
+      "subtitleFa": "انتقال حساب‌به‌حساب با سقف بالا و ثبت رسمی در مدارک تمکن",
+      "feePct": {
+        "value": 0.018,
+        "unit": "ratio",
+        "asOf": "1405-08",
+        "source": "پارامتر انتزاعی کارمزد حواله بانکی درون‌بازی",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 60,
+        "unit": "bps",
+        "asOf": "1405-08",
+        "source": "اختلاف نرخ خرید و فروش کانال بانکی",
+        "confidence": "estimate"
+      },
+      "minAmountUsd": {
+        "value": 500,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "حداقل مبلغ قابل انتقال از مسیر بانکی",
+        "confidence": "estimate"
+      },
+      "maxAmountUsd": {
+        "value": 150000,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "سقف سالانه انتقال در هر نوبت",
+        "confidence": "estimate"
+      },
+      "delayTurns": {
+        "value": 1,
+        "unit": "turns",
+        "asOf": "1405-08",
+        "source": "زمان پردازش ۱ نوبت در انتقال بانکی",
+        "confidence": "estimate"
+      },
+      "failureRisk": {
+        "value": 0.03,
+        "unit": "prob",
+        "asOf": "1405-08",
+        "source": "احتمال بازگشت یا تأخیر اداری حواله",
+        "confidence": "estimate"
+      },
+      "requiresBankAccount": true,
+      "notesFa": "کارمزد متعادل، پذیرش کامل برای گواهی تمکن، اما با زمان انتظار پردازش"
+    },
+    {
+      "id": "exchange_office",
+      "titleFa": "شبکه صرافی مجاز",
+      "subtitleFa": "انتقال سریع‌تر با کارمزد میانه و سقف متعارف",
+      "feePct": {
+        "value": 0.025,
+        "unit": "ratio",
+        "asOf": "1405-08",
+        "source": "پارامتر انتزاعی کارمزد شبکه صرافی",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 95,
+        "unit": "bps",
+        "asOf": "1405-08",
+        "source": "شکاف نرخ تبدیل صرافی",
+        "confidence": "estimate"
+      },
+      "minAmountUsd": {
+        "value": 200,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "حداقل مبلغ مبادله",
+        "confidence": "estimate"
+      },
+      "maxAmountUsd": {
+        "value": 60000,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "سقف در هر تراکنش",
+        "confidence": "estimate"
+      },
+      "delayTurns": {
+        "value": 0,
+        "unit": "turns",
+        "asOf": "1405-08",
+        "source": "تسویه فوری در همان سال",
+        "confidence": "estimate"
+      },
+      "failureRisk": {
+        "value": 0.04,
+        "unit": "prob",
+        "asOf": "1405-08",
+        "source": "احتمال خطا یا لغو موقت در صف",
+        "confidence": "estimate"
+      },
+      "requiresBankAccount": false,
+      "notesFa": "تسویه سریع در همان نوبت اما با شکاف نرخ بیشتر"
+    },
+    {
+      "id": "remittance_network",
+      "titleFa": "شبکه حواله سریع خرد",
+      "subtitleFa": "مناسب مبالغ کوچک و ارسال مقرری خانوادگی",
+      "feePct": {
+        "value": 0.038,
+        "unit": "ratio",
+        "asOf": "1405-08",
+        "source": "پارامتر انتزاعی کارمزد حواله خرد",
+        "confidence": "estimate"
+      },
+      "spreadBps": {
+        "value": 120,
+        "unit": "bps",
+        "asOf": "1405-08",
+        "source": "شکاف نرخ حواله خرد",
+        "confidence": "estimate"
+      },
+      "minAmountUsd": {
+        "value": 50,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "حداقل مبلغ ارسال",
+        "confidence": "estimate"
+      },
+      "maxAmountUsd": {
+        "value": 15000,
+        "unit": "usd",
+        "asOf": "1405-08",
+        "source": "سقف هر تراکنش خرد",
+        "confidence": "estimate"
+      },
+      "delayTurns": {
+        "value": 0,
+        "unit": "turns",
+        "asOf": "1405-08",
+        "source": "وصول فوری برای مبالغ خرد",
+        "confidence": "estimate"
+      },
+      "failureRisk": {
+        "value": 0.02,
+        "unit": "prob",
+        "asOf": "1405-08",
+        "source": "ریسک خطای عملیاتی پایین برای مبالغ کم",
+        "confidence": "estimate"
+      },
+      "requiresBankAccount": false,
+      "notesFa": "مناسب ارسال کمک‌هزینه خانواده یا مبالغ پایین با کارمزد درصدی بالاتر"
+    }
+  ],
+  "historicalUsdRates": [
+    {
+      "year": 1340,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1340-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1340-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000009,
+          "unit": "TRY/USD",
+          "asOf": "1340-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.02,
+          "unit": "EUR/USD",
+          "asOf": "1340-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1340-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.01,
+          "unit": "CAD/USD",
+          "asOf": "1340-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.76,
+          "unit": "AED/USD",
+          "asOf": "1340-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1341,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1341-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1341-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.00001,
+          "unit": "TRY/USD",
+          "asOf": "1341-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.008,
+          "unit": "EUR/USD",
+          "asOf": "1341-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1341-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.01875,
+          "unit": "CAD/USD",
+          "asOf": "1341-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.714,
+          "unit": "AED/USD",
+          "asOf": "1341-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1342,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1342-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1342-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.00001,
+          "unit": "TRY/USD",
+          "asOf": "1342-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.996,
+          "unit": "EUR/USD",
+          "asOf": "1342-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1342-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.0275,
+          "unit": "CAD/USD",
+          "asOf": "1342-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.668,
+          "unit": "AED/USD",
+          "asOf": "1342-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1343,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1343-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1343-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.00001,
+          "unit": "TRY/USD",
+          "asOf": "1343-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.984,
+          "unit": "EUR/USD",
+          "asOf": "1343-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1343-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.03625,
+          "unit": "CAD/USD",
+          "asOf": "1343-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.622,
+          "unit": "AED/USD",
+          "asOf": "1343-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1344,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1344-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1344-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000011,
+          "unit": "TRY/USD",
+          "asOf": "1344-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.972,
+          "unit": "EUR/USD",
+          "asOf": "1344-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1344-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.045,
+          "unit": "CAD/USD",
+          "asOf": "1344-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.576,
+          "unit": "AED/USD",
+          "asOf": "1344-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1345,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1345-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1345-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000012,
+          "unit": "TRY/USD",
+          "asOf": "1345-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.96,
+          "unit": "EUR/USD",
+          "asOf": "1345-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.357,
+          "unit": "GBP/USD",
+          "asOf": "1345-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.05375,
+          "unit": "CAD/USD",
+          "asOf": "1345-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.53,
+          "unit": "AED/USD",
+          "asOf": "1345-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1346,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1346-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1346-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000012,
+          "unit": "TRY/USD",
+          "asOf": "1346-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.948,
+          "unit": "EUR/USD",
+          "asOf": "1346-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.387,
+          "unit": "GBP/USD",
+          "asOf": "1346-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.0625,
+          "unit": "CAD/USD",
+          "asOf": "1346-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.484,
+          "unit": "AED/USD",
+          "asOf": "1346-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1347,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1347-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1347-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000012,
+          "unit": "TRY/USD",
+          "asOf": "1347-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.936,
+          "unit": "EUR/USD",
+          "asOf": "1347-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.417,
+          "unit": "GBP/USD",
+          "asOf": "1347-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.07125,
+          "unit": "CAD/USD",
+          "asOf": "1347-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.438,
+          "unit": "AED/USD",
+          "asOf": "1347-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1348,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1348-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1348-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000013,
+          "unit": "TRY/USD",
+          "asOf": "1348-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.924,
+          "unit": "EUR/USD",
+          "asOf": "1348-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.41275,
+          "unit": "GBP/USD",
+          "asOf": "1348-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.08,
+          "unit": "CAD/USD",
+          "asOf": "1348-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.392,
+          "unit": "AED/USD",
+          "asOf": "1348-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1349,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1349-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1349-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000013,
+          "unit": "TRY/USD",
+          "asOf": "1349-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.912,
+          "unit": "EUR/USD",
+          "asOf": "1349-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.4085,
+          "unit": "GBP/USD",
+          "asOf": "1349-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.07,
+          "unit": "CAD/USD",
+          "asOf": "1349-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.346,
+          "unit": "AED/USD",
+          "asOf": "1349-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1350,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1350-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1350-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000014,
+          "unit": "TRY/USD",
+          "asOf": "1350-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.9,
+          "unit": "EUR/USD",
+          "asOf": "1350-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.40425,
+          "unit": "GBP/USD",
+          "asOf": "1350-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.06,
+          "unit": "CAD/USD",
+          "asOf": "1350-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.3,
+          "unit": "AED/USD",
+          "asOf": "1350-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1351,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1351-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1351-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000021,
+          "unit": "TRY/USD",
+          "asOf": "1351-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.88125,
+          "unit": "EUR/USD",
+          "asOf": "1351-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.4,
+          "unit": "GBP/USD",
+          "asOf": "1351-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.05,
+          "unit": "CAD/USD",
+          "asOf": "1351-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 4.125,
+          "unit": "AED/USD",
+          "asOf": "1351-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1352,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1352-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1352-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000028,
+          "unit": "TRY/USD",
+          "asOf": "1352-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.8625,
+          "unit": "EUR/USD",
+          "asOf": "1352-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.4375,
+          "unit": "GBP/USD",
+          "asOf": "1352-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.04,
+          "unit": "CAD/USD",
+          "asOf": "1352-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.95,
+          "unit": "AED/USD",
+          "asOf": "1352-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1353,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1353-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1353-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000035,
+          "unit": "TRY/USD",
+          "asOf": "1353-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.84375,
+          "unit": "EUR/USD",
+          "asOf": "1353-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.475,
+          "unit": "GBP/USD",
+          "asOf": "1353-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.03,
+          "unit": "CAD/USD",
+          "asOf": "1353-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.90375,
+          "unit": "AED/USD",
+          "asOf": "1353-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1354,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1354-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1354-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000042,
+          "unit": "TRY/USD",
+          "asOf": "1354-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.825,
+          "unit": "EUR/USD",
+          "asOf": "1354-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.5125,
+          "unit": "GBP/USD",
+          "asOf": "1354-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.02,
+          "unit": "CAD/USD",
+          "asOf": "1354-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.8575,
+          "unit": "AED/USD",
+          "asOf": "1354-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1355,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1355-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1355-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000048,
+          "unit": "TRY/USD",
+          "asOf": "1355-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.80625,
+          "unit": "EUR/USD",
+          "asOf": "1355-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.55,
+          "unit": "GBP/USD",
+          "asOf": "1355-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.05,
+          "unit": "CAD/USD",
+          "asOf": "1355-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.81125,
+          "unit": "AED/USD",
+          "asOf": "1355-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1356,
+      "rates": {
+        "IRT": {
+          "value": 7,
+          "unit": "IRT/USD",
+          "asOf": "1356-12",
+          "source": "نرخ رسمی تک‌نرخی بانک مرکزی (۷۰ ریال)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1356-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000055,
+          "unit": "TRY/USD",
+          "asOf": "1356-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.7875,
+          "unit": "EUR/USD",
+          "asOf": "1356-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.538,
+          "unit": "GBP/USD",
+          "asOf": "1356-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.08,
+          "unit": "CAD/USD",
+          "asOf": "1356-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.765,
+          "unit": "AED/USD",
+          "asOf": "1356-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1357,
+      "rates": {
+        "IRT": {
+          "value": 10,
+          "unit": "IRT/USD",
+          "asOf": "1357-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1357-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000062,
+          "unit": "TRY/USD",
+          "asOf": "1357-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.76875,
+          "unit": "EUR/USD",
+          "asOf": "1357-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.526,
+          "unit": "GBP/USD",
+          "asOf": "1357-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.11,
+          "unit": "CAD/USD",
+          "asOf": "1357-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.71875,
+          "unit": "AED/USD",
+          "asOf": "1357-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1358,
+      "rates": {
+        "IRT": {
+          "value": 14,
+          "unit": "IRT/USD",
+          "asOf": "1358-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1358-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000069,
+          "unit": "TRY/USD",
+          "asOf": "1358-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.75,
+          "unit": "EUR/USD",
+          "asOf": "1358-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.514,
+          "unit": "GBP/USD",
+          "asOf": "1358-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.14,
+          "unit": "CAD/USD",
+          "asOf": "1358-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1358-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1359,
+      "rates": {
+        "IRT": {
+          "value": 20,
+          "unit": "IRT/USD",
+          "asOf": "1359-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1359-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000076,
+          "unit": "TRY/USD",
+          "asOf": "1359-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.816667,
+          "unit": "EUR/USD",
+          "asOf": "1359-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.502,
+          "unit": "GBP/USD",
+          "asOf": "1359-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.17,
+          "unit": "CAD/USD",
+          "asOf": "1359-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1359-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1360,
+      "rates": {
+        "IRT": {
+          "value": 27,
+          "unit": "IRT/USD",
+          "asOf": "1360-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1360-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000175,
+          "unit": "TRY/USD",
+          "asOf": "1360-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.883333,
+          "unit": "EUR/USD",
+          "asOf": "1360-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.49,
+          "unit": "GBP/USD",
+          "asOf": "1360-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.2,
+          "unit": "CAD/USD",
+          "asOf": "1360-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1360-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1361,
+      "rates": {
+        "IRT": {
+          "value": 35,
+          "unit": "IRT/USD",
+          "asOf": "1361-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1361-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000274,
+          "unit": "TRY/USD",
+          "asOf": "1361-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.95,
+          "unit": "EUR/USD",
+          "asOf": "1361-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.56,
+          "unit": "GBP/USD",
+          "asOf": "1361-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.238,
+          "unit": "CAD/USD",
+          "asOf": "1361-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1361-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1362,
+      "rates": {
+        "IRT": {
+          "value": 45,
+          "unit": "IRT/USD",
+          "asOf": "1362-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1362-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000373,
+          "unit": "TRY/USD",
+          "asOf": "1362-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.016667,
+          "unit": "EUR/USD",
+          "asOf": "1362-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.63,
+          "unit": "GBP/USD",
+          "asOf": "1362-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.276,
+          "unit": "CAD/USD",
+          "asOf": "1362-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1362-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1363,
+      "rates": {
+        "IRT": {
+          "value": 58,
+          "unit": "IRT/USD",
+          "asOf": "1363-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1363-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000472,
+          "unit": "TRY/USD",
+          "asOf": "1363-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.083333,
+          "unit": "EUR/USD",
+          "asOf": "1363-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.7,
+          "unit": "GBP/USD",
+          "asOf": "1363-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.314,
+          "unit": "CAD/USD",
+          "asOf": "1363-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1363-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1364,
+      "rates": {
+        "IRT": {
+          "value": 61,
+          "unit": "IRT/USD",
+          "asOf": "1364-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1364-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.000571,
+          "unit": "TRY/USD",
+          "asOf": "1364-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.15,
+          "unit": "EUR/USD",
+          "asOf": "1364-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.77,
+          "unit": "GBP/USD",
+          "asOf": "1364-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.352,
+          "unit": "CAD/USD",
+          "asOf": "1364-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1364-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1365,
+      "rates": {
+        "IRT": {
+          "value": 74,
+          "unit": "IRT/USD",
+          "asOf": "1365-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1365-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.00067,
+          "unit": "TRY/USD",
+          "asOf": "1365-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.1,
+          "unit": "EUR/USD",
+          "asOf": "1365-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.728,
+          "unit": "GBP/USD",
+          "asOf": "1365-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.39,
+          "unit": "CAD/USD",
+          "asOf": "1365-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1365-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1366,
+      "rates": {
+        "IRT": {
+          "value": 99,
+          "unit": "IRT/USD",
+          "asOf": "1366-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1366-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.001376,
+          "unit": "TRY/USD",
+          "asOf": "1366-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.05,
+          "unit": "EUR/USD",
+          "asOf": "1366-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.686,
+          "unit": "GBP/USD",
+          "asOf": "1366-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.342,
+          "unit": "CAD/USD",
+          "asOf": "1366-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1366-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1367,
+      "rates": {
+        "IRT": {
+          "value": 96,
+          "unit": "IRT/USD",
+          "asOf": "1367-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1367-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.002082,
+          "unit": "TRY/USD",
+          "asOf": "1367-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1,
+          "unit": "EUR/USD",
+          "asOf": "1367-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.644,
+          "unit": "GBP/USD",
+          "asOf": "1367-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.294,
+          "unit": "CAD/USD",
+          "asOf": "1367-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1367-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1368,
+      "rates": {
+        "IRT": {
+          "value": 120,
+          "unit": "IRT/USD",
+          "asOf": "1368-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1368-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.002788,
+          "unit": "TRY/USD",
+          "asOf": "1368-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.95,
+          "unit": "EUR/USD",
+          "asOf": "1368-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.602,
+          "unit": "GBP/USD",
+          "asOf": "1368-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.246,
+          "unit": "CAD/USD",
+          "asOf": "1368-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1368-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1369,
+      "rates": {
+        "IRT": {
+          "value": 141,
+          "unit": "IRT/USD",
+          "asOf": "1369-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1369-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.003494,
+          "unit": "TRY/USD",
+          "asOf": "1369-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.9,
+          "unit": "EUR/USD",
+          "asOf": "1369-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.56,
+          "unit": "GBP/USD",
+          "asOf": "1369-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.198,
+          "unit": "CAD/USD",
+          "asOf": "1369-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1369-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1370,
+      "rates": {
+        "IRT": {
+          "value": 142,
+          "unit": "IRT/USD",
+          "asOf": "1370-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1370-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.0042,
+          "unit": "TRY/USD",
+          "asOf": "1370-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.85,
+          "unit": "EUR/USD",
+          "asOf": "1370-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.574,
+          "unit": "GBP/USD",
+          "asOf": "1370-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.15,
+          "unit": "CAD/USD",
+          "asOf": "1370-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1370-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1371,
+      "rates": {
+        "IRT": {
+          "value": 149,
+          "unit": "IRT/USD",
+          "asOf": "1371-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1371-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.0144,
+          "unit": "TRY/USD",
+          "asOf": "1371-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.86125,
+          "unit": "EUR/USD",
+          "asOf": "1371-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.588,
+          "unit": "GBP/USD",
+          "asOf": "1371-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.197143,
+          "unit": "CAD/USD",
+          "asOf": "1371-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1371-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1372,
+      "rates": {
+        "IRT": {
+          "value": 180,
+          "unit": "IRT/USD",
+          "asOf": "1372-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1372-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.0246,
+          "unit": "TRY/USD",
+          "asOf": "1372-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.8725,
+          "unit": "EUR/USD",
+          "asOf": "1372-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.602,
+          "unit": "GBP/USD",
+          "asOf": "1372-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.244286,
+          "unit": "CAD/USD",
+          "asOf": "1372-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1372-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1373,
+      "rates": {
+        "IRT": {
+          "value": 263,
+          "unit": "IRT/USD",
+          "asOf": "1373-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1373-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.0348,
+          "unit": "TRY/USD",
+          "asOf": "1373-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.88375,
+          "unit": "EUR/USD",
+          "asOf": "1373-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.616,
+          "unit": "GBP/USD",
+          "asOf": "1373-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.291429,
+          "unit": "CAD/USD",
+          "asOf": "1373-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1373-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1374,
+      "rates": {
+        "IRT": {
+          "value": 403,
+          "unit": "IRT/USD",
+          "asOf": "1374-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1374-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.045,
+          "unit": "TRY/USD",
+          "asOf": "1374-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.895,
+          "unit": "EUR/USD",
+          "asOf": "1374-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.63,
+          "unit": "GBP/USD",
+          "asOf": "1374-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.338571,
+          "unit": "CAD/USD",
+          "asOf": "1374-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1374-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1375,
+      "rates": {
+        "IRT": {
+          "value": 444,
+          "unit": "IRT/USD",
+          "asOf": "1375-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1375-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.16,
+          "unit": "TRY/USD",
+          "asOf": "1375-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.90625,
+          "unit": "EUR/USD",
+          "asOf": "1375-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.64,
+          "unit": "GBP/USD",
+          "asOf": "1375-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.385714,
+          "unit": "CAD/USD",
+          "asOf": "1375-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1375-12",
+          "source": "برآورد تاریخی نرخ پیش از تثبیت کامل درهم",
+          "confidence": "estimate"
+        }
+      }
+    },
+    {
+      "year": 1376,
+      "rates": {
+        "IRT": {
+          "value": 478,
+          "unit": "IRT/USD",
+          "asOf": "1376-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1376-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.275,
+          "unit": "TRY/USD",
+          "asOf": "1376-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.9175,
+          "unit": "EUR/USD",
+          "asOf": "1376-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.65,
+          "unit": "GBP/USD",
+          "asOf": "1376-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.432857,
+          "unit": "CAD/USD",
+          "asOf": "1376-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1376-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1377,
+      "rates": {
+        "IRT": {
+          "value": 646,
+          "unit": "IRT/USD",
+          "asOf": "1377-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1377-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.39,
+          "unit": "TRY/USD",
+          "asOf": "1377-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.92875,
+          "unit": "EUR/USD",
+          "asOf": "1377-12",
+          "source": "نرخ ترکیبی هم‌ارز ECU/مارک آلمان پیش از راه‌اندازی رسمی یورو",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.66,
+          "unit": "GBP/USD",
+          "asOf": "1377-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.48,
+          "unit": "CAD/USD",
+          "asOf": "1377-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1377-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1378,
+      "rates": {
+        "IRT": {
+          "value": 863,
+          "unit": "IRT/USD",
+          "asOf": "1378-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1378-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.505,
+          "unit": "TRY/USD",
+          "asOf": "1378-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.94,
+          "unit": "EUR/USD",
+          "asOf": "1378-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.67,
+          "unit": "GBP/USD",
+          "asOf": "1378-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.503333,
+          "unit": "CAD/USD",
+          "asOf": "1378-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1378-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1379,
+      "rates": {
+        "IRT": {
+          "value": 813,
+          "unit": "IRT/USD",
+          "asOf": "1379-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1379-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.62,
+          "unit": "TRY/USD",
+          "asOf": "1379-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.03,
+          "unit": "EUR/USD",
+          "asOf": "1379-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.68,
+          "unit": "GBP/USD",
+          "asOf": "1379-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.526667,
+          "unit": "CAD/USD",
+          "asOf": "1379-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1379-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1380,
+      "rates": {
+        "IRT": {
+          "value": 792,
+          "unit": "IRT/USD",
+          "asOf": "1380-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1380-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.764,
+          "unit": "TRY/USD",
+          "asOf": "1380-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.12,
+          "unit": "EUR/USD",
+          "asOf": "1380-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.69,
+          "unit": "GBP/USD",
+          "asOf": "1380-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.55,
+          "unit": "CAD/USD",
+          "asOf": "1380-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1380-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1381,
+      "rates": {
+        "IRT": {
+          "value": 799,
+          "unit": "IRT/USD",
+          "asOf": "1381-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1381-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 0.908,
+          "unit": "TRY/USD",
+          "asOf": "1381-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 1.055,
+          "unit": "EUR/USD",
+          "asOf": "1381-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.658333,
+          "unit": "GBP/USD",
+          "asOf": "1381-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.47,
+          "unit": "CAD/USD",
+          "asOf": "1381-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1381-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1382,
+      "rates": {
+        "IRT": {
+          "value": 832,
+          "unit": "IRT/USD",
+          "asOf": "1382-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1382-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.052,
+          "unit": "TRY/USD",
+          "asOf": "1382-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.99,
+          "unit": "EUR/USD",
+          "asOf": "1382-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.626667,
+          "unit": "GBP/USD",
+          "asOf": "1382-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.39,
+          "unit": "CAD/USD",
+          "asOf": "1382-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1382-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1383,
+      "rates": {
+        "IRT": {
+          "value": 874,
+          "unit": "IRT/USD",
+          "asOf": "1383-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1383-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.196,
+          "unit": "TRY/USD",
+          "asOf": "1383-12",
+          "source": "بازسازی بر مبنای لیر قدیم تعدیل‌شده با حذف ۶ صفر سال ۲۰۰۵",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.925,
+          "unit": "EUR/USD",
+          "asOf": "1383-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.595,
+          "unit": "GBP/USD",
+          "asOf": "1383-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.31,
+          "unit": "CAD/USD",
+          "asOf": "1383-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1383-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1384,
+      "rates": {
+        "IRT": {
+          "value": 904,
+          "unit": "IRT/USD",
+          "asOf": "1384-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1384-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.34,
+          "unit": "TRY/USD",
+          "asOf": "1384-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.86,
+          "unit": "EUR/USD",
+          "asOf": "1384-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.563333,
+          "unit": "GBP/USD",
+          "asOf": "1384-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.23,
+          "unit": "CAD/USD",
+          "asOf": "1384-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1384-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1385,
+      "rates": {
+        "IRT": {
+          "value": 922,
+          "unit": "IRT/USD",
+          "asOf": "1385-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1385-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.372,
+          "unit": "TRY/USD",
+          "asOf": "1385-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.795,
+          "unit": "EUR/USD",
+          "asOf": "1385-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.531667,
+          "unit": "GBP/USD",
+          "asOf": "1385-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.15,
+          "unit": "CAD/USD",
+          "asOf": "1385-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1385-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1386,
+      "rates": {
+        "IRT": {
+          "value": 935,
+          "unit": "IRT/USD",
+          "asOf": "1386-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1386-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.404,
+          "unit": "TRY/USD",
+          "asOf": "1386-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.73,
+          "unit": "EUR/USD",
+          "asOf": "1386-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.5,
+          "unit": "GBP/USD",
+          "asOf": "1386-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.07,
+          "unit": "CAD/USD",
+          "asOf": "1386-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1386-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1387,
+      "rates": {
+        "IRT": {
+          "value": 966,
+          "unit": "IRT/USD",
+          "asOf": "1387-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1387-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.436,
+          "unit": "TRY/USD",
+          "asOf": "1387-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.7275,
+          "unit": "EUR/USD",
+          "asOf": "1387-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.53,
+          "unit": "GBP/USD",
+          "asOf": "1387-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.05,
+          "unit": "CAD/USD",
+          "asOf": "1387-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1387-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1388,
+      "rates": {
+        "IRT": {
+          "value": 1000,
+          "unit": "IRT/USD",
+          "asOf": "1388-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1388-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.468,
+          "unit": "TRY/USD",
+          "asOf": "1388-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.725,
+          "unit": "EUR/USD",
+          "asOf": "1388-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.56,
+          "unit": "GBP/USD",
+          "asOf": "1388-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.03,
+          "unit": "CAD/USD",
+          "asOf": "1388-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1388-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1389,
+      "rates": {
+        "IRT": {
+          "value": 1100,
+          "unit": "IRT/USD",
+          "asOf": "1389-12",
+          "source": "میانگین سالانه نرخ دلار بازار آزاد (بانک مرکزی / آرشیو اقتصادی)",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1389-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.5,
+          "unit": "TRY/USD",
+          "asOf": "1389-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.7225,
+          "unit": "EUR/USD",
+          "asOf": "1389-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.59,
+          "unit": "GBP/USD",
+          "asOf": "1389-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.01,
+          "unit": "CAD/USD",
+          "asOf": "1389-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1389-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1390,
+      "rates": {
+        "IRT": {
+          "value": 1600,
+          "unit": "IRT/USD",
+          "asOf": "1390-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1390-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.6725,
+          "unit": "TRY/USD",
+          "asOf": "1390-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.72,
+          "unit": "EUR/USD",
+          "asOf": "1390-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.62,
+          "unit": "GBP/USD",
+          "asOf": "1390-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 0.99,
+          "unit": "CAD/USD",
+          "asOf": "1390-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1390-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1391,
+      "rates": {
+        "IRT": {
+          "value": 2650,
+          "unit": "IRT/USD",
+          "asOf": "1391-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1391-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 1.845,
+          "unit": "TRY/USD",
+          "asOf": "1391-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.765,
+          "unit": "EUR/USD",
+          "asOf": "1391-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.644,
+          "unit": "GBP/USD",
+          "asOf": "1391-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.056,
+          "unit": "CAD/USD",
+          "asOf": "1391-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1391-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1392,
+      "rates": {
+        "IRT": {
+          "value": 3450,
+          "unit": "IRT/USD",
+          "asOf": "1392-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1392-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 2.0175,
+          "unit": "TRY/USD",
+          "asOf": "1392-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.81,
+          "unit": "EUR/USD",
+          "asOf": "1392-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.668,
+          "unit": "GBP/USD",
+          "asOf": "1392-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.122,
+          "unit": "CAD/USD",
+          "asOf": "1392-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1392-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1393,
+      "rates": {
+        "IRT": {
+          "value": 3475,
+          "unit": "IRT/USD",
+          "asOf": "1393-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1393-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 2.19,
+          "unit": "TRY/USD",
+          "asOf": "1393-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.855,
+          "unit": "EUR/USD",
+          "asOf": "1393-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.692,
+          "unit": "GBP/USD",
+          "asOf": "1393-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.188,
+          "unit": "CAD/USD",
+          "asOf": "1393-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1393-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1394,
+      "rates": {
+        "IRT": {
+          "value": 3375,
+          "unit": "IRT/USD",
+          "asOf": "1394-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1394-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 2.676667,
+          "unit": "TRY/USD",
+          "asOf": "1394-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.9,
+          "unit": "EUR/USD",
+          "asOf": "1394-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.716,
+          "unit": "GBP/USD",
+          "asOf": "1394-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.254,
+          "unit": "CAD/USD",
+          "asOf": "1394-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1394-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1395,
+      "rates": {
+        "IRT": {
+          "value": 3750,
+          "unit": "IRT/USD",
+          "asOf": "1395-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1395-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 3.163333,
+          "unit": "TRY/USD",
+          "asOf": "1395-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.896,
+          "unit": "EUR/USD",
+          "asOf": "1395-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.74,
+          "unit": "GBP/USD",
+          "asOf": "1395-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.32,
+          "unit": "CAD/USD",
+          "asOf": "1395-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1395-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1396,
+      "rates": {
+        "IRT": {
+          "value": 4300,
+          "unit": "IRT/USD",
+          "asOf": "1396-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1396-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 3.65,
+          "unit": "TRY/USD",
+          "asOf": "1396-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.892,
+          "unit": "EUR/USD",
+          "asOf": "1396-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.751667,
+          "unit": "GBP/USD",
+          "asOf": "1396-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.325,
+          "unit": "CAD/USD",
+          "asOf": "1396-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1396-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1397,
+      "rates": {
+        "IRT": {
+          "value": 11850,
+          "unit": "IRT/USD",
+          "asOf": "1397-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1397-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 4.66,
+          "unit": "TRY/USD",
+          "asOf": "1397-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.888,
+          "unit": "EUR/USD",
+          "asOf": "1397-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.763333,
+          "unit": "GBP/USD",
+          "asOf": "1397-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.33,
+          "unit": "CAD/USD",
+          "asOf": "1397-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1397-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1398,
+      "rates": {
+        "IRT": {
+          "value": 13575,
+          "unit": "IRT/USD",
+          "asOf": "1398-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1398-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 5.67,
+          "unit": "TRY/USD",
+          "asOf": "1398-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.884,
+          "unit": "EUR/USD",
+          "asOf": "1398-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.775,
+          "unit": "GBP/USD",
+          "asOf": "1398-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.335,
+          "unit": "CAD/USD",
+          "asOf": "1398-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1398-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1399,
+      "rates": {
+        "IRT": {
+          "value": 23900,
+          "unit": "IRT/USD",
+          "asOf": "1399-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1399-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 7.26,
+          "unit": "TRY/USD",
+          "asOf": "1399-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.88,
+          "unit": "EUR/USD",
+          "asOf": "1399-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.786667,
+          "unit": "GBP/USD",
+          "asOf": "1399-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.34,
+          "unit": "CAD/USD",
+          "asOf": "1399-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1399-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1400,
+      "rates": {
+        "IRT": {
+          "value": 26350,
+          "unit": "IRT/USD",
+          "asOf": "1400-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1400-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 8.85,
+          "unit": "TRY/USD",
+          "asOf": "1400-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.915,
+          "unit": "EUR/USD",
+          "asOf": "1400-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.798333,
+          "unit": "GBP/USD",
+          "asOf": "1400-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.343333,
+          "unit": "CAD/USD",
+          "asOf": "1400-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1400-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1401,
+      "rates": {
+        "IRT": {
+          "value": 43425,
+          "unit": "IRT/USD",
+          "asOf": "1401-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1401-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 16.55,
+          "unit": "TRY/USD",
+          "asOf": "1401-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.95,
+          "unit": "EUR/USD",
+          "asOf": "1401-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.81,
+          "unit": "GBP/USD",
+          "asOf": "1401-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.346667,
+          "unit": "CAD/USD",
+          "asOf": "1401-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1401-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1402,
+      "rates": {
+        "IRT": {
+          "value": 54550,
+          "unit": "IRT/USD",
+          "asOf": "1402-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1402-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 23.8,
+          "unit": "TRY/USD",
+          "asOf": "1402-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.935,
+          "unit": "EUR/USD",
+          "asOf": "1402-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.8025,
+          "unit": "GBP/USD",
+          "asOf": "1402-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.35,
+          "unit": "CAD/USD",
+          "asOf": "1402-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1402-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1403,
+      "rates": {
+        "IRT": {
+          "value": 77550,
+          "unit": "IRT/USD",
+          "asOf": "1403-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1403-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 32.8,
+          "unit": "TRY/USD",
+          "asOf": "1403-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.92,
+          "unit": "EUR/USD",
+          "asOf": "1403-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.795,
+          "unit": "GBP/USD",
+          "asOf": "1403-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.36,
+          "unit": "CAD/USD",
+          "asOf": "1403-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1403-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1404,
+      "rates": {
+        "IRT": {
+          "value": 112000,
+          "unit": "IRT/USD",
+          "asOf": "1404-12",
+          "source": "برآورد میانگین از بازه سالانه بازار آزاد ارز",
+          "confidence": "estimate"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1404-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 39.5,
+          "unit": "TRY/USD",
+          "asOf": "1404-12",
+          "source": "سری تاریخی لیر جدید ترکیه (TCMB / IMF) - میانگین سالانه تقریبی",
+          "confidence": "estimate"
+        },
+        "EUR": {
+          "value": 0.92,
+          "unit": "EUR/USD",
+          "asOf": "1404-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.7875,
+          "unit": "GBP/USD",
+          "asOf": "1404-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.37,
+          "unit": "CAD/USD",
+          "asOf": "1404-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1404-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    },
+    {
+      "year": 1405,
+      "rates": {
+        "IRT": {
+          "value": 271900,
+          "unit": "IRT/USD",
+          "asOf": "1405-08",
+          "source": "نرخ دلار بازار آزاد تهران — آبان ۱۴۰۵",
+          "confidence": "verified"
+        },
+        "USD": {
+          "value": 1,
+          "unit": "USD/USD",
+          "asOf": "1405-12",
+          "source": "واحد پایه دلاری",
+          "confidence": "verified"
+        },
+        "TRY": {
+          "value": 45,
+          "unit": "TRY/USD",
+          "asOf": "2026-04",
+          "source": "نرخ مرجع بازار ارز ترکیه (آوریل ۲۰۲۶ ~ ۴۵ لیر به ازای هر دلار)",
+          "confidence": "verified"
+        },
+        "EUR": {
+          "value": 0.92,
+          "unit": "EUR/USD",
+          "asOf": "1405-12",
+          "source": "میانگین سالانه نرخ برابری یورو در برابر دلار (ECB / IMF)",
+          "confidence": "estimate"
+        },
+        "GBP": {
+          "value": 0.78,
+          "unit": "GBP/USD",
+          "asOf": "1405-12",
+          "source": "نرخ میانگین سالانه پوند به دلار (Bank of England / IMF)",
+          "confidence": "estimate"
+        },
+        "CAD": {
+          "value": 1.38,
+          "unit": "CAD/USD",
+          "asOf": "1405-12",
+          "source": "نرخ میانگین سالانه دلار کانادا به دلار آمریکا (Bank of Canada / IMF)",
+          "confidence": "estimate"
+        },
+        "AED": {
+          "value": 3.6725,
+          "unit": "AED/USD",
+          "asOf": "1405-12",
+          "source": "برابری ثابت رسمی درهم امارات به دلار آمریکا (بانک مرکزی امارات)",
+          "confidence": "verified"
+        }
+      }
+    }
+  ]
+}

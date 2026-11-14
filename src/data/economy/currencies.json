@@ -1,0 +1,205 @@
+[
+  {
+    "code": "IRT",
+    "nameFa": "تومان ایران",
+    "shortNameFa": "تومان",
+    "symbolFa": "تومان",
+    "minorUnit": 0,
+    "highInflationRisk": true,
+    "annualCarryRate": {
+      "value": 0.23,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "نرخ سود سپرده یک‌ساله مصوب بانک مرکزی ایران",
+      "confidence": "verified"
+    },
+    "oilBeta": {
+      "value": -0.35,
+      "unit": "elasticity",
+      "asOf": "1405-08",
+      "source": "برآورد حساسیت نرخ ارز به شوک درآمد نفتی (مدل کلان)",
+      "confidence": "estimate"
+    },
+    "globalGrowthBeta": {
+      "value": -0.1,
+      "unit": "elasticity",
+      "asOf": "1405-08",
+      "source": "برآورد حساسیت ارزی به رشد اقتصاد جهانی",
+      "confidence": "estimate"
+    }
+  },
+  {
+    "code": "USD",
+    "nameFa": "دلار آمریکا",
+    "shortNameFa": "دلار",
+    "symbolFa": "دلار",
+    "minorUnit": 2,
+    "highInflationRisk": false,
+    "annualCarryRate": {
+      "value": 0.04,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد میانگین بازده سپرده دلاری هم‌راستا با نرخ فدرال رزرو",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": 0,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "ارز مبنا (لنگر جفت‌ارزها)",
+      "confidence": "verified"
+    },
+    "globalGrowthBeta": {
+      "value": 0,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "ارز مبنا (لنگر جفت‌ارزها)",
+      "confidence": "verified"
+    }
+  },
+  {
+    "code": "TRY",
+    "nameFa": "لیر ترکیه",
+    "shortNameFa": "لیر",
+    "symbolFa": "لیر",
+    "minorUnit": 2,
+    "highInflationRisk": true,
+    "annualCarryRate": {
+      "value": 0.32,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "نرخ سیاست و سپرده لیر هم‌راستا با محیط تورمی ترکیه (۲۰۲۶)",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": 0.12,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "واردکننده خالص انرژی — تضعیف ملایم در جهش نفت",
+      "confidence": "estimate"
+    },
+    "globalGrowthBeta": {
+      "value": -0.18,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "حساسیت ارز بازارهای نوظهور به چرخه رشد جهانی",
+      "confidence": "estimate"
+    }
+  },
+  {
+    "code": "EUR",
+    "nameFa": "یورو",
+    "shortNameFa": "یورو",
+    "symbolFa": "یورو",
+    "minorUnit": 2,
+    "highInflationRisk": false,
+    "annualCarryRate": {
+      "value": 0.025,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد نرخ سپرده بانکی منطقه یورو",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": 0.05,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "حساسیت ملایم تراز تجاری انرژی منطقه یورو",
+      "confidence": "estimate"
+    },
+    "globalGrowthBeta": {
+      "value": -0.06,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "حساسیت جفت‌ارز یورو به رشد جهانی",
+      "confidence": "estimate"
+    }
+  },
+  {
+    "code": "GBP",
+    "nameFa": "پوند بریتانیا",
+    "shortNameFa": "پوند",
+    "symbolFa": "پوند",
+    "minorUnit": 2,
+    "highInflationRisk": false,
+    "annualCarryRate": {
+      "value": 0.035,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد نرخ سپرده بانکی در بریتانیا",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": 0.03,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "حساسیت ملایم پوند به قیمت انرژی",
+      "confidence": "estimate"
+    },
+    "globalGrowthBeta": {
+      "value": -0.07,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "حساسیت پوند به چرخه اقتصاد جهانی",
+      "confidence": "estimate"
+    }
+  },
+  {
+    "code": "CAD",
+    "nameFa": "دلار کانادا",
+    "shortNameFa": "دلار کانادا",
+    "symbolFa": "دلار کانادا",
+    "minorUnit": 2,
+    "highInflationRisk": false,
+    "annualCarryRate": {
+      "value": 0.032,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "برآورد نرخ سپرده بانکی در کانادا",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": -0.14,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "تقویت نسبی ارز کشور صادرکننده انرژی در جهش قیمت نفت",
+      "confidence": "estimate"
+    },
+    "globalGrowthBeta": {
+      "value": -0.09,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "همبستگی ارز کالامحور با تقاضای جهانی",
+      "confidence": "estimate"
+    }
+  },
+  {
+    "code": "AED",
+    "nameFa": "درهم امارات",
+    "shortNameFa": "درهم",
+    "symbolFa": "درهم",
+    "minorUnit": 2,
+    "highInflationRisk": false,
+    "annualCarryRate": {
+      "value": 0.038,
+      "unit": "ratio",
+      "asOf": "2026-10",
+      "source": "نرخ سپرده درهم هم‌راستا با پیوند ثابت ارزی به دلار",
+      "confidence": "estimate"
+    },
+    "oilBeta": {
+      "value": 0,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "نظام برابری ثابت درهم به دلار (۳٫۶۷۲۵)",
+      "confidence": "verified"
+    },
+    "globalGrowthBeta": {
+      "value": 0,
+      "unit": "elasticity",
+      "asOf": "2026-10",
+      "source": "نظام برابری ثابت درهم به دلار (۳٫۶۷۲۵)",
+      "confidence": "verified"
+    }
+  }
+]

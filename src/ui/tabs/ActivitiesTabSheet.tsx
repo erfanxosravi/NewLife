@@ -1,58 +1,61 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { gameDataset } from '../../data/registry';
 import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { STANDARD_ACTIVITY_CATEGORIES } from '../../engine/recommendation';
 import type {
   ActivityCategory,
   ActivityDefinition,
-  CountryDefinition,
+  ActivityOutcome,
   SaveGame,
 } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
 import {
-  advanceEmigrationStepAction,
   developTalentAction,
   performActivityAction,
+  toggleFavoriteActivityAction,
+  undoLastActivityAction,
   type ActionOutcome,
 } from '../../state/actions';
 import {
   canPerformActivity,
-  getEmigrationProgress,
-  getEmigrationStepCostToman,
-  getEmigrationTotalCostToman,
+  getActivitiesHubSummary,
   getTalentPracticeOptions,
   isActivityVisibleByContentSettings,
 } from '../../state/selectors';
+import { ActivityResultSheet } from '../components/ActivityResultSheet';
+import { CountryFlag } from '../components/flags/CountryFlag';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
-  ActionButton,
   ActionRow,
-  Card,
   ConfirmDialog,
-  CurrencyText,
   DangerZoneGroup,
   DetailSheet,
   EmptyState,
-  HubHeroCard,
   InfoSheet,
-  LockedNotice,
-  ProgressStepper,
+  ProgressRing,
   SectionGroup,
   SegmentedControl,
-  StatBar,
 } from '../components/Primitives';
 import {
-  IconActivities,
+  IconBank,
   IconBook,
   IconCharity,
   IconCoins,
   IconCrime,
   IconDice,
   IconDoctor,
-  IconHealth,
+  IconFlame,
   IconMapPin,
+  IconPalette,
   IconPlane,
+  IconRelations,
+  IconShield,
+  IconShop,
   IconSparkles,
   IconSport,
+  IconStar,
+  IconTrendUp,
+  IconWarning,
 } from '../icons';
 
 interface ActivitiesTabSheetProps {
@@ -60,154 +63,169 @@ interface ActivitiesTabSheetProps {
   saveGame: SaveGame;
   onClose: () => void;
   onUpdateSave: (outcome: ActionOutcome) => void;
+  onSilentSave?: (nextSave: SaveGame) => void;
+  onQuickExecuteWithUndo?: (activity: ActivityDefinition) => ActionOutcome;
+  onOpenEmigration?: () => void;
 }
 
-type CategoryKey = ActivityCategory | 'migration';
+type DiscoveryMode = 'seasonal' | 'favorites' | 'recent';
 
-const STANDARD_CATEGORIES: {
-  id: CategoryKey;
-  labelKey: string;
-  desc: string;
-  emoji: string;
-  icon: React.ReactNode;
-}[] = [
+interface CategoryTileMeta {
+  id: ActivityCategory;
+  descFa: string;
+  icon: ReactNode;
+  accentBg: string;
+  accentText: string;
+}
+
+const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'health',
-    labelKey: 'activities.categories.health',
-    desc: 'چکاپ، دندان‌پزشکی و روان',
-    emoji: '🩺',
-    icon: <IconDoctor className="h-4 w-4" />,
+    descFa: 'چکاپ، دندان و آرامش',
+    icon: <IconDoctor className="h-5 w-5" />,
+    accentBg: 'bg-emerald-500/12',
+    accentText: 'text-emerald-600 dark:text-emerald-400',
   },
   {
     id: 'leisure',
-    labelKey: 'activities.categories.leisure',
-    desc: 'سینما، طبیعت‌گردی و کافه',
-    emoji: '☕',
-    icon: <IconSparkles className="h-4 w-4" />,
+    descFa: 'سینما، کافه و فرهنگ',
+    icon: <IconSparkles className="h-5 w-5" />,
+    accentBg: 'bg-amber-500/12',
+    accentText: 'text-amber-600 dark:text-amber-400',
   },
   {
     id: 'travel',
-    labelKey: 'activities.categories.travel',
-    desc: 'سفرهای داخلی و زیارتی',
-    emoji: '🗺️',
-    icon: <IconMapPin className="h-4 w-4" />,
+    descFa: 'ایران‌گردی و طبیعت',
+    icon: <IconMapPin className="h-5 w-5" />,
+    accentBg: 'bg-sky-500/12',
+    accentText: 'text-sky-600 dark:text-sky-400',
   },
   {
     id: 'sport',
-    labelKey: 'activities.categories.sport',
-    desc: 'باشگاه، دویدن و کوهنوردی',
-    emoji: '🏃',
-    icon: <IconSport className="h-4 w-4" />,
+    descFa: 'باشگاه، دو و کوه',
+    icon: <IconSport className="h-5 w-5" />,
+    accentBg: 'bg-orange-500/12',
+    accentText: 'text-orange-600 dark:text-orange-400',
   },
   {
     id: 'learning',
-    labelKey: 'activities.categories.learning',
-    desc: 'کتاب، زبان و هنر',
-    emoji: '📚',
-    icon: <IconBook className="h-4 w-4" />,
+    descFa: 'مطالعه، زبان و پژوهش',
+    icon: <IconBook className="h-5 w-5" />,
+    accentBg: 'bg-indigo-500/12',
+    accentText: 'text-indigo-600 dark:text-indigo-400',
   },
   {
     id: 'charity',
-    labelKey: 'activities.categories.charity',
-    desc: 'نیکوکاری و مشارکت مدنی',
-    emoji: '🤝',
-    icon: <IconCharity className="h-4 w-4" />,
+    descFa: 'نیکوکاری و داوطلبی',
+    icon: <IconCharity className="h-5 w-5" />,
+    accentBg: 'bg-rose-500/12',
+    accentText: 'text-rose-600 dark:text-rose-400',
   },
   {
-    id: 'migration',
-    labelKey: 'activities.categories.migration',
-    desc: 'مسیرهای مهاجرت و ویزا',
-    emoji: '✈️',
-    icon: <IconPlane className="h-4 w-4" />,
+    id: 'arts_talent',
+    descFa: 'موسیقی، قلم و هنر',
+    icon: <IconPalette className="h-5 w-5" />,
+    accentBg: 'bg-fuchsia-500/12',
+    accentText: 'text-fuchsia-600 dark:text-fuchsia-400',
+  },
+  {
+    id: 'pets',
+    descFa: 'حیوانات خانگی و باغچه',
+    icon: <IconFlame className="h-5 w-5" />,
+    accentBg: 'bg-lime-500/12',
+    accentText: 'text-lime-600 dark:text-lime-400',
+  },
+  {
+    id: 'social_digital',
+    descFa: 'جمع، گفتگو و رسانه',
+    icon: <IconRelations className="h-5 w-5" />,
+    accentBg: 'bg-cyan-500/12',
+    accentText: 'text-cyan-600 dark:text-cyan-400',
+  },
+  {
+    id: 'business_trade',
+    descFa: 'معامله، پروژه و شبکه',
+    icon: <IconTrendUp className="h-5 w-5" />,
+    accentBg: 'bg-teal-500/12',
+    accentText: 'text-teal-600 dark:text-teal-400',
+  },
+  {
+    id: 'legal_civic',
+    descFa: 'امور مدنی، بیمه و حقوق',
+    icon: <IconShield className="h-5 w-5" />,
+    accentBg: 'bg-slate-500/12',
+    accentText: 'text-slate-600 dark:text-slate-300',
+  },
+  {
+    id: 'lifestyle_shop',
+    descFa: 'نظم، خانه و سبک زندگی',
+    icon: <IconShop className="h-5 w-5" />,
+    accentBg: 'bg-orange-500/12',
+    accentText: 'text-[var(--primary-strong)]',
   },
 ];
 
 const RISKY_CATEGORIES: {
   id: ActivityCategory;
-  labelKey: string;
-  desc: string;
-  emoji: string;
-  icon: React.ReactNode;
+  descFa: string;
+  icon: ReactNode;
 }[] = [
   {
     id: 'crime',
-    labelKey: 'activities.categories.crime',
-    desc: 'مسیرهای پرریسک و خلاف قانون',
-    emoji: '⚠️',
+    descFa: 'مسیرهای پرریسک و خلاف قانون',
     icon: <IconCrime className="h-4 w-4" />,
   },
   {
     id: 'gambling',
-    labelKey: 'activities.categories.gambling',
-    desc: 'شرط‌بندی و ریسک مالی بالا',
-    emoji: '🎲',
+    descFa: 'شرط‌بندی و ریسک مالی بالا',
     icon: <IconDice className="h-4 w-4" />,
   },
 ];
-
-const MIGRATION_STEPS = ['مدارک', 'آزمون زبان', 'پذیرش/پیشنهاد', 'ویزا'];
-
-const PATH_LABELS: Record<'study' | 'work' | 'investment', string> = {
-  study: 'تحصیلی',
-  work: 'کاری',
-  investment: 'سرمایه‌گذاری',
-};
 
 export function ActivitiesTabSheet({
   open,
   saveGame,
   onClose,
   onUpdateSave,
+  onSilentSave,
+  onQuickExecuteWithUndo,
+  onOpenEmigration,
 }: ActivitiesTabSheetProps) {
   const { t } = useI18n();
   const { state, contentSettings } = saveGame;
   const { player } = state;
 
-  const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
-  const [selectedCountry, setSelectedCountry] = useState<CountryDefinition | null>(null);
-  const [selectedPath, setSelectedPath] = useState<'study' | 'work' | 'investment'>('work');
-  const [confirmEmigrate, setConfirmEmigrate] = useState(false);
+  const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>('seasonal');
+  const [selectedCategory, setSelectedCategory] = useState<ActivityCategory | null>(null);
   const [confirmRiskActivity, setConfirmRiskActivity] = useState<ActivityDefinition | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [resultModal, setResultModal] = useState<{
+    activity: ActivityDefinition;
+    outcome: ActivityOutcome;
+  } | null>(null);
 
-  const recommendedActivities = useMemo(() => {
-    const safePool = gameDataset.activities.filter(
-      (a) =>
-        a.category !== 'crime' &&
-        a.category !== 'gambling' &&
-        isActivityVisibleByContentSettings(a, saveGame),
-    );
-    const available = safePool.filter((a) => canPerformActivity(a, saveGame).allowed);
-    const scored = available.map((a) => {
-      let score = 0;
-      if (player.stats.health < 60 && a.category === 'health') score += 4;
-      if (player.stats.happiness < 60 && (a.category === 'leisure' || a.category === 'travel'))
-        score += 3;
-      if (player.stats.mentalHealth < 60 && (a.category === 'sport' || a.category === 'leisure'))
-        score += 3;
-      if (player.stats.intelligence < 65 && a.category === 'learning') score += 2;
-      if (a.costToman === 0) score += 1;
-      return { a, score };
-    });
-    scored.sort((x, y) => y.score - x.score);
-    return scored.slice(0, 3).map((x) => x.a);
-  }, [
-    saveGame,
-    player.stats.health,
-    player.stats.happiness,
-    player.stats.mentalHealth,
-    player.stats.intelligence,
-  ]);
+  const summary = useMemo(
+    () => getActivitiesHubSummary(saveGame, gameDataset),
+    [saveGame],
+  );
+
+  const { runtime, urgentAlert, smartRecommendations, seasonal, favorites, recents, moneySummary } =
+    summary;
+
+  const quotaRemaining = Math.max(0, runtime.maxQuotaPerTurn - runtime.quotaUsedThisTurn);
+  const favoriteSet = useMemo(() => new Set(runtime.favoriteIds), [runtime.favoriteIds]);
 
   const categoryActivities = useMemo(() => {
-    if (!selectedCategory || selectedCategory === 'migration') return [];
+    if (!selectedCategory) return [];
     return gameDataset.activities.filter(
       (a) => a.category === selectedCategory && isActivityVisibleByContentSettings(a, saveGame),
     );
   }, [selectedCategory, saveGame]);
 
   const categoryTalents = useMemo(() => {
-    if (selectedCategory !== 'sport' && selectedCategory !== 'learning') return [];
+    if (selectedCategory !== 'sport' && selectedCategory !== 'arts_talent' && selectedCategory !== 'learning') {
+      return [];
+    }
     const targetIds =
       selectedCategory === 'sport'
         ? new Set(['athletics'])
@@ -217,114 +235,323 @@ export function ActivitiesTabSheet({
     );
   }, [selectedCategory, state]);
 
-  const emigProgress = getEmigrationProgress(state);
-  const abroadCountries = useMemo(() => gameDataset.countries.filter((c) => !c.isIran), []);
-
-  const activeCountry =
-    selectedCountry ??
-    abroadCountries.find((c) => c.id === emigProgress.targetCountryId) ??
-    abroadCountries[0];
-
-  const activePath = activeCountry.paths.includes(selectedPath)
-    ? selectedPath
-    : activeCountry.paths[0];
-
-  const isTrackingActive =
-    emigProgress.targetCountryId === activeCountry.id && emigProgress.path === activePath;
-  const currentStep = isTrackingActive ? emigProgress.step : 0;
-  const nextStepCost = getEmigrationStepCostToman(activeCountry, currentStep, state, gameDataset);
-  const totalEmigrationCost = getEmigrationTotalCostToman(activeCountry, state, gameDataset);
-
-  const countForCategory = (catId: CategoryKey): number => {
-    if (catId === 'migration') return abroadCountries.length;
-    return gameDataset.activities.filter(
-      (a) => a.category === catId && isActivityVisibleByContentSettings(a, saveGame),
-    ).length;
+  const handleToggleFavorite = (activityId: string) => {
+    const next = toggleFavoriteActivityAction(saveGame, activityId);
+    if (onSilentSave) {
+      onSilentSave(next);
+    } else {
+      onUpdateSave({ save: next, success: true, message: 'فهرست علاقه‌مندی‌ها به‌روزرسانی شد' });
+    }
   };
 
-  const triggerActivity = (act: ActivityDefinition) => {
+  const runActivity = (act: ActivityDefinition, showResultModal: boolean) => {
+    const outcome =
+      !showResultModal && onQuickExecuteWithUndo
+        ? onQuickExecuteWithUndo(act)
+        : (() => {
+            const out = performActivityAction(saveGame, act);
+            onUpdateSave(out);
+            return out;
+          })();
+    if (showResultModal && outcome.success && outcome.pickedOutcome) {
+      setResultModal({ activity: act, outcome: outcome.pickedOutcome });
+    }
+  };
+
+  const triggerActivity = (act: ActivityDefinition, showResultModal: boolean) => {
     const isHighRisk =
       act.category === 'crime' || act.category === 'gambling' || act.riskLabelFa === 'زیاد';
     if (isHighRisk) {
       setConfirmRiskActivity(act);
     } else {
-      onUpdateSave(performActivityAction(saveGame, act));
+      runActivity(act, showResultModal);
     }
   };
+
+  const discoveryItems: ActivityDefinition[] =
+    discoveryMode === 'seasonal'
+      ? seasonal.items.slice(0, 6)
+      : discoveryMode === 'favorites'
+        ? favorites.slice(0, 6)
+        : recents.slice(0, 6);
+
+  const countForCategory = (catId: ActivityCategory): number =>
+    gameDataset.activities.filter(
+      (a) => a.category === catId && isActivityVisibleByContentSettings(a, saveGame),
+    ).length;
+
+  const firstChunk = categoryActivities.slice(0, 6);
+  const secondChunk = categoryActivities.slice(6, 12);
 
   return (
     <FullScreenSheet
       open={open}
       onClose={onClose}
       title={t('nav.activities')}
-      subtitle="کارهای روزمره، سلامت، سفر و مهاجرت"
+      subtitle="برنامه سالانه، پیشنهادهای هوشمند و دسته‌بندی فعالیت‌ها"
     >
       <div className="space-y-4">
-        <HubHeroCard
-          icon={<IconActivities className="h-5 w-5" />}
-          title="برنامه امسال"
-          subtitle="فعالیت‌های سبک با یک ضربه نتیجه می‌دهند"
-          onInfo={() => setInfoOpen(true)}
-          metrics={[
-            {
-              label: 'سلامت',
-              value: `${toPersianDigits(Math.round(player.stats.health))}٪`,
-              tone: player.stats.health < 40 ? 'danger' : 'success',
-            },
-            {
-              label: 'شادی',
-              value: `${toPersianDigits(Math.round(player.stats.happiness))}٪`,
-              tone: player.stats.happiness < 40 ? 'danger' : 'primary',
-            },
-            {
-              label: 'نقدینگی',
-              value: <CurrencyText amountToman={player.moneyToman} />,
-            },
-          ]}
-        />
+        {/* Section 1: Hero «برنامه امسال» (5 quota dots + 4 SVG mini-gauges + cash + optional urgent priority) */}
+        <section className="space-y-3 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-bold text-[var(--text)]">
+                  {t('activitiesHub.heroTitle')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setInfoOpen(true)}
+                  aria-label="راهنمای فعالیت‌ها"
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-[var(--surface-2)] text-[var(--primary-strong)]"
+                >
+                  <IconSparkles className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                {quotaRemaining > 0
+                  ? `${toPersianDigits(quotaRemaining)} سهمیه از ${toPersianDigits(runtime.maxQuotaPerTurn)} باقی مانده · ${seasonal.seasonLabelFa}`
+                  : t('activitiesHub.quotaFull')}
+              </p>
+            </div>
 
-        {recommendedActivities.length > 0 && (
-          <SectionGroup title="پیشنهادهای امسال" subtitle="یک ضربه برای اجرای سریع">
-            {recommendedActivities.map((act) => {
-              const check = canPerformActivity(act, saveGame);
-              return (
-                <ActionRow
-                  key={act.id}
-                  icon={<IconSparkles className="h-4 w-4" />}
-                  title={act.titleFa}
-                  subtitle={act.effectHintFa}
-                  value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
-                  state="recommended"
-                  ctaLabel="انجام"
-                  onClick={() => triggerActivity(act)}
-                />
-              );
-            })}
-          </SectionGroup>
+            <div className="shrink-0 text-left">
+              <div className="text-[10px] text-[var(--text-muted)]">{t('cashLabel')}</div>
+              <div className="text-xs font-bold tabular-nums text-[var(--primary-strong)]">
+                <bdi dir="rtl">{moneySummary.cashDisplayText}</bdi>
+              </div>
+            </div>
+          </div>
+
+          {/* 5 Circular Quota Dots */}
+          <div className="flex items-center justify-between gap-2 rounded-2xl bg-[var(--surface-2)] px-3 py-2">
+            <span className="text-[11px] font-bold text-[var(--text-muted)]">ظرفیت امسال</span>
+            <div className="flex items-center gap-1.5" aria-label="سهمیه فعالیت امسال">
+              {Array.from({ length: runtime.maxQuotaPerTurn }).map((_, idx) => {
+                const used = idx < runtime.quotaUsedThisTurn;
+                return (
+                  <span
+                    key={idx}
+                    className={`h-3 w-3 rounded-full border transition-colors ${
+                      used
+                        ? 'border-[var(--primary)] bg-[var(--primary)]'
+                        : 'border-[var(--border)] bg-[var(--surface)]'
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 4 SVG Mini-Gauges */}
+          <div className="grid grid-cols-4 gap-2 text-center">
+            {[
+              { label: 'سلامت', val: player.stats.health, colorVar: '--stat-health' },
+              { label: 'شادی', val: player.stats.happiness, colorVar: '--stat-happiness' },
+              { label: 'روان', val: player.stats.mentalHealth, colorVar: '--stat-mental' },
+              { label: 'هوش', val: player.stats.intelligence, colorVar: '--stat-smarts' },
+            ].map((g) => (
+              <div key={g.label} className="flex flex-col items-center gap-1 rounded-xl bg-[var(--surface-2)] py-2">
+                <ProgressRing value={g.val} size={40} strokeWidth={4} colorVar={g.colorVar} />
+                <span className="text-[10px] font-bold text-[var(--text-muted)]">{g.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Pinned Urgent Alert when Health < 20 */}
+          {urgentAlert && (
+            <div className="flex items-center justify-between gap-2 rounded-2xl border border-[var(--danger)]/40 bg-[var(--danger)]/10 px-3 py-2.5">
+              <div className="flex min-w-0 items-start gap-2">
+                <IconWarning className="mt-0.5 h-4 w-4 shrink-0 text-[var(--danger)]" />
+                <div className="min-w-0 text-right">
+                  <div className="text-xs font-bold text-[var(--danger)]">
+                    {t('activitiesHub.urgentPriorityTitle')}: {urgentAlert.titleFa}
+                  </div>
+                  <div className="mt-0.5 line-clamp-2 text-[11px] text-[var(--text)]">
+                    {urgentAlert.bodyFa}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => triggerActivity(urgentAlert.activity, false)}
+                className="min-h-[38px] shrink-0 rounded-xl bg-[var(--danger)] px-3 text-xs font-bold text-[var(--on-primary)]"
+              >
+                {urgentAlert.activity.titleFa}
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* Section 2: Smart 1-Tap Horizontal Carousel */}
+        {smartRecommendations.length > 0 && (
+          <section className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-xs font-bold text-[var(--text-muted)]">
+                {t('activitiesHub.smartCarouselTitle')}
+              </h3>
+              <span className="text-[11px] text-[var(--text-muted)]">اجرای فوری با امکان بازگردانی</span>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
+              {smartRecommendations.map((rec) => {
+                const tileMeta = CATEGORY_TILES.find((c) => c.id === rec.activity.category);
+                const check = canPerformActivity(rec.activity, saveGame);
+                return (
+                  <button
+                    key={rec.activity.id}
+                    type="button"
+                    onClick={() => triggerActivity(rec.activity, false)}
+                    className="flex min-h-[112px] w-[164px] shrink-0 flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span
+                        className={`flex h-8 w-8 items-center justify-center rounded-xl ${tileMeta?.accentBg ?? 'bg-[var(--primary-soft)]'} ${tileMeta?.accentText ?? 'text-[var(--primary-strong)]'}`}
+                      >
+                        {tileMeta?.icon ?? <IconSparkles className="h-4 w-4" />}
+                      </span>
+                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 text-[10px] font-bold tabular-nums text-[var(--text)]">
+                        {check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                      </span>
+                    </div>
+                    <div className="mt-2 min-w-0">
+                      <div className="truncate text-xs font-bold text-[var(--text)]">
+                        {rec.activity.titleFa}
+                      </div>
+                      <div className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-[var(--text-muted)]">
+                        {rec.reasonFa}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
         )}
 
-        <SectionGroup title="دسته‌بندی فعالیت‌ها">
-          {STANDARD_CATEGORIES.map((cat) => {
-            const cnt = countForCategory(cat.id);
-            const subtitle =
-              cat.id === 'migration' && emigProgress.targetCountryId
-                ? `پرونده فعال: ${gameDataset.countries.find((c) => c.id === emigProgress.targetCountryId)?.nameFa ?? ''}`
-                : cat.desc;
-            return (
-              <ActionRow
-                key={cat.id}
-                icon={cat.icon}
-                emoji={cat.emoji}
-                title={t(cat.labelKey)}
-                subtitle={subtitle}
-                value={`${toPersianDigits(cnt)} مورد`}
-                showChevron
-                onClick={() => setSelectedCategory(cat.id)}
+        {/* Section 3: Unified Discovery (Seasonal / Favorites / Recent) */}
+        <SectionGroup
+          title="فصلی، علاقه‌مندی‌ها و اخیر"
+          action={
+            <div className="w-[196px]">
+              <SegmentedControl<DiscoveryMode>
+                value={discoveryMode}
+                onChange={setDiscoveryMode}
+                items={[
+                  { value: 'seasonal', label: 'فصلی' },
+                  { value: 'favorites', label: 'علاقه' },
+                  { value: 'recent', label: 'اخیر' },
+                ]}
               />
-            );
-          })}
+            </div>
+          }
+        >
+          {discoveryItems.length === 0 ? (
+            <div className="px-3.5 py-4 text-center text-xs text-[var(--text-muted)]">
+              {discoveryMode === 'favorites'
+                ? 'با زدن ستاره کنار هر فعالیت، آن را اینجا پین کن.'
+                : 'هنوز فعالیتی در این بخش ثبت نشده است.'}
+            </div>
+          ) : (
+            discoveryItems.map((act) => {
+              const check = canPerformActivity(act, saveGame);
+              const isFav = favoriteSet.has(act.id);
+              const isCooldown = check.reason?.includes('یک بار');
+              return (
+                <div key={act.id} className="flex items-center">
+                  <div className="min-w-0 flex-1">
+                    <ActionRow
+                      icon={<IconSparkles className="h-4 w-4" />}
+                      title={act.titleFa}
+                      subtitle={act.effectHintFa}
+                      value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                      state={check.allowed ? 'enabled' : isCooldown ? 'cooldown' : 'disabled'}
+                      reason={check.reason}
+                      ctaLabel="انجام"
+                      onClick={() => triggerActivity(act, true)}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFavorite(act.id)}
+                    aria-label={`نشان کردن ${act.titleFa}`}
+                    className={`flex min-h-[48px] min-w-[44px] shrink-0 items-center justify-center border-r border-[var(--border)] transition-colors ${
+                      isFav ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'
+                    }`}
+                  >
+                    <IconStar className="h-4 w-4" />
+                  </button>
+                </div>
+              );
+            })
+          )}
         </SectionGroup>
 
+        {/* Section 4: 2-Col Duotone Vector Category Tiles + Highlighted Travel & Migration Tile */}
+        <section className="space-y-2.5">
+          <div className="px-1">
+            <h3 className="text-xs font-bold text-[var(--text-muted)]">
+              {t('activitiesHub.categoriesTitle')}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {STANDARD_ACTIVITY_CATEGORIES.map((catId) => {
+              const meta = CATEGORY_TILES.find((m) => m.id === catId)!;
+              const cnt = countForCategory(catId);
+              return (
+                <button
+                  key={catId}
+                  type="button"
+                  onClick={() => setSelectedCategory(catId)}
+                  className="flex min-h-[74px] items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
+                >
+                  <span
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.accentBg} ${meta.accentText}`}
+                  >
+                    {meta.icon}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-xs font-bold text-[var(--text)]">
+                      {t(`activities.categories.${catId}`)}
+                    </div>
+                    <div className="mt-0.5 truncate text-[10px] text-[var(--text-muted)]">
+                      {meta.descFa} · {toPersianDigits(cnt)}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {onOpenEmigration && (
+            <button
+              type="button"
+              onClick={onOpenEmigration}
+              className="flex min-h-[68px] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--primary)]/40 bg-[var(--primary-soft)]/60 px-3.5 py-3 text-right transition-colors hover:border-[var(--primary)]"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] text-[var(--on-primary)]">
+                  <IconPlane className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-bold text-[var(--primary-strong)]">
+                    {t('activitiesHub.travelMigrationTile')}
+                  </div>
+                  <div className="mt-0.5 truncate text-[11px] text-[var(--text)]">
+                    {t('activitiesHub.travelMigrationSubtitle')}
+                  </div>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center -space-x-1 space-x-reverse">
+                <CountryFlag countryId="turkey" size="xs" />
+                <CountryFlag countryId="germany" size="xs" />
+                <CountryFlag countryId="canada" size="xs" />
+              </div>
+            </button>
+          )}
+        </section>
+
+        {/* Section 5: Optional DangerZone for Risky Categories */}
         {contentSettings.allowCrime && (
           <DangerZoneGroup title="گزینه‌های حساس و پرریسک">
             {RISKY_CATEGORIES.map((cat) => (
@@ -332,9 +559,8 @@ export function ActivitiesTabSheet({
                 key={cat.id}
                 variant="danger"
                 icon={cat.icon}
-                emoji={cat.emoji}
-                title={t(cat.labelKey)}
-                subtitle={cat.desc}
+                title={t(`activities.categories.${cat.id}`)}
+                subtitle={cat.descFa}
                 value={`${toPersianDigits(countForCategory(cat.id))} مورد`}
                 showChevron
                 onClick={() => setSelectedCategory(cat.id)}
@@ -344,164 +570,118 @@ export function ActivitiesTabSheet({
         )}
       </div>
 
-      {/* Category & Migration Drill-down DetailSheet */}
+      {/* Category Drill-down DetailSheet (chunks <= 6 rows each) */}
       <DetailSheet
         open={selectedCategory !== null}
         onClose={() => setSelectedCategory(null)}
         title={selectedCategory ? t(`activities.categories.${selectedCategory}`) : ''}
-        subtitle={
-          selectedCategory === 'migration'
-            ? 'انتخاب کشور مقصد، مسیر و پیگیری مراحل ویزا'
-            : 'برای انجام هر فعالیت روی ردیف بزن'
-        }
+        subtitle="برای ثبت در کارنامه سالانه روی فعالیت ضربه بزن"
         onInfo={() => setInfoOpen(true)}
-        footer={
-          selectedCategory === 'migration' && player.age >= 18 ? (
-            <ActionButton
-              label={`اجرای مرحله ${toPersianDigits(currentStep + 1)}: ${MIGRATION_STEPS[currentStep]}`}
-              costText={formatToman(nextStepCost)}
-              effectHint={`هزینه کل تقریبی مسیر: ${formatToman(totalEmigrationCost)}`}
-              disabled={player.moneyToman < nextStepCost}
-              disabledReason={player.moneyToman < nextStepCost ? 'موجودی کافی نیست' : undefined}
-              onClick={() => setConfirmEmigrate(true)}
-            />
-          ) : undefined
-        }
       >
-        {selectedCategory === 'migration' ? (
-          player.age < 18 ? (
-            <LockedNotice message="فرآیند مستقل مهاجرت از ۱۸ سالگی فعال می‌شود." />
-          ) : (
-            <>
-              <HubHeroCard
-                icon={<IconPlane className="h-5 w-5" />}
-                title={`مهاجرت به ${activeCountry.nameFa}`}
-                subtitle={
-                  player.countryId !== 'iran'
-                    ? `اقامت فعلی: ${gameDataset.countries.find((c) => c.id === player.countryId)?.nameFa ?? ''}`
-                    : `سختی پذیرش: ${toPersianDigits(Math.round(activeCountry.difficulty * 100))}٪`
-                }
-                status={currentStep > 0 ? 'in_progress' : 'waiting'}
-                metrics={[
-                  { label: 'مرحله فعلی', value: `${toPersianDigits(currentStep)} از ۴` },
-                  { label: 'هزینه گام بعد', value: formatToman(nextStepCost) },
-                  { label: 'برآورد کل', value: formatToman(totalEmigrationCost) },
-                ]}
-              />
+        {categoryTalents.length > 0 && (
+          <SectionGroup
+            title="پرورش گرایش و استعداد مرتبط"
+            subtitle="تمرین فردی در کنار فعالیت‌های روزمره"
+          >
+            {categoryTalents.slice(0, 6).map((opt) => {
+              const ageLocked = player.age < opt.minPracticeAge;
+              const cooledDown = opt.cooldownRemaining > 0;
+              return (
+                <ActionRow
+                  key={opt.talentId}
+                  icon={<IconSport className="h-4 w-4" />}
+                  title={
+                    opt.athleticDisciplineTitleFa
+                      ? `${opt.titleFa} (${opt.athleticDisciplineTitleFa})`
+                      : opt.titleFa
+                  }
+                  subtitle={`مهارت: ${opt.skillLevelLabelFa}${opt.discoveredTierLabelFa ? ` · ${opt.discoveredTierLabelFa}` : ''}`}
+                  value="رایگان"
+                  state={ageLocked ? 'locked' : cooledDown ? 'cooldown' : 'enabled'}
+                  reason={
+                    ageLocked ? `از ${toPersianDigits(opt.minPracticeAge)} سالگی` : undefined
+                  }
+                  ctaLabel="تمرین"
+                  onClick={() =>
+                    onUpdateSave(
+                      developTalentAction(
+                        saveGame,
+                        opt.talentId,
+                        'self_practice',
+                        gameDataset,
+                      ),
+                    )
+                  }
+                />
+              );
+            })}
+          </SectionGroup>
+        )}
 
-              <ProgressStepper
-                orientation="horizontal"
-                steps={MIGRATION_STEPS.map((label, idx) => ({
-                  id: label,
-                  title: label,
-                  status:
-                    idx < currentStep
-                      ? 'done'
-                      : idx === currentStep
-                        ? 'current'
-                        : 'upcoming',
-                }))}
-              />
-
-              <SectionGroup title="کشور مقصد">
-                {abroadCountries.map((country) => {
-                  const selected = country.id === activeCountry.id;
-                  return (
-                    <ActionRow
-                      key={country.id}
-                      icon={<IconPlane className="h-4 w-4" />}
-                      title={country.nameFa}
-                      subtitle={`سختی: ${toPersianDigits(Math.round(country.difficulty * 100))}٪`}
-                      state={selected ? 'done' : 'enabled'}
-                      ctaLabel={selected ? undefined : 'انتخاب'}
-                      onClick={() => setSelectedCountry(country)}
-                    />
-                  );
-                })}
-              </SectionGroup>
-
-              <SectionGroup title="مسیر پرونده">
-                <div className="p-2.5">
-                  <SegmentedControl
-                    value={activePath}
-                    onChange={setSelectedPath}
-                    items={activeCountry.paths.map((p) => ({
-                      value: p,
-                      label: PATH_LABELS[p],
-                    }))}
-                  />
-                </div>
-              </SectionGroup>
-            </>
-          )
+        {categoryActivities.length === 0 ? (
+          <EmptyState
+            title="فعالیتی در این دسته‌بندی نیست"
+            description="ممکن است در تنظیمات محتوا محدود شده باشد."
+          />
         ) : (
           <>
-            {selectedCategory === 'health' && (
-              <Card className="space-y-2">
-                <StatBar
-                  label="سلامت جسم"
-                  value={player.stats.health}
-                  colorVar="--stat-health"
-                  icon={<IconHealth className="h-3.5 w-3.5 text-[var(--stat-health)]" />}
-                />
-                <StatBar
-                  label="سلامت روان"
-                  value={player.stats.mentalHealth}
-                  colorVar="--stat-mental"
-                />
-              </Card>
-            )}
+            <SectionGroup title="فعالیت‌های اصلی">
+              {firstChunk.map((act) => {
+                const check = canPerformActivity(act, saveGame);
+                const isCooldown =
+                  check.reason?.includes('فقط یک بار در سال') ||
+                  check.reason?.includes('تا نوبت بعد');
+                const isDisabledMoney = check.reason === 'موجودی کافی نیست';
+                const rowState = check.allowed
+                  ? 'enabled'
+                  : isCooldown
+                    ? 'cooldown'
+                    : isDisabledMoney
+                      ? 'disabled'
+                      : 'locked';
+                const isDanger =
+                  act.category === 'crime' ||
+                  act.category === 'gambling' ||
+                  act.riskLabelFa === 'زیاد';
+                const isFav = favoriteSet.has(act.id);
 
-            {categoryTalents.length > 0 && (
-              <SectionGroup
-                title="پرورش گرایش و استعداد مرتبط"
-                subtitle="تمرین فردی رایگان در کنار فعالیت‌ها"
-              >
-                {categoryTalents.map((opt) => {
-                  const ageLocked = player.age < opt.minPracticeAge;
-                  const cooledDown = opt.cooldownRemaining > 0;
-                  return (
-                    <ActionRow
-                      key={opt.talentId}
-                      icon={<IconSport className="h-4 w-4" />}
-                      title={
-                        opt.athleticDisciplineTitleFa
-                          ? `${opt.titleFa} (${opt.athleticDisciplineTitleFa})`
-                          : opt.titleFa
-                      }
-                      subtitle={`مهارت: ${opt.skillLevelLabelFa}${opt.discoveredTierLabelFa ? ` · ${opt.discoveredTierLabelFa}` : ''}`}
-                      value="رایگان"
-                      state={ageLocked ? 'locked' : cooledDown ? 'cooldown' : 'enabled'}
-                      reason={
-                        ageLocked ? `از ${toPersianDigits(opt.minPracticeAge)} سالگی` : undefined
-                      }
-                      ctaLabel="تمرین"
-                      onClick={() =>
-                        onUpdateSave(
-                          developTalentAction(
-                            saveGame,
-                            opt.talentId,
-                            'self_practice',
-                            gameDataset,
-                          ),
-                        )
-                      }
-                    />
-                  );
-                })}
-              </SectionGroup>
-            )}
+                return (
+                  <div key={act.id} className="flex items-center">
+                    <div className="min-w-0 flex-1">
+                      <ActionRow
+                        variant={isDanger ? 'danger' : 'default'}
+                        icon={<IconCoins className="h-4 w-4" />}
+                        title={act.titleFa}
+                        subtitle={`${act.effectHintFa} · ریسک ${act.riskLabelFa}`}
+                        value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                        state={rowState}
+                        reason={check.reason}
+                        ctaLabel="انجام"
+                        onClick={() => triggerActivity(act, true)}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleFavorite(act.id)}
+                      aria-label={`افزودن ${act.titleFa} به علاقه‌مندی‌ها`}
+                      className={`flex min-h-[48px] min-w-[44px] shrink-0 items-center justify-center border-r border-[var(--border)] transition-colors ${
+                        isFav ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'
+                      }`}
+                    >
+                      <IconStar className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              })}
+            </SectionGroup>
 
-            {categoryActivities.length === 0 ? (
-              <EmptyState
-                title="فعالیتی در این بخش نیست"
-                description="ممکن است در تنظیمات محتوا محدود شده باشد."
-              />
-            ) : (
-              <SectionGroup title="فهرست فعالیت‌ها">
-                {categoryActivities.map((act) => {
+            {secondChunk.length > 0 && (
+              <SectionGroup title="گزینه‌های تکمیلی">
+                {secondChunk.map((act) => {
                   const check = canPerformActivity(act, saveGame);
-                  const isCooldown = check.reason?.includes('فقط یک بار در سال') || check.reason?.includes('تا نوبت بعد');
+                  const isCooldown =
+                    check.reason?.includes('فقط یک بار در سال') ||
+                    check.reason?.includes('تا نوبت بعد');
                   const isDisabledMoney = check.reason === 'موجودی کافی نیست';
                   const rowState = check.allowed
                     ? 'enabled'
@@ -510,24 +690,33 @@ export function ActivitiesTabSheet({
                       : isDisabledMoney
                         ? 'disabled'
                         : 'locked';
-                  const isDanger =
-                    act.category === 'crime' ||
-                    act.category === 'gambling' ||
-                    act.riskLabelFa === 'زیاد';
+                  const isFav = favoriteSet.has(act.id);
 
                   return (
-                    <ActionRow
-                      key={act.id}
-                      variant={isDanger ? 'danger' : 'default'}
-                      icon={<IconCoins className="h-4 w-4" />}
-                      title={act.titleFa}
-                      subtitle={`${act.effectHintFa} · ریسک ${act.riskLabelFa}`}
-                      value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
-                      state={rowState}
-                      reason={check.reason}
-                      ctaLabel="انجام"
-                      onClick={() => triggerActivity(act)}
-                    />
+                    <div key={act.id} className="flex items-center">
+                      <div className="min-w-0 flex-1">
+                        <ActionRow
+                          icon={<IconBank className="h-4 w-4" />}
+                          title={act.titleFa}
+                          subtitle={`${act.effectHintFa} · ریسک ${act.riskLabelFa}`}
+                          value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                          state={rowState}
+                          reason={check.reason}
+                          ctaLabel="انجام"
+                          onClick={() => triggerActivity(act, true)}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFavorite(act.id)}
+                        aria-label={`افزودن ${act.titleFa} به علاقه‌مندی‌ها`}
+                        className={`flex min-h-[48px] min-w-[44px] shrink-0 items-center justify-center border-r border-[var(--border)] transition-colors ${
+                          isFav ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]'
+                        }`}
+                      >
+                        <IconStar className="h-4 w-4" />
+                      </button>
+                    </div>
                   );
                 })}
               </SectionGroup>
@@ -536,14 +725,24 @@ export function ActivitiesTabSheet({
         )}
       </DetailSheet>
 
+      <ActivityResultSheet
+        open={resultModal !== null}
+        activity={resultModal?.activity ?? null}
+        outcome={resultModal?.outcome ?? null}
+        saveGame={saveGame}
+        onClose={() => setResultModal(null)}
+        onToggleFavorite={handleToggleFavorite}
+        onUndo={() => onUpdateSave(undoLastActivityAction(saveGame))}
+      />
+
       <InfoSheet
         open={infoOpen}
         onClose={() => setInfoOpen(false)}
         title="درباره فعالیت‌ها"
         bullets={[
-          'بیشتر فعالیت‌ها هر سال یک بار قابل انجام هستند و با حلقه انتظار مشخص می‌شوند.',
-          'فعالیت‌های پرریسک یا غیرقانونی قبل از اجرا پنجره تأیید دارند.',
-          'بخش مهاجرت مراحل پرونده را به‌صورت گام‌به‌گام ذخیره می‌کند.',
+          'هر سال تا ۵ سهمیه فعالیت داری و پیشنهادهای هوشمند بر پایه وضعیت فعلی شاخص‌هایت مرتب می‌شوند.',
+          'اجرای سریع از نوار پیشنهاد هوشمند تا پیش از رفتن به سال بعد قابل بازگردانی است.',
+          'برای سفر کوتاه‌مدت خارجی یا پیگیری پرونده مهاجرت از کاشی ویژه «سفر خارجی و مهاجرت» وارد شو.',
         ]}
       />
 
@@ -559,23 +758,11 @@ export function ActivitiesTabSheet({
         onCancel={() => setConfirmRiskActivity(null)}
         onConfirm={() => {
           if (confirmRiskActivity) {
-            onUpdateSave(performActivityAction(saveGame, confirmRiskActivity));
+            runActivity(confirmRiskActivity, true);
           }
           setConfirmRiskActivity(null);
-        }}
-      />
-
-      <ConfirmDialog
-        open={confirmEmigrate}
-        title={`پیشبرد پرونده مهاجرت به ${activeCountry.nameFa}`}
-        message={`هزینه مرحله «${MIGRATION_STEPS[currentStep]}» برابر با ${formatToman(nextStepCost)} است. آیا ادامه می‌دهی؟`}
-        onCancel={() => setConfirmEmigrate(false)}
-        onConfirm={() => {
-          onUpdateSave(advanceEmigrationStepAction(saveGame, activeCountry, activePath));
-          setConfirmEmigrate(false);
         }}
       />
     </FullScreenSheet>
   );
 }
-

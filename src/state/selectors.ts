@@ -1,5 +1,11 @@
 import { gameDataset, type GameDataset } from '../data/registry';
 import {
+  calculateAbroadJobIncome,
+  getAbroadMonthlyBudget,
+  getCountryMacroDef,
+  getCountryPathsDef,
+} from '../engine/countries';
+import {
   calculateHousingQuote,
   calculateJobAnnualIncomeBreakdown,
   calculateNetWorthToman,
@@ -12,7 +18,28 @@ import {
   type HousingPriceQuote,
   type JobIncomeBreakdown,
 } from '../engine/economy';
+import {
+  compareCountries,
+  computeEmigrationDifficulty,
+  ensureEmigrationState,
+  rankCountriesForPlayer,
+} from '../engine/emigration';
+import { formatCurrencyAmount, getDisplayCurrencyCode } from '../engine/fx';
 import { toPersianDigits } from '../engine/jalali';
+import {
+  getAnnualRealPerformanceAndBenchmarks,
+  getCurrencyExposureBreakdown,
+  getLedgerNetWorth,
+  getSavingsErosionWarnings,
+  getTotalAssetsAndLiabilitiesInToman,
+} from '../engine/ledger';
+import {
+  ensureActivityRuntimeState,
+  getPinnedUrgentAlert,
+  getRecentAndFavoriteActivities,
+  getSeasonalActivities,
+  getSmartRecommendations,
+} from '../engine/recommendation';
 import {
   checkPromotionEligibility,
   getLicenseStatus,
@@ -454,6 +481,13 @@ export function canPerformActivity(
       adjustedCost,
     };
   }
+  if (activity.minIntelligence !== undefined && player.stats.intelligence < activity.minIntelligence) {
+    return {
+      allowed: false,
+      reason: `نیاز به هوش ${toPersianDigits(activity.minIntelligence)} دارد`,
+      adjustedCost,
+    };
+  }
   const cd = getActionCooldownRemaining(state, `act_${activity.id}`, activity.cooldownYears);
   if (cd > 0) {
     return {
@@ -462,7 +496,23 @@ export function canPerformActivity(
       adjustedCost,
     };
   }
-  if (adjustedCost > player.moneyToman) {
+  const activityRuntime = ensureActivityRuntimeState(state);
+  const quotaCost = activity.quotaCost ?? 1;
+  if (activityRuntime.quotaUsedThisTurn + quotaCost > activityRuntime.maxQuotaPerTurn) {
+    return {
+      allowed: false,
+      reason: 'سهمیه فعالیت امسال تکمیل شده است',
+      adjustedCost,
+    };
+  }
+  const availableToman =
+    player.countryId !== 'iran' && state.ledger
+      ? Math.max(
+          player.moneyToman,
+          getTotalAssetsAndLiabilitiesInToman(state, gameDataset).walletsToman,
+        )
+      : player.moneyToman;
+  if (adjustedCost > availableToman) {
     return { allowed: false, reason: 'موجودی کافی نیست', adjustedCost };
   }
   return { allowed: true, adjustedCost };
@@ -520,13 +570,37 @@ export function getJobApplicationStatus(
   breakdown: JobIncomeBreakdown;
 } {
   const { player } = state;
-  const breakdown = calculateJobAnnualIncomeBreakdown({
-    job,
-    level: 1,
-    state,
-    dataset,
-    positionOverride01: 0.35,
-  });
+  let breakdown: JobIncomeBreakdown;
+  if (player.countryId !== 'iran') {
+    const ab = calculateAbroadJobIncome({
+      job,
+      level: 1,
+      state,
+      dataset,
+      positionOverride01: 0.35,
+    });
+    breakdown = {
+      grossAnnual: ab.grossAnnualToman,
+      commission: 0,
+      runningCosts: 0,
+      bimeh: Math.round(
+        ab.socialSecurityLocal * (ab.grossAnnualToman / Math.max(1, ab.grossAnnualLocal)),
+      ),
+      incomeTax: Math.round(
+        ab.incomeTaxLocal * (ab.grossAnnualToman / Math.max(1, ab.grossAnnualLocal)),
+      ),
+      netAnnual: ab.netAnnualToman,
+      monthlyMultiplierOfMinWage: ab.monthlyMultiplierOfMinWage,
+    };
+  } else {
+    breakdown = calculateJobAnnualIncomeBreakdown({
+      job,
+      level: 1,
+      state,
+      dataset,
+      positionOverride01: 0.35,
+    });
+  }
   const estimatedSalary = breakdown.netAnnual;
 
   if (player.age < 18) {
@@ -936,5 +1010,104 @@ export function getAdoptionHubSummary(
     adoptedChildrenCount,
   };
 }
+
+export function getHeaderMoneySummary(
+  state: GameState,
+  dataset: GameDataset = gameDataset,
+) {
+  const displayCurrency = getDisplayCurrencyCode(state, dataset);
+  const netWorth = getLedgerNetWorth(state, dataset);
+  const exposure = getCurrencyExposureBreakdown(state, dataset);
+  const warnings = getSavingsErosionWarnings(state, dataset);
+  const perf = getAnnualRealPerformanceAndBenchmarks(state, dataset);
+  const cashDisplayText = formatCurrencyAmount(
+    netWorth.displayCurrency === 'IRT'
+      ? state.player.moneyToman
+      : state.ledger
+        ? state.ledger.wallets
+            .filter((w) => w.currencyCode === netWorth.displayCurrency)
+            .reduce((s, w) => s + w.balance, 0) ||
+          Number(
+            (
+              state.player.moneyToman *
+              (netWorth.tomanAmount > 0 ? netWorth.displayAmount / netWorth.tomanAmount : 0)
+            ).toFixed(2),
+          )
+        : state.player.moneyToman,
+    displayCurrency,
+    dataset,
+  );
+  const primaryFormatted = formatCurrencyAmount(
+    netWorth.displayAmount,
+    netWorth.displayCurrency,
+    dataset,
+  );
+  const secondaryTomanFormatted = formatCurrencyAmount(netWorth.tomanAmount, 'IRT', dataset);
+  return {
+    displayCurrency,
+    netWorth: {
+      ...netWorth,
+      primaryFormatted,
+      secondaryTomanFormatted,
+    },
+    cashDisplayText,
+    exposure,
+    warnings,
+    performance: perf,
+  };
+}
+
+export function getEmigrationHubSummary(
+  state: GameState,
+  dataset: GameDataset = gameDataset,
+) {
+  const emigration = ensureEmigrationState(state);
+  const ranked = rankCountriesForPlayer(state, dataset);
+  const compareIds =
+    emigration.shortlistedCountryIds.length > 0
+      ? emigration.shortlistedCountryIds
+      : ranked.slice(0, 3).map((r) => r.countryId);
+  const comparison = compareCountries(compareIds, state, dataset);
+  const abroadBudget =
+    state.player.countryId !== 'iran' ? getAbroadMonthlyBudget(state, dataset) : null;
+  const activeCountryDef =
+    state.player.countryId !== 'iran' ? getCountryMacroDef(state.player.countryId, dataset) : null;
+  const activePathsDef =
+    state.player.countryId !== 'iran' ? getCountryPathsDef(state.player.countryId, dataset) : null;
+
+  return {
+    emigration,
+    ranked,
+    comparison,
+    abroadBudget,
+    activeCountryDef,
+    activePathsDef,
+    computeDifficulty: (countryId: string, pathId?: 'study' | 'work' | 'skilled' | 'investment' | 'family') =>
+      computeEmigrationDifficulty({ countryId, pathId, state, dataset }),
+  };
+}
+
+export function getActivitiesHubSummary(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+) {
+  const runtime = ensureActivityRuntimeState(save.state);
+  const urgentAlert = getPinnedUrgentAlert(save, dataset);
+  const smartRecommendations = getSmartRecommendations(save, dataset, 5);
+  const seasonal = getSeasonalActivities(save, dataset);
+  const { favorites, recents } = getRecentAndFavoriteActivities(save, dataset);
+  const moneySummary = getHeaderMoneySummary(save.state, dataset);
+  return {
+    runtime,
+    urgentAlert,
+    smartRecommendations,
+    seasonal,
+    favorites,
+    recents,
+    moneySummary,
+  };
+}
+
+
 
 

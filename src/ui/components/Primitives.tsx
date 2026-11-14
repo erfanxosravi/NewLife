@@ -492,10 +492,14 @@ export function Toast({
   message,
   tone = 'primary',
   visible,
+  actionLabel,
+  onAction,
 }: {
   message: string;
   tone?: 'primary' | 'success' | 'danger' | 'warning';
   visible: boolean;
+  actionLabel?: string;
+  onAction?: () => void;
 }) {
   if (!visible || !message) return null;
   const bgMap: Record<NonNullable<typeof tone>, string> = {
@@ -508,11 +512,20 @@ export function Toast({
   return (
     <div className="pointer-events-none fixed inset-x-0 top-14 z-[70] flex justify-center px-4">
       <div
-        className={`flex max-w-[420px] items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold shadow-lg ${bgMap[tone]}`}
+        className={`pointer-events-auto flex max-w-[430px] items-center gap-2.5 rounded-2xl px-4 py-2.5 text-xs font-bold shadow-lg ${bgMap[tone]}`}
         role="status"
       >
         <IconCheck className="h-4 w-4 shrink-0" />
-        <span>{message}</span>
+        <span className="min-w-0 flex-1 leading-snug">{message}</span>
+        {actionLabel && onAction && (
+          <button
+            type="button"
+            onClick={onAction}
+            className="min-h-[32px] shrink-0 rounded-xl bg-white/20 px-2.5 py-1 text-[11px] font-bold text-[var(--on-primary)] transition-colors hover:bg-white/30"
+          >
+            {actionLabel}
+          </button>
+        )}
       </div>
     </div>
   );

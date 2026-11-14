@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { gameDataset } from './data/registry';
 import type {
+  ActivityDefinition,
   ContentSettings,
   EventChoice,
   EventDefinition,
@@ -9,8 +10,11 @@ import type {
 } from './engine/types';
 import { useI18n } from './i18n/useI18n';
 import {
+  performActivityAction,
   runAdvanceYearWithTick,
   runApplyEventChoice,
+  setDisplayCurrencyModeAction,
+  undoLastActivityAction,
   type ActionOutcome,
 } from './state/actions';
 import {
@@ -82,8 +86,21 @@ const DynastyScreen = lazy(() =>
 const WillEditorSheet = lazy(() =>
   import('./ui/WillEditorSheet').then((m) => ({ default: m.WillEditorSheet })),
 );
+const EmigrationTravelHub = lazy(() =>
+  import('./ui/components/emigration/EmigrationTravelHub').then((m) => ({
+    default: m.EmigrationTravelHub,
+  })),
+);
 
-type ActiveSheet = null | BottomNavTab | 'stats' | 'menu' | 'dynasty' | 'dynasty_continue' | 'will';
+type ActiveSheet =
+  | null
+  | BottomNavTab
+  | 'stats'
+  | 'menu'
+  | 'dynasty'
+  | 'dynasty_continue'
+  | 'will'
+  | 'emigration';
 
 const STAT_KEYS: (keyof PlayerStats)[] = [
   'happiness',
@@ -146,7 +163,11 @@ export default function App() {
     visible: boolean;
     message: string;
     tone: 'primary' | 'success' | 'danger' | 'warning';
+    actionLabel?: string;
+    onAction?: () => void;
   }>({ visible: false, message: '', tone: 'primary' });
+  const latestSaveRef = useRef<SaveGame | null>(null);
+  latestSaveRef.current = saveGame;
 
   // Animation sequence state
   const sequenceControllerRef = useRef<YearSequenceController | null>(null);
@@ -225,19 +246,30 @@ export default function App() {
   };
 
   const showToast = useCallback(
-    (message: string, tone: 'primary' | 'success' | 'danger' | 'warning' = 'primary') => {
-      setToast({ visible: true, message, tone });
+    (
+      message: string,
+      tone: 'primary' | 'success' | 'danger' | 'warning' = 'primary',
+      action?: { label: string; onAction: () => void },
+    ) => {
+      setToast({
+        visible: true,
+        message,
+        tone,
+        actionLabel: action?.label,
+        onAction: action?.onAction,
+      });
     },
     [],
   );
 
   useEffect(() => {
     if (!toast.visible) return;
+    const duration = toast.actionLabel ? 4200 : 2600;
     const timer = window.setTimeout(() => {
-      setToast((prev) => ({ ...prev, visible: false }));
-    }, 2600);
+      setToast((prev) => ({ ...prev, visible: false, actionLabel: undefined, onAction: undefined }));
+    }, duration);
     return () => window.clearTimeout(timer);
-  }, [toast.visible, toast.message]);
+  }, [toast.visible, toast.message, toast.actionLabel]);
 
   // Trigger audio cues & stat/money delta displays cleanly at phase transitions
   useEffect(() => {
@@ -524,6 +556,45 @@ export default function App() {
     await persistSave(nextSave);
   };
 
+  const handleQuickActivityWithUndo = (activity: ActivityDefinition): ActionOutcome => {
+    const current = latestSaveRef.current ?? saveGame;
+    if (!current) {
+      return { save: saveGame!, success: false, message: 'بازی آماده نیست' };
+    }
+    const outcome = performActivityAction(current, activity);
+    if (outcome.save !== current) {
+      const statDeltas = computeStatDeltas(
+        current.state.player.stats,
+        outcome.save.state.player.stats,
+      );
+      const moneyDelta = outcome.save.state.player.moneyToman - current.state.player.moneyToman;
+      const nextKey = ++deltaCounterRef.current;
+      setStatDeltaDisplay({ deltas: statDeltas, key: nextKey });
+      if (moneyDelta !== 0) {
+        setMoneyDeltaDisplay({ amount: moneyDelta, key: nextKey });
+      }
+      setSaveGame(outcome.save);
+      latestSaveRef.current = outcome.save;
+      void persistSave(outcome.save, current.state.unlockedAchievements);
+    }
+    triggerHaptic(outcome.success ? 'success' : 'warning');
+    if (outcome.success) {
+      showToast(outcome.message, 'success', {
+        label: t('activitiesHub.undoLabel'),
+        onAction: () => {
+          const fresh = latestSaveRef.current;
+          if (!fresh) return;
+          const undone = undoLastActivityAction(fresh);
+          setToast((prev) => ({ ...prev, visible: false, actionLabel: undefined, onAction: undefined }));
+          void handleActionOutcome(undone);
+        },
+      });
+    } else {
+      showToast(outcome.message, 'warning');
+    }
+    return outcome;
+  };
+
   const handleUpdateContentSettings = async (nextSettings: ContentSettings) => {
     if (!saveGame) return;
     const updated: SaveGame = {
@@ -687,7 +758,13 @@ export default function App() {
     <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
       {/* Centered Phone-Width Column (360-480px) */}
       <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)] sm:border-x sm:border-[var(--border)] sm:shadow-2xl">
-        <Toast visible={toast.visible} message={toast.message} tone={toast.tone} />
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          tone={toast.tone}
+          actionLabel={toast.actionLabel}
+          onAction={toast.onAction}
+        />
 
         {!isCreating && saveGame ? (
           <HeaderBar
@@ -695,8 +772,13 @@ export default function App() {
             age={displayedAge}
             jalaliYear={displayedYear}
             moneyToman={displayedMoney}
+            state={saveGame.state}
             moneyDelta={moneyDeltaDisplay}
             reducedMotion={prefersReducedMotion || animationSpeed === 'off'}
+            onChangeDisplayCurrency={(mode) => {
+              triggerHaptic('light');
+              void handleSilentSaveUpdate(setDisplayCurrencyModeAction(saveGame, mode));
+            }}
             onOpenAssets={() => {
               triggerHaptic('light');
               setActiveSheet('assets');
@@ -873,6 +955,26 @@ export default function App() {
                   saveGame={saveGame}
                   onClose={() => setActiveSheet(null)}
                   onUpdateSave={handleActionOutcome}
+                  onSilentSave={handleSilentSaveUpdate}
+                  onQuickExecuteWithUndo={handleQuickActivityWithUndo}
+                  onOpenEmigration={() => {
+                    triggerHaptic('light');
+                    setActiveSheet('emigration');
+                  }}
+                />
+              )}
+
+              {activeSheet === 'emigration' && (
+                <EmigrationTravelHub
+                  open
+                  saveGame={saveGame}
+                  onClose={() => setActiveSheet(null)}
+                  onUpdateSave={handleActionOutcome}
+                  onSilentSave={handleSilentSaveUpdate}
+                  onDeepLink={(tab) => {
+                    triggerHaptic('light');
+                    setActiveSheet(tab === 'work' ? 'career' : tab === 'assets' ? 'assets' : 'activities');
+                  }}
                 />
               )}
             </Suspense>

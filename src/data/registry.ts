@@ -11,6 +11,11 @@ import sampleEventsRaw from './events/sample.json';
 import baseline1405Raw from './economy/baseline_1405.json';
 import historicalSeriesRaw from './economy/historical_series.json';
 import jobIncomeRaw from './economy/job_income.json';
+import currenciesRaw from './economy/currencies.json';
+import fxParamsRaw from './economy/fx_params.json';
+import countriesMacroRaw from './countries_macro.json';
+import countryCostsRaw from './country_costs.json';
+import countryPathsRaw from './country_paths.json';
 import talentsRaw from './talents.json';
 import careersSpecialRaw from './careers_special.json';
 import businessesRaw from './businesses.json';
@@ -27,7 +32,12 @@ import {
   CareersSpecialFileSchema,
   CitiesFileSchema,
   CountriesFileSchema,
+  CountriesMacroFileSchema,
+  CountryCostsFileSchema,
+  CountryPathsFileSchema,
+  CurrenciesFileSchema,
   EventsFileSchema,
+  FxParamsFileSchema,
   HistoricalSeriesSchema,
   HousingFileSchema,
   I18nStringsSchema,
@@ -46,7 +56,10 @@ import type {
   AdoptionDataset,
   BusinessesCatalog,
   City,
+  CountryCostDefinition,
   CountryDefinition,
+  CountryMacroDefinition,
+  CountryPathsDefinition,
   EconomyDataset,
   EventDefinition,
   HousingCatalog,
@@ -65,6 +78,9 @@ export interface GameDataset {
   names: NamesDataset;
   jobs: JobDefinition[];
   countries: CountryDefinition[];
+  countriesMacro: CountryMacroDefinition[];
+  countryCosts: CountryCostDefinition[];
+  countryPaths: CountryPathsDefinition[];
   achievements: AchievementDefinition[];
   events: EventDefinition[];
   activities: ActivityDefinition[];
@@ -101,6 +117,11 @@ export function validateAllJsonData(): GameDataset {
   const baseline1405 = Baseline1405Schema.parse(baseline1405Raw);
   const historicalSeries = HistoricalSeriesSchema.parse(historicalSeriesRaw);
   const jobIncome = JobIncomeFileSchema.parse(jobIncomeRaw);
+  const currencies = CurrenciesFileSchema.parse(currenciesRaw);
+  const fxParams = FxParamsFileSchema.parse(fxParamsRaw);
+  const countriesMacro = CountriesMacroFileSchema.parse(countriesMacroRaw);
+  const countryCosts = CountryCostsFileSchema.parse(countryCostsRaw);
+  const countryPaths = CountryPathsFileSchema.parse(countryPathsRaw);
   const faStrings = I18nStringsSchema.parse(faStringsRaw);
 
   // Referential integrity checks
@@ -123,6 +144,35 @@ export function validateAllJsonData(): GameDataset {
     }
   }
 
+  // FX & Countries referential integrity
+  const currencyCodes = new Set(currencies.map((c) => c.code));
+  for (const fxYear of fxParams.historicalUsdRates) {
+    for (const code of currencyCodes) {
+      if (!fxYear.rates[code]) {
+        throw new Error(`FX historical rates missing currency "${code}" for year ${fxYear.year}`);
+      }
+    }
+  }
+  const fxYearSet = new Set(fxParams.historicalUsdRates.map((r) => r.year));
+  for (let y = 1340; y <= 1405; y++) {
+    if (!fxYearSet.has(y)) {
+      throw new Error(`FX historical series missing year ${y}`);
+    }
+  }
+  const costIds = new Set(countryCosts.map((c) => c.countryId));
+  const pathIds = new Set(countryPaths.map((c) => c.countryId));
+  for (const cm of countriesMacro) {
+    if (!currencyCodes.has(cm.currencyCode)) {
+      throw new Error(`Country "${cm.id}" references unknown currency "${cm.currencyCode}"`);
+    }
+    if (!costIds.has(cm.id)) {
+      throw new Error(`Country "${cm.id}" missing entry in country_costs.json`);
+    }
+    if (!pathIds.has(cm.id)) {
+      throw new Error(`Country "${cm.id}" missing entry in country_paths.json`);
+    }
+  }
+
   const jobIncomeIds = new Set(jobIncome.map((j) => j.jobId));
   for (const job of jobs) {
     if (!jobIncomeIds.has(job.id)) {
@@ -138,6 +188,50 @@ export function validateAllJsonData(): GameDataset {
   const activityIds = new Set(activities.map((a) => a.id));
   if (activityIds.size !== activities.length) {
     throw new Error('Duplicate activity id detected in activities.json');
+  }
+
+  const requiredStandardCategories = [
+    'health',
+    'leisure',
+    'travel',
+    'sport',
+    'learning',
+    'charity',
+    'arts_talent',
+    'pets',
+    'social_digital',
+    'business_trade',
+    'legal_civic',
+    'lifestyle_shop',
+  ] as const;
+  const countsByCategory = new Map<string, number>();
+  for (const act of activities) {
+    countsByCategory.set(act.category, (countsByCategory.get(act.category) ?? 0) + 1);
+    if (/[A-Za-z]/.test(act.titleFa) || /[A-Za-z]/.test(act.effectHintFa)) {
+      throw new Error(`Activity "${act.id}" contains forbidden Latin text in Persian copy`);
+    }
+    if ((requiredStandardCategories as readonly string[]).includes(act.category)) {
+      if (act.outcomes.length < 5) {
+        throw new Error(`Activity "${act.id}" must have at least 5 distinct outcomes`);
+      }
+      const textSet = new Set(act.outcomes.map((o) => o.resultTextFa.trim()));
+      if (textSet.size < act.outcomes.length) {
+        throw new Error(`Activity "${act.id}" has duplicate outcome texts`);
+      }
+    }
+    for (const out of act.outcomes) {
+      if (/[A-Za-z]/.test(out.resultTextFa)) {
+        throw new Error(`Activity "${act.id}" outcome contains forbidden Latin text`);
+      }
+    }
+  }
+  for (const cat of requiredStandardCategories) {
+    const cnt = countsByCategory.get(cat) ?? 0;
+    if (cnt < 8 || cnt > 12) {
+      throw new Error(
+        `Standard activity category "${cat}" must contain 8..12 items (found ${cnt})`,
+      );
+    }
   }
 
   const shopIds = new Set(shop.map((s) => s.id));
@@ -256,6 +350,9 @@ export function validateAllJsonData(): GameDataset {
     names,
     jobs,
     countries,
+    countriesMacro,
+    countryCosts,
+    countryPaths,
     achievements,
     events,
     activities,
@@ -272,6 +369,8 @@ export function validateAllJsonData(): GameDataset {
       baseline1405,
       historicalSeries,
       jobIncome,
+      currencies,
+      fxParams,
     },
     faStrings,
   };

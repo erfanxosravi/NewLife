@@ -37,6 +37,7 @@ import {
   Toggle,
 } from './components/Primitives';
 import { PersonAvatar } from './components/PersonAvatar';
+import { CountryFlag } from './components/flags/CountryFlag';
 import { ChecklistCard, InspectorVisitCard } from './components/AdoptionCards';
 import { BottomSheet } from './components/BottomSheet';
 import {
@@ -63,6 +64,7 @@ import {
   IconLooks,
   IconMentalHealth,
   IconMoon,
+  IconPlane,
   IconShield,
   IconSmarts,
   IconStanding,
@@ -614,6 +616,73 @@ export function StyleGuidePage({
               }
               onOpenDetail={(item) => setJcSelectedItem(item)}
             />
+          </Card>
+
+          {/* Emigration Flags, Currency Status & Activity Hub Tiles Showcase */}
+          <Card className="space-y-4" data-testid="styleguide-emigration-activities">
+            <SectionHeader
+              title="پرچم‌های برداری، سهمیه فعالیت و کاشی دو‌رنگ"
+              subtitle="نمایش پرچم‌های اختصاصی (بدون ایموجی)، سهمیه ۵ تایی سالانه و الگوی دسته‌بندی فعالیت‌ها"
+            />
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { id: 'iran', name: 'ایران' },
+                { id: 'turkey', name: 'ترکیه' },
+                { id: 'germany', name: 'آلمان' },
+                { id: 'uae', name: 'امارات' },
+                { id: 'uk', name: 'بریتانیا' },
+                { id: 'canada', name: 'کانادا' },
+                { id: 'generic_template', name: 'سایر' },
+              ].map((c) => (
+                <div
+                  key={c.id}
+                  className="flex flex-col items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] py-2"
+                >
+                  <CountryFlag countryId={c.id} size="md" />
+                  <span className="text-[11px] font-bold text-[var(--text)]">{c.name}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5">
+              <div>
+                <div className="text-xs font-bold text-[var(--text)]">سهمیه برنامه امسال</div>
+                <div className="text-[11px] text-[var(--text-muted)]">۳ از ۵ اقدام باقی‌مانده</div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {[0, 1, 2, 3, 4].map((idx) => (
+                  <span
+                    key={idx}
+                    className={`h-3 w-3 rounded-full border transition-colors ${
+                      idx < 2
+                        ? 'border-[var(--primary)] bg-[var(--primary)]'
+                        : 'border-[var(--border-strong)] bg-[var(--surface)]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-soft)] text-[var(--primary-strong)]">
+                  <IconHealth className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-xs font-bold text-[var(--text)]">ورزش و تندرستی</div>
+                  <div className="text-[10px] text-[var(--text-muted)]">۸ فعالیت</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5 rounded-2xl border border-[var(--primary)]/35 bg-[var(--primary-soft)] p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--surface)] text-[var(--primary-strong)]">
+                  <IconPlane className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-xs font-bold text-[var(--primary-strong)]">سفر و مهاجرت</div>
+                  <div className="text-[10px] text-[var(--text-muted)]">۶ مقصد</div>
+                </div>
+              </div>
+            </div>
           </Card>
         </main>
 

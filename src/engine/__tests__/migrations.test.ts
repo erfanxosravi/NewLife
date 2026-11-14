@@ -153,11 +153,35 @@ describe('SaveGame schemaVersion Migrations', () => {
     expect(migrated.state.jobCompass?.pinnedJobId).toBeNull();
   });
 
+  it('migrates v6 save payload to v7 cleanly with multi-currency IRT wallet, fxState, and displayCurrencyMode', () => {
+    const validSave = createNewSaveGame({ seed: 'v6-to-v7-test' }, gameDataset);
+    const stateWithoutV7 = { ...(validSave.state as unknown as Record<string, unknown>) };
+    delete stateWithoutV7.ledger;
+    delete stateWithoutV7.fxState;
+    delete stateWithoutV7.displayCurrencyMode;
+    validSave.state.player.moneyToman = 123_456_789;
+    const v6Save = {
+      ...validSave,
+      schemaVersion: 6,
+      state: {
+        ...stateWithoutV7,
+        player: { ...validSave.state.player, moneyToman: 123_456_789 },
+      },
+    };
+
+    const migrated = migrateSaveGame(v6Save);
+    expect(migrated.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(migrated.state.displayCurrencyMode).toBe('local');
+    expect(migrated.state.fxState?.usdRates.USD).toBe(1);
+    const irtWallet = migrated.state.ledger?.wallets.find((w) => w.currencyCode === 'IRT');
+    expect(irtWallet?.balance).toBe(123_456_789);
+  });
+
   it('passes through valid current-version save payloads', () => {
-    const validSave = createNewSaveGame({ seed: 'v6-valid' }, gameDataset);
+    const validSave = createNewSaveGame({ seed: 'v7-valid' }, gameDataset);
     const result = migrateSaveGame(validSave);
     expect(result.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
-    expect(result.seed).toBe('v6-valid');
+    expect(result.seed).toBe('v7-valid');
   });
 
   it('rejects unsupported future schema versions and malformed data', () => {

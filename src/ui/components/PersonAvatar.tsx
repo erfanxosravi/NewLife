@@ -8,6 +8,8 @@ export interface PersonAvatarProps {
   className?: string;
   originKind?: PersonOriginKind;
   deceased?: boolean;
+  countryId?: string;
+  isAbroad?: boolean;
 }
 
 function hashSeed(input: string): number {
@@ -43,6 +45,14 @@ const SHIRT_COLORS = [
   '#059669',
   '#475569',
 ];
+const ABROAD_SHIRT_TINTS: Record<string, string> = {
+  turkey: '#B91C1C',
+  germany: '#1E293B',
+  uae: '#0F766E',
+  uk: '#1D4ED8',
+  canada: '#DC2626',
+  generic_template: '#0369A1',
+};
 const SCARF_COLORS = ['#F97316', '#0EA5E9', '#10B981', '#8B5CF6', '#EC4899', '#D97706'];
 
 export function PersonAvatar({
@@ -53,19 +63,28 @@ export function PersonAvatar({
   className = '',
   originKind,
   deceased = false,
+  countryId,
+  isAbroad = false,
 }: PersonAvatarProps) {
   const h = hashSeed(`${seed}_${gender}`);
   const h2 = hashSeed(`${seed}_v2_${gender}`);
   const h3 = hashSeed(`${seed}_v3`);
 
-  const bg = deceased ? 'var(--surface-2)' : BG_PALETTE[h % BG_PALETTE.length];
+  const abroadMode = Boolean(isAbroad || (countryId && countryId !== 'iran'));
+  const bg = deceased
+    ? 'var(--surface-2)'
+    : abroadMode
+      ? '#EAF4F4'
+      : BG_PALETTE[h % BG_PALETTE.length];
   const skin = SKIN_TONES[(h >>> 3) % SKIN_TONES.length];
   const shirt =
     originKind === 'inspector'
       ? '#1E3A5F'
       : originKind === 'mentor'
         ? '#0F766E'
-        : SHIRT_COLORS[(h2 >>> 2) % SHIRT_COLORS.length];
+        : abroadMode && countryId && ABROAD_SHIRT_TINTS[countryId] && h2 % 2 === 0
+          ? ABROAD_SHIRT_TINTS[countryId]
+          : SHIRT_COLORS[(h2 >>> 2) % SHIRT_COLORS.length];
 
   const isInfant = age <= 2;
   const isChild = age >= 3 && age <= 11;
@@ -76,7 +95,7 @@ export function PersonAvatar({
     : HAIR_COLORS_YOUNG[(h >>> 5) % HAIR_COLORS_YOUNG.length];
 
   const hairVariant = h2 % 3;
-  const wearsScarf = gender === 'female' && age >= 14 && (h3 % 5) < 2;
+  const wearsScarf = gender === 'female' && age >= 14 && (abroadMode ? h3 % 6 === 0 : h3 % 5 < 2);
   const scarfColor = SCARF_COLORS[(h3 >>> 3) % SCARF_COLORS.length];
   const hasGlasses = age >= 16 && ((h2 >>> 6) % 4 === 0 || (originKind === 'inspector' && h2 % 2 === 0));
   const hasBeard = gender === 'male' && age >= 24 && (h3 % 3 === 0);
@@ -106,6 +125,9 @@ export function PersonAvatar({
           <path d="M23 50 Q32 58 41 50 L38 56 Q32 60 26 56 Z" fill="#FFFFFF" opacity="0.92" />
         ) : (
           <path d="M26 48 L32 54 L38 48" stroke="#FFFFFF" strokeWidth="2" strokeOpacity="0.55" fill="none" />
+        )}
+        {abroadMode && !isInfant && (
+          <path d="M23 50 L27 60 M41 50 L37 60" stroke="#FFFFFF" strokeWidth="1.2" strokeOpacity="0.35" />
         )}
 
         {/* Back hair for female without scarf */}

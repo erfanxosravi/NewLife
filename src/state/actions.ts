@@ -20,6 +20,14 @@ import {
   getLicenseStatus,
 } from '../engine/careers';
 import {
+  ensureCountryMacros,
+  getAbroadHousingOptions,
+  getAbroadLanguageLevel,
+  getCountryMacroDef,
+  getCountryPathsDef,
+  type CredentialCategory,
+} from '../engine/countries';
+import {
   calculateHousingQuote,
   calculateJobAnnualIncomeBreakdown,
   calculateNetWorthToman,
@@ -28,6 +36,19 @@ import {
   getMinWageMonthlyForState,
   hasReachedFinancialFreedomMilestone,
 } from '../engine/economy';
+import {
+  computeEmigrationDifficulty,
+  EMIGRATION_STEP_LABELS_FA,
+  ensureEmigrationState,
+  getEmigrationStepFeeLocal,
+  getLanguageLevelLabelFa,
+  getPreferredPathForCountry,
+  getShortTripQuote,
+  getStudyLanguageCost,
+  INTEGRATION_CHECKLIST_ITEMS,
+  triggerReturnToIran,
+} from '../engine/emigration';
+import { formatCurrencyAmount, getFxRate } from '../engine/fx';
 import { formatToman, toPersianDigits } from '../engine/jalali';
 import {
   clampChancePct,
@@ -43,6 +64,16 @@ import {
   inheritFromDeceasedToHeir,
   isWillUnlocked,
 } from '../engine/legacy';
+import {
+  adoptExternalMoneyTomanOverride,
+  creditWallet,
+  ensureLedgerState,
+  executeCurrencyConversion,
+  getWalletBalance,
+  payInCurrencyOrConvert,
+  reconcileLegacyMoneyDelta,
+  submitCrossBorderTransfer,
+} from '../engine/ledger';
 import { advanceYear, applyEventChoice } from '../engine/reducer';
 import { SeededRNG } from '../engine/rng';
 import { applyStatDelta, clampStat } from '../engine/stats';
@@ -58,14 +89,21 @@ import {
   getTierForTalentScore,
   getTierLabelFa,
 } from '../engine/talents';
+import {
+  ensureActivityRuntimeState,
+  pickNonRepeatingActivityOutcome,
+} from '../engine/recommendation';
 import type {
   ActivityDefinition,
+  ActivityOutcome,
   AdoptionCareType,
   Asset,
   BusinessAcquisitionMode,
   BusinessFinancingMode,
   BusinessSize,
   CountryDefinition,
+  CurrencyCode,
+  DisplayCurrencyMode,
   EventChoice,
   EventDefinition,
   GameState,
@@ -76,6 +114,7 @@ import type {
   JobCompassPriorities,
   JobDefinition,
   Loan,
+  MigrationPathType,
   MilitaryStatus,
   Person,
   SaveGame,
@@ -84,6 +123,7 @@ import type {
   SkillDefinition,
   SpecialCareerRouteId,
   TalentId,
+  TransferChannelDef,
   UniversityTier,
   VehicleCatalogItem,
   WillConfig,
@@ -120,6 +160,7 @@ export interface ActionOutcome {
   save: SaveGame;
   success: boolean;
   message: string;
+  pickedOutcome?: ActivityOutcome;
 }
 
 function updateState(
@@ -166,9 +207,80 @@ function updateState(
     unlockedAchievements: [...save.state.unlockedAchievements],
     adoption: save.state.adoption ? ensureAdoptionState(save.state) : undefined,
     jobCompass: save.state.jobCompass ? ensureJobCompassState(save.state) : undefined,
+    fxState: save.state.fxState
+      ? {
+          usdRates: { ...save.state.fxState.usdRates },
+          fairUsdRates: { ...save.state.fxState.fairUsdRates },
+          cumulativePriceIndices: { ...save.state.fxState.cumulativePriceIndices },
+          history: save.state.fxState.history.map((h) => ({
+            ...h,
+            usdRates: { ...h.usdRates },
+            fairUsdRates: { ...h.fairUsdRates },
+          })),
+        }
+      : undefined,
+    ledger: save.state.ledger
+      ? {
+          ...save.state.ledger,
+          wallets: save.state.ledger.wallets.map((w) => ({ ...w })),
+          conversions: save.state.ledger.conversions.map((c) => ({ ...c })),
+          pendingTransfers: save.state.ledger.pendingTransfers.map((t) => ({ ...t })),
+          yearSnapshots: save.state.ledger.yearSnapshots.map((s) => ({ ...s })),
+        }
+      : undefined,
+    emigration: save.state.emigration
+      ? {
+          ...save.state.emigration,
+          shortlistedCountryIds: [...save.state.emigration.shortlistedCountryIds],
+          activeApplications: Object.fromEntries(
+            Object.entries(save.state.emigration.activeApplications).map(([k, v]) => [
+              k,
+              { ...v, stepsCompleted: [...v.stepsCompleted] },
+            ]),
+          ),
+          languageLevels: { ...save.state.emigration.languageLevels },
+          residency: {
+            ...save.state.emigration.residency,
+            checklistDoneIds: [...save.state.emigration.residency.checklistDoneIds],
+            credentialRelicensedTracks: [
+              ...save.state.emigration.residency.credentialRelicensedTracks,
+            ],
+          },
+          travelHistory: save.state.emigration.travelHistory.map((t) => ({ ...t })),
+          lastReportCard: save.state.emigration.lastReportCard
+            ? { ...save.state.emigration.lastReportCard }
+            : undefined,
+        }
+      : undefined,
+    countryMacros: save.state.countryMacros
+      ? Object.fromEntries(
+          Object.entries(save.state.countryMacros).map(([k, v]) => [
+            k,
+            { ...v, history: v.history.map((h) => ({ ...h })) },
+          ]),
+        )
+      : undefined,
+    activityState: save.state.activityState
+      ? {
+          ...save.state.activityState,
+          favoriteIds: [...save.state.activityState.favoriteIds],
+          recentIds: [...save.state.activityState.recentIds],
+          seenOutcomeMap: Object.fromEntries(
+            Object.entries(save.state.activityState.seenOutcomeMap).map(([k, v]) => [k, [...v]]),
+          ),
+        }
+      : undefined,
   };
 
+  if (nextState.ledger || save.state.ledger) {
+    adoptExternalMoneyTomanOverride(nextState, gameDataset);
+  }
+  const moneyBefore = nextState.player.moneyToman;
   mutator(nextState);
+  if (nextState.ledger || save.state.ledger) {
+    nextState.ledger = ensureLedgerState(nextState, gameDataset);
+    reconcileLegacyMoneyDelta(nextState, moneyBefore, gameDataset);
+  }
 
   return {
     ...save,
@@ -285,8 +397,22 @@ export function runAdvanceYearWithTick(save: SaveGame, dataset: GameDataset = ga
       }
     }
 
-    // 2. Housing rent & appreciation
-    if (draft.player.housing.type === 'owned' || draft.player.housing.type === 'villa') {
+    // 2. Housing rent & appreciation (abroad monthly rent is already deducted by local budget)
+    if (draft.player.countryId !== 'iran') {
+      if (draft.player.housing.type === 'owned' || draft.player.housing.type === 'villa') {
+        const prevMacroIdx = prevSave.state.countryMacros?.[draft.player.countryId]?.housingIndex ?? 1;
+        const currMacroIdx = draft.countryMacros?.[draft.player.countryId]?.housingIndex ?? prevMacroIdx;
+        const localHousingRatio = Math.max(0.7, currMacroIdx / Math.max(0.1, prevMacroIdx));
+        draft.player.housing.propertyValueToman = Math.round(
+          draft.player.housing.propertyValueToman * localHousingRatio * (usdRatio / Math.max(0.5, getFxRate(prevSave.state, 'USD', 'IRT', dataset) / Math.max(1, getFxRate(draft, 'USD', 'IRT', dataset)) || 1)),
+        );
+      }
+      if (typeof draft.flags['iran_owned_property_toman'] === 'number' && draft.flags['iran_owned_property_toman'] > 0) {
+        draft.flags['iran_owned_property_toman'] = Math.round(
+          draft.flags['iran_owned_property_toman'] * housingRatio,
+        );
+      }
+    } else if (draft.player.housing.type === 'owned' || draft.player.housing.type === 'villa') {
       draft.player.housing.propertyValueToman = Math.round(
         draft.player.housing.propertyValueToman * housingRatio,
       );
@@ -532,14 +658,65 @@ export function performActivityAction(
     return { save, success: false, message: check.reason ?? 'امکان انجام این فعالیت نیست' };
   }
 
-  const rng = new SeededRNG(
-    `${save.seed}:act:${activity.id}:${save.state.turn}:${save.state.timeline.length}`,
+  const pickSeed = `${save.seed}:act:${activity.id}:${save.state.turn}:${save.state.timeline.length}`;
+  const { outcome: pickedOutcome, nextSeenIndices } = pickNonRepeatingActivityOutcome(
+    activity,
+    save.state,
+    pickSeed,
   );
-  const pickedOutcome = rng.weightedPick(activity.outcomes, (o) => o.weight);
 
   const nextSave = updateState(save, (draft) => {
+    const runtimeBefore = ensureActivityRuntimeState(draft);
+    const flagsSnapshot: Record<string, boolean | number | string> = {};
+    for (const [fk, fv] of Object.entries(draft.flags)) {
+      if (fk !== '_undo_non_irt_wallets') {
+        flagsSnapshot[fk] = fv;
+      }
+    }
+    const prevSeenForAct = runtimeBefore.seenOutcomeMap[activity.id]
+      ? [...runtimeBefore.seenOutcomeMap[activity.id]]
+      : undefined;
+
+    const snapshot = {
+      activityId: activity.id,
+      turn: draft.turn,
+      statsBefore: { ...draft.player.stats },
+      moneyTomanBefore: draft.player.moneyToman,
+      flagsBefore: flagsSnapshot,
+      timelineLengthBefore: draft.timeline.length,
+      quotaUsedBefore: runtimeBefore.quotaUsedThisTurn,
+      recentIdsBefore: [...runtimeBefore.recentIds],
+      seenOutcomeIndicesBefore: prevSeenForAct,
+    };
+
+    if (draft.ledger) {
+      const nonIrtWallets = draft.ledger.wallets
+        .filter((w) => w.currencyCode !== 'IRT')
+        .map((w) => ({ ...w }));
+      draft.flags['_undo_non_irt_wallets'] = JSON.stringify(nonIrtWallets);
+    }
+
     draft.flags[`cd_act_${activity.id}`] = draft.turn;
-    deductMoney(draft, check.adjustedCost);
+    if (check.adjustedCost > 0) {
+      if (draft.player.countryId !== 'iran' && draft.ledger && draft.player.moneyToman < check.adjustedCost) {
+        const localCurrency =
+          getCountryMacroDef(draft.player.countryId, gameDataset)?.currencyCode ?? 'USD';
+        const rateIrtToLocal = getFxRate(draft, 'IRT', localCurrency, gameDataset);
+        const localAmount = Number((check.adjustedCost * rateIrtToLocal).toFixed(2));
+        const paid = payInCurrencyOrConvert({
+          state: draft,
+          currencyCode: localCurrency,
+          amount: localAmount,
+          dataset: gameDataset,
+        });
+        if (!paid.ok) {
+          deductMoney(draft, check.adjustedCost);
+        }
+      } else {
+        deductMoney(draft, check.adjustedCost);
+      }
+    }
+
     if (pickedOutcome.stats) {
       draft.player.stats = applyStatDelta(draft.player.stats, pickedOutcome.stats);
     }
@@ -553,10 +730,98 @@ export function performActivityAction(
         draft.player.criminalRecord + pickedOutcome.criminalRecordDelta,
       );
     }
-    pushTimeline(draft, activity.titleFa, pickedOutcome.resultTextFa, 'life', pickedOutcome.stats);
+
+    pushTimeline(
+      draft,
+      activity.titleFa,
+      pickedOutcome.memoryTextFa ?? pickedOutcome.resultTextFa,
+      'life',
+      pickedOutcome.stats,
+    );
+
+    const nextRecent = [
+      activity.id,
+      ...runtimeBefore.recentIds.filter((id) => id !== activity.id),
+    ].slice(0, 8);
+
+    draft.activityState = {
+      ...runtimeBefore,
+      turn: draft.turn,
+      quotaUsedThisTurn: runtimeBefore.quotaUsedThisTurn + (activity.quotaCost ?? 1),
+      recentIds: nextRecent,
+      seenOutcomeMap: {
+        ...runtimeBefore.seenOutcomeMap,
+        [activity.id]: nextSeenIndices,
+      },
+      annualUndoSnapshot: snapshot,
+    };
   });
 
-  return { save: nextSave, success: true, message: pickedOutcome.resultTextFa };
+  return {
+    save: nextSave,
+    success: true,
+    message: pickedOutcome.resultTextFa,
+    pickedOutcome,
+  };
+}
+
+export function toggleFavoriteActivityAction(save: SaveGame, activityId: string): SaveGame {
+  return updateState(save, (draft) => {
+    const runtime = ensureActivityRuntimeState(draft);
+    const exists = runtime.favoriteIds.includes(activityId);
+    const nextFavs = exists
+      ? runtime.favoriteIds.filter((id) => id !== activityId)
+      : [activityId, ...runtime.favoriteIds].slice(0, 12);
+    draft.activityState = {
+      ...runtime,
+      favoriteIds: nextFavs,
+    };
+  });
+}
+
+export function undoLastActivityAction(save: SaveGame): ActionOutcome {
+  const runtime = ensureActivityRuntimeState(save.state);
+  const snap = runtime.annualUndoSnapshot;
+  if (!snap || snap.turn !== save.state.turn) {
+    return { save, success: false, message: 'امکان بازگردانی انتخاب قبلی در این سال وجود ندارد' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const nonIrtRaw = draft.flags['_undo_non_irt_wallets'];
+    draft.player.stats = { ...snap.statsBefore };
+    draft.player.moneyToman = snap.moneyTomanBefore;
+    draft.flags = { ...snap.flagsBefore };
+    draft.timeline = draft.timeline.slice(0, snap.timelineLengthBefore);
+
+    if (draft.ledger && typeof nonIrtRaw === 'string') {
+      try {
+        const parsedNonIrt = JSON.parse(nonIrtRaw) as typeof draft.ledger.wallets;
+        const irtWallets = draft.ledger.wallets.filter((w) => w.currencyCode === 'IRT');
+        draft.ledger.wallets = [...irtWallets, ...parsedNonIrt];
+      } catch {
+        // ignore parse fallback
+      }
+    }
+
+    const currRuntime = ensureActivityRuntimeState(draft);
+    const nextSeenMap = { ...currRuntime.seenOutcomeMap };
+    if (snap.seenOutcomeIndicesBefore) {
+      nextSeenMap[snap.activityId] = [...snap.seenOutcomeIndicesBefore];
+    } else {
+      delete nextSeenMap[snap.activityId];
+    }
+
+    draft.activityState = {
+      ...currRuntime,
+      turn: draft.turn,
+      quotaUsedThisTurn: snap.quotaUsedBefore,
+      recentIds: [...snap.recentIdsBefore],
+      seenOutcomeMap: nextSeenMap,
+      annualUndoSnapshot: undefined,
+    };
+  });
+
+  return { save: nextSave, success: true, message: 'انتخاب اخیر بازگردانده شد و سهمیه آزاد گشت' };
 }
 
 export function setStudyEffortAction(save: SaveGame, effort: number): SaveGame {
@@ -3592,5 +3857,938 @@ export function submitJobInterviewAction(
     adviceFa,
   };
 }
+
+// =========================================================================
+// Phase 2: Multi-Currency Ledger, FX, Emigration & Foreign Travel Actions
+// =========================================================================
+
+export function setDisplayCurrencyModeAction(
+  save: SaveGame,
+  mode: DisplayCurrencyMode,
+): SaveGame {
+  return updateState(save, (draft) => {
+    draft.displayCurrencyMode = mode;
+  });
+}
+
+export function convertCurrencyAction(
+  save: SaveGame,
+  params: {
+    fromCurrency: CurrencyCode;
+    toCurrency: CurrencyCode;
+    fromAmount: number;
+    channelId?: TransferChannelDef['id'];
+    noteFa?: string;
+  },
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  let resultMsg = '';
+  let ok = false;
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const res = executeCurrencyConversion({
+      state: draft,
+      fromCurrency: params.fromCurrency,
+      toCurrency: params.toCurrency,
+      fromAmount: params.fromAmount,
+      channelId: params.channelId,
+      noteFa: params.noteFa,
+      dataset,
+    });
+    ok = res.ok;
+    if (res.ok) {
+      resultMsg = `${formatCurrencyAmount(params.fromAmount, params.fromCurrency, dataset)} به ${formatCurrencyAmount(res.toAmount, params.toCurrency, dataset)} تبدیل شد.`;
+      pushTimeline(draft, 'تبدیل ارزی', resultMsg, 'life');
+    } else {
+      resultMsg = res.errorFa ?? 'تبدیل ارز انجام نشد.';
+    }
+  });
+  return { save: ok ? nextSave : save, success: ok, message: resultMsg };
+}
+
+export function submitCrossBorderTransferAction(
+  save: SaveGame,
+  params: {
+    fromCurrency: CurrencyCode;
+    toCurrency: CurrencyCode;
+    fromAmount: number;
+    channelId: TransferChannelDef['id'];
+    purposeFa: string;
+  },
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const rng = new SeededRNG(
+    `${save.seed}:tr:${save.state.turn}:${save.state.ledger?.pendingTransfers.length ?? 0}`,
+  );
+  let msg = '';
+  let ok = false;
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const res = submitCrossBorderTransfer({
+      state: draft,
+      fromCurrency: params.fromCurrency,
+      toCurrency: params.toCurrency,
+      fromAmount: params.fromAmount,
+      channelId: params.channelId,
+      purposeFa: params.purposeFa,
+      rng,
+      dataset,
+    });
+    ok = res.ok;
+    if (!res.ok) {
+      msg = res.errorFa ?? 'حواله ارسال نشد.';
+    } else if (res.delayed) {
+      msg = `حواله «${params.purposeFa}» ثبت شد و سال آینده به حساب مقصد می‌نشیند.`;
+      pushTimeline(draft, 'ثبت حواله ارزی', msg, 'life');
+    } else {
+      msg = `انتقال ${formatCurrencyAmount(res.receivedAmount, params.toCurrency, dataset)} انجام شد.`;
+      pushTimeline(draft, 'انتقال ارزی موفق', msg, 'life');
+    }
+  });
+  return { save: ok ? nextSave : save, success: ok, message: msg };
+}
+
+export function studyForeignLanguageAction(
+  save: SaveGame,
+  countryId: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const countryDef = getCountryMacroDef(countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'کشور مقصد یافت نشد' };
+  }
+  const currentLevel = getAbroadLanguageLevel(save.state, countryId, dataset);
+  if (currentLevel >= 6) {
+    return { save, success: false, message: 'به بالاترین سطح زبان رسیده‌ای' };
+  }
+  if (save.state.flags[`cd_lang_${countryId}`] === save.state.turn) {
+    return { save, success: false, message: 'امسال کلاس زبان این مقصد را گذرانده‌ای' };
+  }
+
+  const { currencyCode, costLocal } = getStudyLanguageCost(countryId, save.state, dataset);
+  let paidOk = false;
+  const nextLevel = Math.min(6, currentLevel + 1);
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode,
+      amount: costLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+    draft.flags[`cd_lang_${countryId}`] = draft.turn;
+    const emig = ensureEmigrationState(draft);
+    emig.languageLevels[countryId] = nextLevel;
+    emig.languageLevels[currencyCode] = Math.max(
+      emig.languageLevels[currencyCode] ?? 1,
+      nextLevel,
+    );
+    draft.emigration = emig;
+    draft.player.stats = applyStatDelta(draft.player.stats, { intelligence: 2, happiness: 2 });
+    pushTimeline(
+      draft,
+      `ارتقای زبان (${countryDef.nameFa})`,
+      `با گذراندن دوره فشرده، سطح زبانت به «${getLanguageLevelLabelFa(nextLevel)}» رسید.`,
+      'life',
+      { intelligence: 2, happiness: 2 },
+    );
+  });
+
+  if (!paidOk) {
+    return {
+      save,
+      success: false,
+      message: `موجودی برای هزینه دوره (${formatCurrencyAmount(costLocal, currencyCode, dataset)}) کافی نیست`,
+    };
+  }
+  return {
+    save: nextSave,
+    success: true,
+    message: `سطح زبان به «${getLanguageLevelLabelFa(nextLevel)}» ارتقا یافت`,
+  };
+}
+
+export function relicenseCredentialAbroadAction(
+  save: SaveGame,
+  track: CredentialCategory,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.countryId === 'iran') {
+    return { save, success: false, message: 'این اقدام پس از ورود به کشور مقصد فعال می‌شود' };
+  }
+  const countryDef = getCountryMacroDef(save.state.player.countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'اطلاعات کشور مقصد یافت نشد' };
+  }
+  const spec = countryDef.credentials[track];
+  if (!spec || !spec.needsRelicensing) {
+    return { save, success: false, message: 'این رشته نیازی به معادل‌سازی مجزا ندارد' };
+  }
+  const emig = ensureEmigrationState(save.state);
+  if (emig.residency.credentialRelicensedTracks.includes(track)) {
+    return { save, success: false, message: 'معادل‌سازی این مدرک قبلاً تکمیل شده است' };
+  }
+  const langLevel = getAbroadLanguageLevel(save.state, countryDef.id, dataset);
+  if (langLevel < spec.minLanguageLevel) {
+    return {
+      save,
+      success: false,
+      message: `برای شرکت در آزمون تطبیق مدرک، حداقل سطح زبان «${getLanguageLevelLabelFa(spec.minLanguageLevel)}» لازم است`,
+    };
+  }
+
+  let paidOk = false;
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode: countryDef.currencyCode,
+      amount: spec.costLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+    const nextEmig = ensureEmigrationState(draft);
+    nextEmig.residency.credentialRelicensedTracks.push(track);
+    draft.emigration = nextEmig;
+    draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6, fame: 2 });
+    pushTimeline(
+      draft,
+      `معادل‌سازی و آزمون تخصصی مدرک در ${countryDef.nameFa}`,
+      'آزمون تطبیق و دریافت مجوز حرفه‌ای با موفقیت ثبت شد و سقف درآمدی شغلت باز شد.',
+      'milestone',
+      { happiness: 6 },
+    );
+  });
+
+  if (!paidOk) {
+    return {
+      save,
+      success: false,
+      message: `موجودی برای هزینه معادل‌سازی (${formatCurrencyAmount(spec.costLocal, countryDef.currencyCode, dataset)}) کافی نیست`,
+    };
+  }
+  return {
+    save: nextSave,
+    success: true,
+    message: 'مدرک تخصصی معادل‌سازی شد و مسیر حقوق کامل باز گردید',
+  };
+}
+
+export function toggleShortlistCountryAction(
+  save: SaveGame,
+  countryId: string,
+): SaveGame {
+  return updateState(save, (draft) => {
+    const emig = ensureEmigrationState(draft);
+    const exists = emig.shortlistedCountryIds.includes(countryId);
+    emig.shortlistedCountryIds = exists
+      ? emig.shortlistedCountryIds.filter((id) => id !== countryId)
+      : [...emig.shortlistedCountryIds, countryId].slice(-3);
+    draft.emigration = emig;
+  });
+}
+
+export function startOrSelectEmigrationPathAction(
+  save: SaveGame,
+  countryId: string,
+  pathId: MigrationPathType,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const countryDef = getCountryMacroDef(countryId, dataset);
+  const pathsDef = getCountryPathsDef(countryId, dataset);
+  if (!countryDef || !pathsDef) {
+    return { save, success: false, message: 'مقصد مورد نظر یافت نشد' };
+  }
+  const pathSpec = pathsDef.pathways.find((p) => p.id === pathId) ?? pathsDef.pathways[0];
+
+  const nextSave = updateState(save, (draft) => {
+    const emig = ensureEmigrationState(draft);
+    const prev = emig.activeApplications[countryId];
+    emig.activeApplications[countryId] = {
+      countryId,
+      status: prev?.status === 'approved' ? 'approved' : 'in_progress',
+      selectedPathId: pathSpec.id,
+      currentStepIndex: prev && prev.selectedPathId === pathSpec.id ? prev.currentStepIndex : 0,
+      stepsCompleted:
+        prev && prev.selectedPathId === pathSpec.id
+          ? [...prev.stepsCompleted]
+          : [false, false, false, false, false, false],
+      proofOfFundsVerified: prev?.proofOfFundsVerified ?? false,
+      lastAttemptYear: draft.currentJalaliYear,
+    };
+    draft.emigration = emig;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `مسیر «${pathSpec.titleFa}» برای ${countryDef.nameFa} انتخاب شد`,
+  };
+}
+
+export function advanceEmigrationPipelineStepAction(
+  save: SaveGame,
+  countryId: string,
+  pathId?: MigrationPathType,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.age < 18) {
+    return { save, success: false, message: 'مهاجرت مستقل از ۱۸ سالگی فعال می‌شود' };
+  }
+  const countryDef = getCountryMacroDef(countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'کشور مقصد یافت نشد' };
+  }
+  const pathSpec = getPreferredPathForCountry(countryId, save.state, dataset, pathId);
+  const report = computeEmigrationDifficulty({
+    countryId,
+    pathId: pathSpec.id,
+    state: save.state,
+    dataset,
+  });
+
+  const existing = save.state.emigration?.activeApplications?.[countryId];
+  const stepIndex =
+    existing && existing.selectedPathId === pathSpec.id ? existing.currentStepIndex : 0;
+  if (stepIndex >= 5) {
+    return {
+      save,
+      success: true,
+      message: 'پرونده ویزا آماده است؛ برای ورود و استقرار شهر مقصد را انتخاب کن',
+    };
+  }
+
+  // Strict prerequisite gates on key steps:
+  if (stepIndex === 0 && (!report.meetsAge || !report.meetsEducation)) {
+    return {
+      save,
+      success: false,
+      message: !report.meetsAge
+        ? `حداقل سن برای این مسیر ${toPersianDigits(pathSpec.minAge)} سال است`
+        : 'مدرک تحصیلی فعلی برای این مسیر کافی نیست',
+    };
+  }
+  if (stepIndex === 1 && !report.meetsLanguage) {
+    return {
+      save,
+      success: false,
+      message: `ابتدا سطح زبان را به «${getLanguageLevelLabelFa(pathSpec.requiredLanguageLevel)}» برسان`,
+    };
+  }
+  if ((stepIndex === 3 || stepIndex === 4) && !report.hasProofOfFunds) {
+    return {
+      save,
+      success: false,
+      message: `تمکن مالی حداقل ${formatCurrencyAmount(report.proofOfFundsRequiredLocal, report.currencyCode, dataset)} لازم است`,
+    };
+  }
+
+  const { currencyCode, feeLocal } = getEmigrationStepFeeLocal(
+    countryId,
+    pathSpec,
+    stepIndex,
+    save.state,
+    dataset,
+  );
+  const stepName = EMIGRATION_STEP_LABELS_FA[stepIndex];
+  const rng = new SeededRNG(`${save.seed}:emig_v2:${countryId}:${stepIndex}:${save.state.turn}`);
+  const stepChance =
+    stepIndex === 4
+      ? report.approvalChancePct / 100
+      : Math.min(0.95, Math.max(0.62, report.approvalChancePct / 100 + 0.14));
+  const passed = rng.chance(stepChance);
+
+  let paidOk = false;
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    draft.countryMacros = ensureCountryMacros(draft, dataset);
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode,
+      amount: feeLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+
+    const emig = ensureEmigrationState(draft);
+    const app = emig.activeApplications[countryId] ?? {
+      countryId,
+      status: 'in_progress',
+      selectedPathId: pathSpec.id,
+      currentStepIndex: 0,
+      stepsCompleted: [false, false, false, false, false, false],
+      proofOfFundsVerified: report.hasProofOfFunds,
+    };
+    app.selectedPathId = pathSpec.id;
+    app.lastAttemptYear = draft.currentJalaliYear;
+    app.proofOfFundsVerified = report.hasProofOfFunds;
+
+    if (passed) {
+      app.stepsCompleted[stepIndex] = true;
+      app.currentStepIndex = Math.min(5, stepIndex + 1);
+      app.status = app.currentStepIndex >= 5 ? 'approved' : 'in_progress';
+      pushTimeline(
+        draft,
+        `تکمیل مرحله «${stepName}» (${countryDef.nameFa})`,
+        app.status === 'approved'
+          ? `ویزای ${countryDef.nameFa} صادر شد و آماده سفر و استقرار هستی.`
+          : `مرحله «${stepName}» با موفقیت انجام شد.`,
+        app.status === 'approved' ? 'milestone' : 'life',
+      );
+      if (app.status === 'approved') {
+        draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 8 });
+      }
+    } else {
+      app.status = 'rejected_retryable';
+      draft.player.stats = applyStatDelta(draft.player.stats, { mentalHealth: -4, happiness: -3 });
+      pushTimeline(
+        draft,
+        `تأخیر در مرحله «${stepName}» (${countryDef.nameFa})`,
+        'پرونده در این مرحله تکمیل‌نقص خورد و پس از تقویت شرایط می‌توانی دوباره اقدام کنی.',
+        'life',
+        { mentalHealth: -4 },
+      );
+    }
+
+    emig.activeApplications[countryId] = app;
+    draft.emigration = emig;
+  });
+
+  if (!paidOk) {
+    return {
+      save,
+      success: false,
+      message: `موجودی برای هزینه مرحله (${formatCurrencyAmount(feeLocal, currencyCode, dataset)}) کافی نیست`,
+    };
+  }
+
+  return {
+    save: nextSave,
+    success: passed,
+    message: passed
+      ? stepIndex === 4
+        ? `ویزای ${countryDef.nameFa} تأیید شد! حالا شهر مقصد را انتخاب و وارد کشور شو`
+        : `مرحله «${stepName}» تکمیل شد`
+      : `مرحله «${stepName}» نیازمند پیگیری مجدد است`,
+  };
+}
+
+export function completeAbroadArrivalAndMoveAction(
+  save: SaveGame,
+  countryId: string,
+  regionId?: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const countryDef = getCountryMacroDef(countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'کشور مقصد یافت نشد' };
+  }
+  const emig = ensureEmigrationState(save.state);
+  const app = emig.activeApplications[countryId];
+  if (!app || app.status !== 'approved') {
+    return { save, success: false, message: 'ابتدا باید ویزای کشور مقصد صادر شده باشد' };
+  }
+
+  const chosenRegion =
+    countryDef.regions.find((r) => r.id === regionId) ?? countryDef.regions[0];
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    draft.countryMacros = ensureCountryMacros(draft, dataset);
+
+    // Preserve any owned property in Iran separately while residing abroad
+    if (
+      draft.player.countryId === 'iran' &&
+      (draft.player.housing.type === 'owned' || draft.player.housing.type === 'villa') &&
+      draft.player.housing.propertyValueToman > 0
+    ) {
+      draft.flags['iran_owned_property_toman'] = draft.player.housing.propertyValueToman;
+    }
+
+    draft.player.countryId = countryDef.id;
+    draft.player.currentCityId = chosenRegion?.id ?? countryDef.id;
+    draft.player.job = null;
+    draft.player.housing = {
+      type: 'rent',
+      cityId: chosenRegion?.id ?? countryDef.id,
+      monthlyRentToman: 0,
+      depositRahnToman: 0,
+      propertyValueToman: 0,
+    };
+
+    const nextEmig = ensureEmigrationState(draft);
+    const nextApp = nextEmig.activeApplications[countryId];
+    if (nextApp) {
+      nextApp.stepsCompleted[5] = true;
+    }
+    nextEmig.residency = {
+      isAbroad: true,
+      countryId: countryDef.id,
+      regionId: chosenRegion?.id,
+      arrivedYear: draft.currentJalaliYear,
+      yearsAbroad: 0,
+      statusStage: 'temporary',
+      permitType: app.selectedPathId,
+      abroadWorkMonthsAccumulated: 0,
+      checklistDoneIds: [],
+      credentialRelicensedTracks: [],
+      annualRemittanceCount: 0,
+      lastArrivalWelcomeSeenYear: draft.currentJalaliYear,
+      forcedReturnNoticeFa: undefined,
+    };
+    draft.emigration = nextEmig;
+    draft.displayCurrencyMode = 'local';
+    unlockAchievement(draft, 'emigrated');
+    draft.player.stats = applyStatDelta(draft.player.stats, {
+      happiness: 10,
+      fame: 4,
+      mentalHealth: -3,
+    });
+    pushTimeline(
+      draft,
+      `ورود و استقرار در ${chosenRegion?.nameFa ?? countryDef.nameFa}`,
+      `فصل جدید زندگی در ${countryDef.nameFa} آغاز شد؛ کارهای اولیه استقرار و جست‌وجوی شغل را شروع کن.`,
+      'milestone',
+      { happiness: 10 },
+    );
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `خوش آمدی به ${chosenRegion?.nameFa ?? countryDef.nameFa}!`,
+  };
+}
+
+export function sellIranPropertyAndTransferAction(
+  save: SaveGame,
+  targetCurrency: CurrencyCode,
+  channelId: TransferChannelDef['id'],
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const iranPropVal =
+    save.state.player.countryId === 'iran' &&
+    (save.state.player.housing.type === 'owned' || save.state.player.housing.type === 'villa')
+      ? save.state.player.housing.propertyValueToman
+      : typeof save.state.flags['iran_owned_property_toman'] === 'number'
+        ? (save.state.flags['iran_owned_property_toman'] as number)
+        : 0;
+
+  if (iranPropVal <= 0) {
+    return { save, success: false, message: 'ملکی در ایران برای فروش ثبت نشده است' };
+  }
+
+  const rng = new SeededRNG(`${save.seed}:sell_iran_prop:${save.state.turn}`);
+  let msg = '';
+  let ok = false;
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    // 2% transaction friction for selling physical real estate
+    const netSaleToman = Math.round(iranPropVal * 0.98);
+    if (draft.player.countryId === 'iran') {
+      draft.player.housing = {
+        type: 'with_family',
+        cityId: draft.player.currentCityId,
+        monthlyRentToman: 0,
+        depositRahnToman: 0,
+        propertyValueToman: 0,
+      };
+    } else {
+      draft.flags['iran_owned_property_toman'] = 0;
+    }
+
+    creditWallet({
+      state: draft,
+      currencyCode: 'IRT',
+      amount: netSaleToman,
+      dataset,
+      accountType: 'bank',
+      countryId: 'iran',
+    });
+
+    if (targetCurrency === 'IRT') {
+      ok = true;
+      msg = `ملک ایران به مبلغ ${formatCurrencyAmount(netSaleToman, 'IRT', dataset)} فروخته شد و به کیف تومانی واریز گردید.`;
+      pushTimeline(draft, 'فروش ملک ایران', msg, 'milestone');
+      return;
+    }
+
+    const res = submitCrossBorderTransfer({
+      state: draft,
+      fromCurrency: 'IRT',
+      toCurrency: targetCurrency,
+      fromAmount: netSaleToman,
+      channelId,
+      purposeFa: 'انتقال سرمایه حاصل از فروش ملک ایران',
+      rng,
+      dataset,
+    });
+    ok = res.ok;
+    if (res.ok) {
+      msg = res.delayed
+        ? `ملک فروخته شد و حواله معادل ${formatCurrencyAmount(res.receivedAmount, targetCurrency, dataset)} برای انتقال به سال بعد ثبت شد.`
+        : `ملک فروخته شد و ${formatCurrencyAmount(res.receivedAmount, targetCurrency, dataset)} به حساب ارزی نشست.`;
+      pushTimeline(draft, 'فروش ملک و تبدیل ارزی سرمایه', msg, 'milestone');
+    } else {
+      msg = `ملک به تومانی نقد شد اما حواله ارزی محدودیت داشت: ${res.errorFa ?? ''}`;
+      ok = true;
+    }
+  });
+
+  return { save: nextSave, success: ok, message: msg };
+}
+
+export function sendRemittanceToIranAction(
+  save: SaveGame,
+  amountLocal: number,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.countryId === 'iran') {
+    return { save, success: false, message: 'این گزینه هنگام زندگی در خارج از کشور فعال است' };
+  }
+  const countryDef = getCountryMacroDef(save.state.player.countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'کشور محل سکونت یافت نشد' };
+  }
+  if (!Number.isFinite(amountLocal) || amountLocal <= 0) {
+    return { save, success: false, message: 'مبلغ باید بزرگ‌تر از صفر باشد' };
+  }
+  const available = getWalletBalance(save.state, countryDef.currencyCode);
+  if (available + 1e-6 < amountLocal) {
+    return { save, success: false, message: 'موجودی حساب ارزی محلی کافی نیست' };
+  }
+
+  let msg = '';
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    payInCurrencyOrConvert({
+      state: draft,
+      currencyCode: countryDef.currencyCode,
+      amount: amountLocal,
+      dataset,
+    });
+    const toIrt = Math.round(amountLocal * getFxRate(draft, countryDef.currencyCode, 'IRT', dataset) * 0.96);
+    // Boost closeness with living family in Iran
+    for (const rel of draft.relationships) {
+      if (
+        (rel.role === 'father' || rel.role === 'mother' || rel.role === 'sibling') &&
+        draft.npcs[rel.personId]?.isAlive
+      ) {
+        rel.closeness = clampStat(rel.closeness + 8);
+        rel.respect = clampStat(rel.respect + 6);
+      }
+    }
+    const emig = ensureEmigrationState(draft);
+    emig.residency.annualRemittanceCount += amountLocal;
+    draft.emigration = emig;
+    draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 5, mentalHealth: 4 });
+    msg = `مبلغ ${formatCurrencyAmount(amountLocal, countryDef.currencyCode, dataset)} (معادل حدود ${formatCurrencyAmount(toIrt, 'IRT', dataset)}) برای حمایت از خانواده ارسال شد.`;
+    pushTimeline(draft, 'ارسال حواله حمایتی به خانواده', msg, 'life', { happiness: 5 });
+  });
+
+  return { save: nextSave, success: true, message: msg };
+}
+
+export function takeShortForeignTripAction(
+  save: SaveGame,
+  countryId: string,
+  tier: 'budget' | 'standard' | 'comfort',
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (!save.state.isAlive) {
+    return { save, success: false, message: 'زندگی به پایان رسیده است' };
+  }
+  if (save.state.player.age < 16) {
+    return { save, success: false, message: 'سفر مستقل از ۱۶ سالگی فعال می‌شود' };
+  }
+  if (save.state.flags['cd_foreign_trip'] === save.state.turn) {
+    return { save, success: false, message: 'امسال یک بار سفر خارجی انجام داده‌ای' };
+  }
+
+  const quote = getShortTripQuote(countryId, tier, save.state, dataset);
+  if (!quote) {
+    return { save, success: false, message: 'اطلاعات سفر یافت نشد' };
+  }
+
+  const rng = new SeededRNG(`${save.seed}:trip:${countryId}:${tier}:${save.state.turn}`);
+  const visaApproved = rng.chance(quote.visaApprovalPct / 100);
+  let paidOk = false;
+  let outcomeMsg = '';
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    if (!visaApproved) {
+      // Only non-refundable visa fee is charged on visa refusal
+      const feeCharge = Math.max(quote.visaFeeLocal, Math.round(quote.totalLocal * 0.12));
+      const p = payInCurrencyOrConvert({
+        state: draft,
+        currencyCode: quote.currencyCode,
+        amount: feeCharge,
+        dataset,
+      });
+      if (!p.ok) return;
+      paidOk = true;
+      draft.flags['cd_foreign_trip'] = draft.turn;
+      draft.player.stats = applyStatDelta(draft.player.stats, { happiness: -3, mentalHealth: -2 });
+      outcomeMsg = `متأسفانه ویزای توریستی ${quote.countryNameFa} در این نوبت صادر نشد؛ سال بعد می‌توانی دوباره درخواست بدهی.`;
+      pushTimeline(draft, `نتیجه ویزای سفر (${quote.countryNameFa})`, outcomeMsg, 'life', {
+        happiness: -3,
+      });
+      return;
+    }
+
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode: quote.currencyCode,
+      amount: quote.totalLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+    draft.flags['cd_foreign_trip'] = draft.turn;
+    const emig = ensureEmigrationState(draft);
+    const prevApp = emig.activeApplications[countryId];
+    if (!prevApp) {
+      emig.activeApplications[countryId] = {
+        countryId,
+        status: 'researching',
+        selectedPathId: 'work',
+        currentStepIndex: 0,
+        stepsCompleted: [false, false, false, false, false, false],
+        proofOfFundsVerified: false,
+      };
+    } else if (prevApp.status === 'unexplored') {
+      prevApp.status = 'researching';
+    }
+
+    const memory = rng.pick(quote.highlightsFa);
+    emig.travelHistory = [
+      ...emig.travelHistory.slice(-19),
+      {
+        id: `trip_${draft.turn}_${countryId}`,
+        countryId,
+        countryNameFa: quote.countryNameFa,
+        jalaliYear: draft.currentJalaliYear,
+        tier,
+        totalCostDisplayFa: formatCurrencyAmount(quote.totalLocal, quote.currencyCode, dataset),
+        memoryFa: memory,
+      },
+    ];
+    draft.emigration = emig;
+    draft.player.stats = applyStatDelta(draft.player.stats, {
+      happiness: quote.happinessBoost,
+      mentalHealth: quote.mentalBoost,
+    });
+    outcomeMsg = `سفر ${toPersianDigits(quote.durationDays)} روزه به ${quote.countryNameFa} (${quote.tierLabelFa}) انجام شد: ${memory}`;
+    pushTimeline(draft, `سفر به ${quote.countryNameFa}`, outcomeMsg, 'life', {
+      happiness: quote.happinessBoost,
+      mentalHealth: quote.mentalBoost,
+    });
+  });
+
+  if (!paidOk) {
+    return {
+      save,
+      success: false,
+      message: `موجودی برای هزینه سفر (${formatCurrencyAmount(quote.totalLocal, quote.currencyCode, dataset)}) کافی نیست`,
+    };
+  }
+  return { save: nextSave, success: visaApproved, message: outcomeMsg };
+}
+
+export function completeIntegrationChecklistAction(
+  save: SaveGame,
+  itemId: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.countryId === 'iran') {
+    return { save, success: false, message: 'فقط هنگام اقامت در خارج فعال است' };
+  }
+  const item = INTEGRATION_CHECKLIST_ITEMS.find((i) => i.id === itemId);
+  if (!item) {
+    return { save, success: false, message: 'مورد استقرار یافت نشد' };
+  }
+  const emig = ensureEmigrationState(save.state);
+  if (emig.residency.checklistDoneIds.includes(itemId)) {
+    return { save, success: false, message: 'این کار قبلاً انجام شده است' };
+  }
+  const countryDef = getCountryMacroDef(save.state.player.countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'اطلاعات کشور یافت نشد' };
+  }
+  const minW =
+    save.state.countryMacros?.[countryDef.id]?.minWageMonthlyLocal ??
+    countryDef.macro.minWageMonthlyLocal.value;
+  const costLocal = Math.max(1, Math.round(minW * item.costLocalMinWageShare));
+  let paidOk = false;
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode: countryDef.currencyCode,
+      amount: costLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+    const nextEmig = ensureEmigrationState(draft);
+    nextEmig.residency.checklistDoneIds.push(itemId);
+    draft.emigration = nextEmig;
+    draft.player.stats = applyStatDelta(draft.player.stats, {
+      mentalHealth: item.mentalBoost,
+      happiness: 2,
+    });
+    pushTimeline(
+      draft,
+      `استقرار در ${countryDef.nameFa}: ${item.titleFa}`,
+      item.subtitleFa,
+      'life',
+      { mentalHealth: item.mentalBoost },
+    );
+  });
+
+  if (!paidOk) {
+    return { save, success: false, message: 'موجودی برای هزینه ثبت اداری کافی نیست' };
+  }
+  return { save: nextSave, success: true, message: `«${item.titleFa}» تکمیل شد` };
+}
+
+export function rentOrBuyAbroadHousingAction(
+  save: SaveGame,
+  optionId: string,
+  regionId?: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.countryId === 'iran') {
+    return { save, success: false, message: 'برای مسکن داخل ایران از بخش دارایی اقدام کن' };
+  }
+  const countryDef = getCountryMacroDef(save.state.player.countryId, dataset);
+  if (!countryDef) {
+    return { save, success: false, message: 'کشور محل سکونت یافت نشد' };
+  }
+  const options = getAbroadHousingOptions(
+    countryDef.id,
+    regionId ?? save.state.emigration?.residency?.regionId,
+    save.state,
+    dataset,
+  );
+  const chosen = options.find((o) => o.id === optionId);
+  if (!chosen) {
+    return { save, success: false, message: 'گزینه مسکن یافت نشد' };
+  }
+  const upfrontLocal = chosen.mode === 'rent' ? chosen.depositLocal : chosen.downPaymentLocal;
+  let paidOk = false;
+  let msg = '';
+
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    const paid = payInCurrencyOrConvert({
+      state: draft,
+      currencyCode: countryDef.currencyCode,
+      amount: upfrontLocal,
+      dataset,
+    });
+    if (!paid.ok) return;
+    paidOk = true;
+    const fxToIrt = getFxRate(draft, countryDef.currencyCode, 'IRT', dataset);
+
+    if (chosen.mode === 'rent') {
+      draft.player.housing = {
+        type: 'rent',
+        cityId: regionId ?? countryDef.id,
+        monthlyRentToman: Math.round(chosen.monthlyRentLocal * fxToIrt),
+        depositRahnToman: Math.round(chosen.depositLocal * fxToIrt),
+        propertyValueToman: 0,
+      };
+      msg = `قرارداد اجاره «${chosen.titleFa}» ثبت شد.`;
+    } else {
+      draft.player.housing = {
+        type: 'owned',
+        cityId: regionId ?? countryDef.id,
+        monthlyRentToman: 0,
+        depositRahnToman: 0,
+        propertyValueToman: Math.round(chosen.buyPriceLocal * fxToIrt),
+      };
+      const principalToman = Math.round((chosen.buyPriceLocal - chosen.downPaymentLocal) * fxToIrt);
+      if (principalToman > 0) {
+        draft.loans.push({
+          id: `loan_abroad_${draft.turn}`,
+          name: `وام مسکن ${countryDef.nameFa}`,
+          principalRemainingToman: principalToman,
+          annualInterestRate: 0.045,
+          yearsRemaining: chosen.mortgageYears,
+          annualPaymentToman: Math.round(chosen.annualMortgageLocal * fxToIrt),
+        });
+      }
+      msg = `خرید «${chosen.titleFa}» ثبت شد و سند مالکیت به نام تو درآمد.`;
+    }
+    pushTimeline(draft, chosen.titleFa, msg, 'milestone', { happiness: 6 });
+    draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6 });
+  });
+
+  if (!paidOk) {
+    return {
+      save,
+      success: false,
+      message: `نقدینگی برای پیش‌پرداخت (${formatCurrencyAmount(upfrontLocal, countryDef.currencyCode, dataset)}) کافی نیست`,
+    };
+  }
+  return { save: nextSave, success: true, message: msg };
+}
+
+export function returnToIranAction(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (save.state.player.countryId === 'iran') {
+    return { save, success: false, message: 'هم‌اکنون در ایران حضور داری' };
+  }
+  const prevCountry = getCountryMacroDef(save.state.player.countryId, dataset);
+  const nextSave = updateState(save, (draft) => {
+    draft.ledger = ensureLedgerState(draft, dataset);
+    triggerReturnToIran({
+      state: draft,
+      reasonFa: `با تصمیم شخصی از ${prevCountry?.nameFa ?? 'خارج از کشور'} به ایران بازگشتی.`,
+      forced: false,
+      dataset,
+    });
+    // Restore Iran owned property if retained while abroad
+    if (
+      typeof draft.flags['iran_owned_property_toman'] === 'number' &&
+      draft.flags['iran_owned_property_toman'] > 0
+    ) {
+      draft.player.housing = {
+        type: 'owned',
+        cityId: 'tehran',
+        monthlyRentToman: 0,
+        depositRahnToman: 0,
+        propertyValueToman: draft.flags['iran_owned_property_toman'],
+      };
+      draft.flags['iran_owned_property_toman'] = 0;
+    }
+  });
+  return {
+    save: nextSave,
+    success: true,
+    message: 'بازگشت به ایران با موفقیت ثبت شد',
+  };
+}
+
+export function dismissArrivalWelcomeAction(save: SaveGame): SaveGame {
+  return updateState(save, (draft) => {
+    const emig = ensureEmigrationState(draft);
+    emig.residency.lastArrivalWelcomeSeenYear = draft.currentJalaliYear;
+    emig.residency.forcedReturnNoticeFa = undefined;
+    draft.emigration = emig;
+  });
+}
+
 
 

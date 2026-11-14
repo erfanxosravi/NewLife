@@ -1,13 +1,24 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
+import { getAbroadHousingOptions, getCountryMacroDef } from '../../engine/countries';
 import { calculateNetWorthToman } from '../../engine/economy';
+import {
+  ALL_CURRENCY_CODES,
+  formatCurrencyAmount,
+  getCurrencyDef,
+  quoteConversion,
+} from '../../engine/fx';
 import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { getWalletBalance } from '../../engine/ledger';
 import type {
   Asset,
+  CurrencyCode,
+  DisplayCurrencyMode,
   HousingListing,
   SaveGame,
   ShopCategory,
   ShopItemDefinition,
+  TransferChannelDef,
   VehicleCatalogItem,
 } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
@@ -15,9 +26,13 @@ import {
   applyHousingAction,
   buyShopItemAction,
   buyVehicleAction,
+  convertCurrencyAction,
   payOffDebtAction,
+  rentOrBuyAbroadHousingAction,
   repairVehicleAction,
   sellVehicleAction,
+  setDisplayCurrencyModeAction,
+  submitCrossBorderTransferAction,
   takeLoanAction,
   tradeInvestmentAction,
   type ActionOutcome,
@@ -34,6 +49,7 @@ import {
   getDebtPayoffChunkToman,
   getEmamiCoinPriceToman,
   getGoldGramPriceToman,
+  getHeaderMoneySummary,
   getHousingListingQuote,
   getLoanPresets,
   getMarketRatesHistory,
@@ -46,6 +62,8 @@ import {
   getTehranSqmPriceToman,
   getUsdRateToman,
 } from '../../state/selectors';
+import { CurrencyExposureCard } from '../components/CurrencyExposureCard';
+import { SellIranPropertyWizard } from '../components/emigration/SellIranPropertyWizard';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
   ActionRow,
@@ -120,6 +138,13 @@ export function AssetsFinanceSheet({
   const [preferHigherRahn, setPreferHigherRahn] = useState(false);
 
   const [showMarketDetail, setShowMarketDetail] = useState(false);
+  const [showFxDrawer, setShowFxDrawer] = useState(false);
+  const [fxMode, setFxMode] = useState<'convert' | 'transfer'>('convert');
+  const [fxFrom, setFxFrom] = useState<CurrencyCode>('IRT');
+  const [fxTo, setFxTo] = useState<CurrencyCode>('USD');
+  const [fxAmountPct, setFxAmountPct] = useState<25 | 50 | 100>(25);
+  const [fxChannelId, setFxChannelId] = useState<TransferChannelDef['id']>('exchange_office');
+  const [showSellPropWizard, setShowSellPropWizard] = useState(false);
   const [selectedInvId, setSelectedInvId] = useState<InvestmentId | null>(null);
   const [housingDrill, setHousingDrill] = useState<'market' | 'showroom' | null>(null);
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
@@ -250,6 +275,44 @@ export function AssetsFinanceSheet({
   const quickTradeAmount = getQuickTradeAmountToman(state, gameDataset);
   const debtPayoffChunk = getDebtPayoffChunkToman(state, gameDataset);
   const loanPresets = getLoanPresets(state, gameDataset);
+  const moneySummary = getHeaderMoneySummary(state, gameDataset);
+  const residenceCountry = getCountryMacroDef(player.countryId, gameDataset);
+  const iranPropToman =
+    player.countryId === 'iran' &&
+    (player.housing.type === 'owned' || player.housing.type === 'villa')
+      ? player.housing.propertyValueToman
+      : typeof state.flags['iran_owned_property_toman'] === 'number'
+        ? (state.flags['iran_owned_property_toman'] as number)
+        : 0;
+  const abroadHousingOptions = useMemo(
+    () =>
+      player.countryId !== 'iran'
+        ? getAbroadHousingOptions(
+            player.countryId,
+            state.emigration?.residency?.regionId,
+            state,
+            gameDataset,
+          )
+        : [],
+    [player.countryId, state],
+  );
+  const fxSourceBalance = getWalletBalance(state, fxFrom);
+  const fxInputAmount = useMemo(() => {
+    const raw = (fxSourceBalance * fxAmountPct) / 100;
+    return fxFrom === 'IRT' ? Math.round(raw) : Number(raw.toFixed(2));
+  }, [fxSourceBalance, fxAmountPct, fxFrom]);
+  const fxQuote = useMemo(
+    () =>
+      quoteConversion({
+        amount: fxInputAmount,
+        from: fxFrom,
+        to: fxTo,
+        state,
+        dataset: gameDataset,
+        channelId: fxMode === 'transfer' ? fxChannelId : undefined,
+      }),
+    [fxInputAmount, fxFrom, fxTo, state, fxMode, fxChannelId],
+  );
 
   const renderShopRow = (item: ShopItemDefinition) => {
     const price = getShopItemPriceToman(item, state);
@@ -419,7 +482,7 @@ export function AssetsFinanceSheet({
       open={open}
       onClose={onClose}
       title={t('nav.assets')}
-      subtitle={`نقدینگی: ${formatToman(player.moneyToman)}`}
+      subtitle={`نقدینگی: ${moneySummary.cashDisplayText}`}
       scrollKey={subTab}
       stickySubHeader={
         <SegmentedControl
@@ -442,19 +505,38 @@ export function AssetsFinanceSheet({
             <HubHeroCard
               tone="primary"
               icon={<IconAssets className="h-5 w-5" />}
-              title={formatToman(netWorth)}
-              subtitle={`${t('netWorthLabel')} · ${netWorthPP.labelFa} · معادل ${toPersianDigits(netWorthPP.tehran70SqmApts)} واحد ۷۰ متری`}
+              title={moneySummary.netWorth.primaryFormatted}
+              subtitle={
+                moneySummary.netWorth.displayCurrency !== 'IRT'
+                  ? `معادل ${moneySummary.netWorth.secondaryTomanFormatted} · ${moneySummary.netWorth.purchasingPowerHintFa}`
+                  : `${netWorthPP.labelFa} · ${moneySummary.netWorth.purchasingPowerHintFa}`
+              }
               onInfo={() => setInfoTopic('netWorth')}
               detailsLabel="تحلیل بازار"
               onDetails={() => setShowMarketDetail(true)}
               metrics={[
-                { label: t('cashLabel'), value: <CurrencyText amountToman={player.moneyToman} /> },
+                { label: t('cashLabel'), value: moneySummary.cashDisplayText },
                 {
                   label: 'خالص درآمد سالانه',
                   value: <CurrencyText amountToman={annualIncome} />,
                 },
                 { label: 'کل بدهی و وام', value: <CurrencyText amountToman={totalDebtAll} /> },
               ]}
+            />
+
+            <CurrencyExposureCard
+              displayMode={state.displayCurrencyMode ?? 'local'}
+              onChangeDisplayMode={(mode: DisplayCurrencyMode) =>
+                onUpdateSave({
+                  save: setDisplayCurrencyModeAction(saveGame, mode),
+                  success: true,
+                  message: `نمایش مبالغ روی «${t(`currencySwitch.${mode}`)}» تنظیم شد`,
+                })
+              }
+              slices={moneySummary.exposure}
+              performance={moneySummary.performance}
+              warnings={moneySummary.warnings}
+              onOpenFxDrawer={() => setShowFxDrawer(true)}
             />
 
             <SectionGroup
@@ -464,6 +546,13 @@ export function AssetsFinanceSheet({
               <div className="p-3">
                 <Sparkline values={netWorthSeries} colorVar="--primary" height={40} />
               </div>
+              <ActionRow
+                icon={<IconCoins className="h-4 w-4" />}
+                title="کیف‌پول‌های ارزی، تبدیل و انتقال"
+                subtitle={`${toPersianDigits(state.ledger?.wallets.length ?? 1)} حساب فعال در سبد ارزی`}
+                showChevron
+                onClick={() => setShowFxDrawer(true)}
+              />
               <ActionRow
                 icon={<IconTrendUp className="h-4 w-4" />}
                 title={`نرخ‌های بازار (${toPersianDigits(state.currentJalaliYear)})`}
@@ -611,13 +700,53 @@ export function AssetsFinanceSheet({
                 )}
 
                 <SectionGroup title="معاملات مسکن و خودرو">
-                  <ActionRow
-                    icon={<IconHome className="h-4 w-4" />}
-                    title="فهرست مسکن (خرید و اجاره)"
-                    subtitle={`متری تهران: ${formatToman(tehranSqm)} · ${toPersianDigits(gameDataset.housing.housingListings.length)} فایل`}
-                    showChevron
-                    onClick={() => setHousingDrill('market')}
-                  />
+                  {player.countryId !== 'iran' && abroadHousingOptions.length > 0 ? (
+                    abroadHousingOptions.slice(0, 4).map((opt) => (
+                      <ActionRow
+                        key={opt.id}
+                        icon={<IconHome className="h-4 w-4" />}
+                        title={opt.titleFa}
+                        subtitle={
+                          opt.mode === 'rent'
+                            ? `ودیعه ${formatCurrencyAmount(opt.depositLocal, opt.currencyCode, gameDataset)} · ماهانه ${formatCurrencyAmount(opt.monthlyRentLocal, opt.currencyCode, gameDataset)}`
+                            : `پیش‌پرداخت ${formatCurrencyAmount(opt.downPaymentLocal, opt.currencyCode, gameDataset)} · ${toPersianDigits(opt.areaSqm)} متر`
+                        }
+                        value={
+                          opt.mode === 'rent'
+                            ? formatCurrencyAmount(opt.depositLocal, opt.currencyCode, gameDataset)
+                            : formatCurrencyAmount(opt.downPaymentLocal, opt.currencyCode, gameDataset)
+                        }
+                        ctaLabel={opt.mode === 'rent' ? 'اجاره' : 'خرید'}
+                        onClick={() =>
+                          onUpdateSave(
+                            rentOrBuyAbroadHousingAction(
+                              saveGame,
+                              opt.id,
+                              state.emigration?.residency?.regionId,
+                              gameDataset,
+                            ),
+                          )
+                        }
+                      />
+                    ))
+                  ) : (
+                    <ActionRow
+                      icon={<IconHome className="h-4 w-4" />}
+                      title="فهرست مسکن (خرید و اجاره)"
+                      subtitle={`متری تهران: ${formatToman(tehranSqm)} · ${toPersianDigits(gameDataset.housing.housingListings.length)} فایل`}
+                      showChevron
+                      onClick={() => setHousingDrill('market')}
+                    />
+                  )}
+                  {iranPropToman > 0 && (
+                    <ActionRow
+                      icon={<IconBank className="h-4 w-4" />}
+                      title="فروش ملک ایران و انتقال ارز"
+                      subtitle={`ارزش فعلی: ${formatToman(iranPropToman)}`}
+                      ctaLabel="فروش و تبدیل"
+                      onClick={() => setShowSellPropWizard(true)}
+                    />
+                  )}
                   <ActionRow
                     icon={<IconCar className="h-4 w-4" />}
                     title="نمایشگاه خودرو"
@@ -1069,6 +1198,157 @@ export function AssetsFinanceSheet({
           );
         })()}
       </DetailSheet>
+
+      {/* DRILL-DOWN: Multi-Currency Wallets, FX Converter & Cross-Border Transfer */}
+      <DetailSheet
+        open={showFxDrawer}
+        onClose={() => setShowFxDrawer(false)}
+        title="کیف‌پول ارزی، تبدیل و حواله"
+        subtitle={residenceCountry ? `اقامتگاه فعلی: ${residenceCountry.nameFa}` : 'مدیریت ارزهای سبد'}
+      >
+        <div className="space-y-4">
+          <SectionGroup title="موجودی کیف‌پول‌ها">
+            {(state.ledger?.wallets ?? []).slice(0, 7).map((w) => {
+              const def = getCurrencyDef(w.currencyCode, gameDataset);
+              return (
+                <ActionRow
+                  key={w.id}
+                  icon={<IconCoins className="h-4 w-4" />}
+                  title={w.labelFa}
+                  subtitle={def.nameFa}
+                  value={formatCurrencyAmount(w.balance, w.currencyCode, gameDataset)}
+                />
+              );
+            })}
+          </SectionGroup>
+
+          <Card className="space-y-3">
+            <SegmentedControl<'convert' | 'transfer'>
+              value={fxMode}
+              onChange={setFxMode}
+              items={[
+                { value: 'convert', label: 'تبدیل در کیف‌پول' },
+                { value: 'transfer', label: 'حواله برون‌مرزی' },
+              ]}
+            />
+
+            <div className="space-y-1.5">
+              <div className="text-[11px] font-bold text-[var(--text-muted)]">از ارز مبدأ</div>
+              <FilterChips<CurrencyCode>
+                value={fxFrom}
+                onChange={(code) => {
+                  setFxFrom(code);
+                  if (code === fxTo) {
+                    setFxTo(code === 'IRT' ? 'USD' : 'IRT');
+                  }
+                }}
+                items={ALL_CURRENCY_CODES.map((code) => ({
+                  value: code,
+                  label: getCurrencyDef(code, gameDataset).shortNameFa,
+                }))}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="text-[11px] font-bold text-[var(--text-muted)]">به ارز مقصد</div>
+              <FilterChips<CurrencyCode>
+                value={fxTo}
+                onChange={setFxTo}
+                items={ALL_CURRENCY_CODES.filter((c) => c !== fxFrom).map((code) => ({
+                  value: code,
+                  label: getCurrencyDef(code, gameDataset).shortNameFa,
+                }))}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="text-[11px] font-bold text-[var(--text-muted)]">
+                سهم انتخابی از موجودی ({formatCurrencyAmount(fxInputAmount, fxFrom, gameDataset)})
+              </div>
+              <SegmentedControl<'25' | '50' | '100'>
+                value={String(fxAmountPct) as '25' | '50' | '100'}
+                onChange={(v) => setFxAmountPct(Number(v) as 25 | 50 | 100)}
+                items={[
+                  { value: '25', label: '۲۵٪ موجودی' },
+                  { value: '50', label: '۵۰٪ موجودی' },
+                  { value: '100', label: 'کل موجودی' },
+                ]}
+              />
+            </div>
+
+            {fxMode === 'transfer' && (
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-bold text-[var(--text-muted)]">کانال انتقال</div>
+                <FilterChips<TransferChannelDef['id']>
+                  value={fxChannelId}
+                  onChange={setFxChannelId}
+                  items={gameDataset.economy.fxParams.transferChannels.map((ch) => ({
+                    value: ch.id,
+                    label: ch.titleFa,
+                  }))}
+                />
+              </div>
+            )}
+
+            <div className="rounded-xl bg-[var(--surface-2)] p-2.5 text-xs space-y-1">
+              <div className="flex justify-between">
+                <span className="text-[var(--text-muted)]">خالص دریافتی مقصد:</span>
+                <span className="font-bold tabular-nums text-[var(--success)]">
+                  <bdi dir="rtl">{formatCurrencyAmount(fxQuote.netToAmount, fxTo, gameDataset)}</bdi>
+                </span>
+              </div>
+              <div className="flex justify-between text-[11px] text-[var(--text-muted)]">
+                <span>کارمزد و شکاف نرخ تبدیل:</span>
+                <span className="tabular-nums">{toPersianDigits(fxQuote.totalFrictionPct)}٪</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={fxInputAmount <= 0 || fxFrom === fxTo}
+              onClick={() => {
+                if (fxMode === 'convert') {
+                  onUpdateSave(
+                    convertCurrencyAction(
+                      saveGame,
+                      {
+                        fromCurrency: fxFrom,
+                        toCurrency: fxTo,
+                        fromAmount: fxInputAmount,
+                      },
+                      gameDataset,
+                    ),
+                  );
+                } else {
+                  onUpdateSave(
+                    submitCrossBorderTransferAction(
+                      saveGame,
+                      {
+                        fromCurrency: fxFrom,
+                        toCurrency: fxTo,
+                        fromAmount: fxInputAmount,
+                        channelId: fxChannelId,
+                        purposeFa: 'انتقال موجودی بین حساب‌ها',
+                      },
+                      gameDataset,
+                    ),
+                  );
+                }
+              }}
+              className="min-h-[46px] w-full rounded-xl bg-[var(--primary)] text-xs font-bold text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-strong)] disabled:opacity-50"
+            >
+              {fxMode === 'convert' ? 'انجام تبدیل ارزی' : 'ارسال حواله ارزی'}
+            </button>
+          </Card>
+        </div>
+      </DetailSheet>
+
+      <SellIranPropertyWizard
+        open={showSellPropWizard}
+        saveGame={saveGame}
+        onClose={() => setShowSellPropWizard(false)}
+        onUpdateSave={onUpdateSave}
+      />
 
       <InfoSheet
         open={infoTopic !== null}
