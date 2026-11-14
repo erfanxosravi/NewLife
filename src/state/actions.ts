@@ -3543,6 +3543,7 @@ export function submitJobInterviewAction(
         {
           jobId: job.id,
           appliedTurn: draft.turn,
+          appliedYear: draft.currentJalaliYear,
           interviewBonusPct: interviewShiftPct,
         },
       ];
