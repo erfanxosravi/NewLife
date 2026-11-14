@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
 import { formatToman, toPersianDigits } from '../../engine/jalali';
 import { formatSpecialRouteChoiceSummary } from '../../engine/talents';
@@ -7,6 +7,7 @@ import type {
   JobDefinition,
   SaveGame,
   SpecialCareerRouteId,
+  TalentId,
   UniversityTier,
 } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
@@ -29,11 +30,14 @@ import {
 import {
   formatUsdEquivalentHint,
   getActionCooldownRemaining,
+  getAllLicensesStatus,
   getCurrentJobPromotionState,
   getEducationHistory,
   getJobApplicationStatus,
   getKonkurFeeToman,
   getMilitaryBuyoutCostToman,
+  getPendingEmployerOffer,
+  getPendingFamilyBizInheritance,
   getQualitativeSkillLabelFa,
   getSkillLevel,
   getSkillTrainingCost,
@@ -44,23 +48,47 @@ import {
   getUniversityTuitionToman,
   getWorkHistory,
 } from '../../state/selectors';
-import { CareerOwnershipPanel } from '../components/CareerOwnershipPanel';
+import {
+  EmployerOfferDetailSheet,
+  FamilyInheritanceDetailSheet,
+  LicensesDetailSheet,
+  OwnedBusinessDetailSheet,
+  OwnershipFlowDetailSheet,
+} from '../components/CareerOwnershipPanel';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
   ActionButton,
+  ActionRow,
   Badge,
   Card,
   ConfirmDialog,
   CurrencyText,
+  DangerZoneGroup,
+  DetailSheet,
   EmptyState,
   FilterChips,
+  HubHeroCard,
+  InfoSheet,
   LockedNotice,
   ProgressRing,
-  SectionHeader,
+  ProgressStepper,
+  RequirementsChecklist,
+  SectionGroup,
   SegmentedControl,
   Slider,
 } from '../components/Primitives';
-import { IconCareerEdu, IconEducation, IconShield, IconSkill } from '../icons';
+import {
+  IconBook,
+  IconBuilding,
+  IconCareerEdu,
+  IconCoins,
+  IconEducation,
+  IconShield,
+  IconSkill,
+  IconSparkles,
+  IconStar,
+  IconTrophy,
+} from '../icons';
 
 interface WorkEducationSheetProps {
   open: boolean;
@@ -169,26 +197,45 @@ export function WorkEducationSheet({
   const [specialFilter, setSpecialFilter] = useState<'ready' | 'all'>('all');
   const [selectedRoutes, setSelectedRoutes] = useState<Record<string, SpecialCareerRouteId>>({});
   const [confirmQuitMode, setConfirmQuitMode] = useState<'quit' | 'retire' | null>(null);
-  const [ownershipFlowOpen, setOwnershipFlowOpen] = useState<boolean>(false);
+  const [confirmMilitaryDefer, setConfirmMilitaryDefer] = useState(false);
+
+  // Drill-down sheets state
+  const [infoTopic, setInfoTopic] = useState<
+    null | 'education' | 'career' | 'skills' | 'military' | 'salary_breakdown'
+  >(null);
+  const [openTrackSheet, setOpenTrackSheet] = useState(false);
+  const [openUniSheet, setOpenUniSheet] = useState(false);
+  const [openEduHistorySheet, setOpenEduHistorySheet] = useState(false);
+
+  const [openLadderSheet, setOpenLadderSheet] = useState(false);
+  const [openJobBoardSheet, setOpenJobBoardSheet] = useState(false);
+  const [selectedJobDetail, setSelectedJobDetail] = useState<JobDefinition | null>(null);
+  const [openSpecialListSheet, setOpenSpecialListSheet] = useState(false);
+  const [selectedSpecialId, setSelectedSpecialId] = useState<string | null>(null);
+  const [openOwnedBizSheet, setOpenOwnedBizSheet] = useState(false);
+  const [openOwnershipFlowSheet, setOpenOwnershipFlowSheet] = useState(false);
   const [preferredBizTypeId, setPreferredBizTypeId] = useState<string | undefined>(undefined);
-  const jobBoardRef = useRef<HTMLDivElement | null>(null);
-  const ownershipRef = useRef<HTMLDivElement | null>(null);
+  const [openLicensesSheet, setOpenLicensesSheet] = useState(false);
+  const [openWorkHistorySheet, setOpenWorkHistorySheet] = useState(false);
+  const [openEmployerOfferSheet, setOpenEmployerOfferSheet] = useState(false);
+  const [openFamilyBizSheet, setOpenFamilyBizSheet] = useState(false);
+
+  const [selectedTalentId, setSelectedTalentId] = useState<TalentId | null>(null);
+  const [openAllTalentsSheet, setOpenAllTalentsSheet] = useState(false);
+  const [openAllSkillsSheet, setOpenAllSkillsSheet] = useState(false);
+
+  const effectiveSubTab: SubTab = subTab === 'military' && !showMilitary ? 'career' : subTab;
 
   const studyEffort = getStudyEffort(state);
   const eduHistory = getEducationHistory(state);
   const workHistory = getWorkHistory(state);
-  const promotionState = useMemo(
-    () => getCurrentJobPromotionState(state, gameDataset),
-    [state],
-  );
-  const talentOptions = useMemo(
-    () => getTalentPracticeOptions(state, gameDataset),
-    [state],
-  );
-  const specialCareerCards = useMemo(
-    () => getSpecialCareerCards(state, gameDataset),
-    [state],
-  );
+  const promotionState = useMemo(() => getCurrentJobPromotionState(state, gameDataset), [state]);
+  const talentOptions = useMemo(() => getTalentPracticeOptions(state, gameDataset), [state]);
+  const specialCareerCards = useMemo(() => getSpecialCareerCards(state, gameDataset), [state]);
+  const licensesStatus = useMemo(() => getAllLicensesStatus(state, gameDataset), [state]);
+  const pendingEmployerOffer = getPendingEmployerOffer(state);
+  const pendingFamilyInheritance = getPendingFamilyBizInheritance(state);
+  const ownedBiz = state.ownedBusiness;
 
   const tabItems = useMemo(() => {
     const base: { value: SubTab; label: string }[] = [
@@ -220,1149 +267,1622 @@ export function WorkEducationSheet({
       ? state.flags['last_job_deductions']
       : null;
 
+  const discoveredTalentsCount = talentOptions.filter((o) => o.isDiscovered).length;
+  const maxedSkillsCount = gameDataset.skills.filter((s) => getSkillLevel(state, s.id) >= 5).length;
+
+  const activeTalent = selectedTalentId
+    ? talentOptions.find((o) => o.talentId === selectedTalentId) ?? null
+    : null;
+  const activeSpecialCard = selectedSpecialId
+    ? specialCareerCards.find((c) => c.career.id === selectedSpecialId) ?? null
+    : null;
+  const activeJobDetailStatus = selectedJobDetail
+    ? getJobApplicationStatus(selectedJobDetail, state, gameDataset)
+    : null;
+
   return (
     <FullScreenSheet
       open={open}
       onClose={onClose}
       title={t('nav.workEducation')}
       subtitle={`${player.firstName} ${player.lastName} · ${currentStageLabel}`}
-    >
-      <div className="space-y-4">
+      stickySubHeader={
         <SegmentedControl
-          value={subTab === 'military' && !showMilitary ? 'career' : subTab}
+          value={effectiveSubTab}
           onChange={setSubTab}
           items={tabItems}
         />
-
-        {/* 1. EDUCATION TAB */}
-        {subTab === 'education' && (
-          <div className="space-y-3.5">
-            <Card className="flex items-center justify-between gap-3">
-              <div className="min-w-0 space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <IconEducation className="h-4 w-4 text-[var(--primary)]" />
-                  <span className="text-sm font-bold">{currentStageLabel}</span>
-                </div>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {player.education.inSchool
-                    ? uniYearsLeft > 0
-                      ? `${player.education.major ?? 'دانشجو'} · ${toPersianDigits(uniYearsLeft)} سال تا فراغت`
+      }
+      scrollKey={effectiveSubTab}
+    >
+      <div className="space-y-4">
+        {/* ================= 1. EDUCATION HUB ================= */}
+        {effectiveSubTab === 'education' && (
+          <div className="space-y-4">
+            <HubHeroCard
+              icon={<IconEducation className="h-5 w-5" />}
+              title={currentStageLabel}
+              subtitle={
+                player.education.inSchool
+                  ? uniYearsLeft > 0
+                    ? `${player.education.major ?? 'دانشجو'} · ${toPersianDigits(uniYearsLeft)} سال تا فراغت`
+                    : player.education.highSchoolTrack
+                      ? `رشته: ${t(`education.trackLabels.${player.education.highSchoolTrack}`)}`
                       : 'در حال تحصیل در مدرسه'
-                    : 'در حال حاضر دانش‌آموز یا دانشجو نیستی'}
-                </p>
-                {player.education.highSchoolTrack && (
-                  <Badge tone="primary">
-                    رشته: {t(`education.trackLabels.${player.education.highSchoolTrack}`)}
-                  </Badge>
-                )}
-              </div>
-              <ProgressRing
-                value={player.education.gpa}
-                max={20}
-                label={toPersianDigits(player.education.gpa.toFixed(1))}
-                colorVar="--stat-smarts"
-              />
-            </Card>
+                  : 'در حال حاضر دانش‌آموز یا دانشجو نیستی'
+              }
+              badge={
+                <ProgressRing
+                  value={player.education.gpa}
+                  max={20}
+                  size={50}
+                  strokeWidth={5}
+                  label={toPersianDigits(player.education.gpa.toFixed(1))}
+                  colorVar="--stat-smarts"
+                />
+              }
+              onInfo={() => setInfoTopic('education')}
+              metrics={[
+                {
+                  label: 'معدل کل',
+                  value: `${toPersianDigits(player.education.gpa.toFixed(1))} از ۲۰`,
+                  tone: player.education.gpa >= 16 ? 'success' : 'default',
+                },
+                { label: 'تلاش درسی', value: `${toPersianDigits(studyEffort)}٪` },
+                {
+                  label: 'رتبه کنکور',
+                  value: player.education.konkurRank
+                    ? toPersianDigits(player.education.konkurRank.toLocaleString('en-US'))
+                    : 'ندارد',
+                },
+              ]}
+            />
 
             {player.age < 7 ? (
               <LockedNotice message="تحصیل رسمی از ۷ سالگی با ورود به دبستان آغاز می‌شود." />
             ) : (
               <>
                 {player.education.inSchool && (
-                  <Card className="space-y-3">
-                    <Slider
-                      label={t('education.studyEffort')}
-                      value={studyEffort}
-                      minLabel="آرام"
-                      maxLabel="فشرده"
-                      valueLabel={`${toPersianDigits(studyEffort)}٪`}
-                      onChange={(val) => onEffortChange(setStudyEffortAction(saveGame, val))}
-                    />
-                    <p className="text-[11px] text-[var(--text-muted)]">
-                      {studyEffort >= 75
-                        ? 'تلاش بالا: شانس معدل عالی و قبولی کنکور بیشتر، فشار روانی کمی بالاتر.'
-                        : studyEffort <= 35
-                          ? 'تلاش کم: فشار روانی کمتر، اما افت معدل و شانس کمتر در آزمون‌ها.'
-                          : 'تعادل مناسب بین یادگیری و آرامش.'}
-                    </p>
-
-                    <div className="space-y-2">
-                      <ActionButton
-                        label="مطالعه جدی و مرور درس‌ها"
-                        costText="رایگان"
-                        effectHint="هوش +۴ · معدل بالاتر · سلامت روان -۳"
-                        disabled={getActionCooldownRemaining(state, 'edu_study_hard') > 0}
-                        disabledReason={
-                          getActionCooldownRemaining(state, 'edu_study_hard') > 0
-                            ? 'فقط یک بار در سال'
-                            : undefined
-                        }
-                        onClick={() =>
-                          onUpdateSave(performStudyAction(saveGame, 'study_hard', gameDataset))
-                        }
-                      />
-                      <ActionButton
-                        label="کلاس تقویتی و معلم خصوصی"
-                        costText={formatToman(tutorCost)}
-                        effectHint="هوش +۶ · جهش معدل"
-                        variant="secondary"
-                        disabled={
-                          getActionCooldownRemaining(state, 'edu_tutor') > 0 ||
-                          player.moneyToman < tutorCost
-                        }
-                        disabledReason={
-                          getActionCooldownRemaining(state, 'edu_tutor') > 0
-                            ? 'فقط یک بار در سال'
-                            : player.moneyToman < tutorCost
-                              ? 'موجودی کافی نیست'
-                              : undefined
-                        }
-                        onClick={() =>
-                          onUpdateSave(performStudyAction(saveGame, 'tutor', gameDataset))
-                        }
-                      />
-                      <ActionButton
-                        label="کمی فاصله گرفتن از کتاب"
-                        costText="رایگان"
-                        effectHint="شادی +۵ · افت جزئی معدل"
-                        variant="secondary"
-                        disabled={getActionCooldownRemaining(state, 'edu_skip') > 0}
-                        disabledReason={
-                          getActionCooldownRemaining(state, 'edu_skip') > 0
-                            ? 'فقط یک بار در سال'
-                            : undefined
-                        }
-                        onClick={() =>
-                          onUpdateSave(performStudyAction(saveGame, 'skip', gameDataset))
-                        }
+                  <SectionGroup title="برنامه و فعالیت درسی">
+                    <div className="p-3.5 space-y-2">
+                      <Slider
+                        label={t('education.studyEffort')}
+                        value={studyEffort}
+                        minLabel="آرام"
+                        maxLabel="فشرده"
+                        valueLabel={`${toPersianDigits(studyEffort)}٪`}
+                        onChange={(val) => onEffortChange(setStudyEffortAction(saveGame, val))}
                       />
                     </div>
-                  </Card>
-                )}
-
-                {/* High School Track Picker */}
-                {(player.education.level === 'high_school' ||
-                  (player.age >= 15 && !player.education.highSchoolTrack)) && (
-                  <Card className="space-y-2.5">
-                    <SectionHeader
-                      title={t('education.chooseTrack')}
-                      subtitle="مسیر رشته‌های دانشگاهی و مشاغل آینده"
+                    <ActionRow
+                      icon={<IconBook className="h-4 w-4" />}
+                      title="مطالعه جدی و مرور درس‌ها"
+                      subtitle="هوش +۴ · معدل بالاتر · سلامت روان -۳"
+                      value="رایگان"
+                      state={
+                        getActionCooldownRemaining(state, 'edu_study_hard') > 0
+                          ? 'cooldown'
+                          : 'enabled'
+                      }
+                      ctaLabel="مطالعه"
+                      onClick={() =>
+                        onUpdateSave(performStudyAction(saveGame, 'study_hard', gameDataset))
+                      }
                     />
-                    <div className="space-y-2">
-                      {TRACK_INFO.map((tr) => {
-                        const selected = player.education.highSchoolTrack === tr.id;
-                        return (
-                          <button
-                            key={tr.id}
-                            type="button"
-                            onClick={() =>
-                              onUpdateSave(selectHighSchoolTrackAction(saveGame, tr.id))
-                            }
-                            className={`w-full rounded-2xl border p-3 text-right transition-colors ${
-                              selected
-                                ? 'border-[var(--primary)] bg-[var(--primary-soft)]'
-                                : 'border-[var(--border)] bg-[var(--surface-2)] hover:border-[var(--primary)]'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-xs font-bold">{tr.label}</span>
-                              <Badge tone={selected ? 'primary' : 'neutral'}>{tr.focus}</Badge>
-                            </div>
-                            <div className="mt-1 text-[11px] text-[var(--text-muted)]">
-                              مشاغل مرتبط: {tr.jobs}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </Card>
+                    <ActionRow
+                      icon={<IconEducation className="h-4 w-4" />}
+                      title="کلاس تقویتی و معلم خصوصی"
+                      subtitle="هوش +۶ · جهش معدل"
+                      value={formatToman(tutorCost)}
+                      state={
+                        getActionCooldownRemaining(state, 'edu_tutor') > 0
+                          ? 'cooldown'
+                          : player.moneyToman < tutorCost
+                            ? 'disabled'
+                            : 'enabled'
+                      }
+                      reason={player.moneyToman < tutorCost ? 'موجودی کافی نیست' : undefined}
+                      ctaLabel="ثبت‌نام"
+                      onClick={() =>
+                        onUpdateSave(performStudyAction(saveGame, 'tutor', gameDataset))
+                      }
+                    />
+                    <ActionRow
+                      icon={<IconSparkles className="h-4 w-4" />}
+                      iconTone="neutral"
+                      title="کمی فاصله گرفتن از کتاب"
+                      subtitle="شادی +۵ · افت جزئی معدل"
+                      value="رایگان"
+                      state={
+                        getActionCooldownRemaining(state, 'edu_skip') > 0 ? 'cooldown' : 'enabled'
+                      }
+                      ctaLabel="استراحت"
+                      onClick={() =>
+                        onUpdateSave(performStudyAction(saveGame, 'skip', gameDataset))
+                      }
+                    />
+                    {(player.education.level === 'high_school' ||
+                      (player.age >= 15 && !player.education.highSchoolTrack)) && (
+                      <ActionRow
+                        icon={<IconStar className="h-4 w-4" />}
+                        title={t('education.chooseTrack')}
+                        subtitle={
+                          player.education.highSchoolTrack
+                            ? `فعلی: ${t(`education.trackLabels.${player.education.highSchoolTrack}`)}`
+                            : 'مسیر رشته‌های دانشگاهی و مشاغل آینده'
+                        }
+                        state={player.education.highSchoolTrack ? 'done' : 'recommended'}
+                        showChevron
+                        onClick={() => setOpenTrackSheet(true)}
+                      />
+                    )}
+                  </SectionGroup>
                 )}
 
-                {/* Konkur & University */}
                 {player.age >= 17 && (
-                  <Card className="space-y-3">
-                    <SectionHeader
-                      title={t('education.konkur')}
-                      subtitle="آزمون ورود به دانشگاه و انتخاب رشته"
-                      action={
-                        player.education.konkurRank ? (
-                          <Badge tone="success">
-                            رتبه:{' '}
-                            {toPersianDigits(player.education.konkurRank.toLocaleString('en-US'))}
-                          </Badge>
-                        ) : undefined
-                      }
-                    />
-                    <ActionButton
-                      label={t('education.takeKonkur')}
-                      costText={formatToman(konkurFee)}
-                      effectHint="نتیجه بر پایه هوش، معدل و تلاش درسی"
-                      disabled={
-                        getActionCooldownRemaining(state, 'konkur') > 0 ||
-                        player.moneyToman < konkurFee
-                      }
-                      disabledReason={
+                  <SectionGroup title="کنکور و دانشگاه">
+                    <ActionRow
+                      icon={<IconTrophy className="h-4 w-4" />}
+                      title={t('education.takeKonkur')}
+                      subtitle="نتیجه بر پایه هوش، معدل و تلاش درسی"
+                      value={formatToman(konkurFee)}
+                      state={
                         getActionCooldownRemaining(state, 'konkur') > 0
-                          ? 'فقط یک بار در سال'
+                          ? 'cooldown'
                           : player.moneyToman < konkurFee
-                            ? 'موجودی کافی نیست'
-                            : undefined
+                            ? 'disabled'
+                            : 'enabled'
                       }
+                      reason={player.moneyToman < konkurFee ? 'موجودی کافی نیست' : undefined}
+                      ctaLabel="شرکت"
                       onClick={() => onUpdateSave(takeKonkurAction(saveGame, gameDataset))}
                     />
-
                     {!player.education.inSchool &&
                       player.education.konkurRank !== undefined && (
-                        <div className="space-y-2 pt-1">
-                          <div className="text-xs font-bold text-[var(--text-muted)]">
-                            گزینه‌های ثبت‌نام دانشگاه با رتبه فعلی:
-                          </div>
-                          {UNI_OFFERS.map((offer) => {
-                            const tuition = getUniversityTuitionToman(
-                              offer.tier,
-                              offer.majorFa,
-                              state,
-                              gameDataset,
-                            );
-                            const rankOk = (player.education.konkurRank ?? 999999) <= offer.maxRank;
-                            const moneyOk = player.moneyToman >= tuition;
-                            return (
-                              <ActionButton
-                                key={`${offer.tier}_${offer.majorFa}`}
-                                label={`${offer.majorFa} — ${offer.tierLabel}`}
-                                costText={formatToman(tuition)}
-                                effectHint={`${toPersianDigits(offer.years)} سال تحصیل`}
-                                variant="secondary"
-                                disabled={!rankOk || !moneyOk}
-                                disabledReason={
-                                  !rankOk
-                                    ? `نیازمند رتبه بهتر از ${toPersianDigits(offer.maxRank.toLocaleString('en-US'))}`
-                                    : !moneyOk
-                                      ? 'موجودی کافی نیست'
-                                      : undefined
-                                }
-                                onClick={() =>
-                                  onUpdateSave(
-                                    enrollUniversityAction(
-                                      saveGame,
-                                      offer.tier,
-                                      offer.majorFa,
-                                      offer.degree,
-                                      offer.years,
-                                      gameDataset,
-                                    ),
-                                  )
-                                }
-                              />
-                            );
-                          })}
-                        </div>
+                        <ActionRow
+                          icon={<IconEducation className="h-4 w-4" />}
+                          title="انتخاب رشته و ثبت‌نام دانشگاه"
+                          subtitle="مشاهده گزینه‌های مجاز بر اساس رتبه فعلی"
+                          value={`رتبه ${toPersianDigits(player.education.konkurRank.toLocaleString('en-US'))}`}
+                          state="recommended"
+                          showChevron
+                          onClick={() => setOpenUniSheet(true)}
+                        />
                       )}
-                  </Card>
+                  </SectionGroup>
                 )}
 
-                {/* Education History */}
-                <Card>
-                  <SectionHeader title={t('education.graduateHistory')} />
-                  {eduHistory.length === 0 ? (
-                    <p className="text-xs text-[var(--text-muted)]">
-                      هنوز مدرک دانشگاهی ثبت نشده است.
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {eduHistory.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs"
-                        >
-                          <div>
-                            <div className="font-bold">{item.stageFa}</div>
-                            <div className="text-[11px] text-[var(--text-muted)]">
-                              {item.detailFa}
-                            </div>
-                          </div>
-                          <Badge tone="neutral">{toPersianDigits(item.year)}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </Card>
+                {eduHistory.length > 0 && (
+                  <SectionGroup title="سوابق و مدارک">
+                    <ActionRow
+                      icon={<IconBook className="h-4 w-4" />}
+                      iconTone="neutral"
+                      title={t('education.graduateHistory')}
+                      subtitle="مدارک و مراحل تحصیلی ثبت‌شده"
+                      value={`${toPersianDigits(eduHistory.length)} مورد`}
+                      showChevron
+                      onClick={() => setOpenEduHistorySheet(true)}
+                    />
+                  </SectionGroup>
+                )}
               </>
             )}
           </div>
         )}
 
-        {/* 2. CAREER TAB */}
-        {subTab === 'career' && (
-          <div className="space-y-3.5">
+        {/* ================= 2. CAREER HUB ================= */}
+        {effectiveSubTab === 'career' && (
+          <div className="space-y-4">
             {player.age < 16 ? (
               <LockedNotice message="بازار کار رسمی از ۱۸ سالگی و مسیرهای ویژه ورزشی و رسانه‌ای از ۱۶ سالگی فعال می‌شوند." />
             ) : (
               <>
-                {player.age < 18 && (
-                  <LockedNotice message="استخدام در مشاغل عمومی و اداری از ۱۸ سالگی فعال می‌شود؛ مسیرهای ورزشی و محتوایی زودهنگام در پایین باز هستند." />
+                {player.job ? (
+                  <HubHeroCard
+                    testId="active-job-card"
+                    icon={<IconCareerEdu className="h-5 w-5" />}
+                    title={player.job.title}
+                    subtitle={
+                      promotionState
+                        ? `${promotionState.jobDef.employerType ?? 'شغلی'} · عملکرد ${toPersianDigits(promotionState.eligibility.performance)} از ۱۰۰`
+                        : 'شاغل تمام‌وقت'
+                    }
+                    status={promotionState?.eligibility.atCeiling ? 'done' : 'in_progress'}
+                    detailsLabel="رده و جزئیات"
+                    onDetails={() => setOpenLadderSheet(true)}
+                    onInfo={() => setInfoTopic('career')}
+                    metrics={[
+                      {
+                        label: 'خالص حقوق سالانه',
+                        value: <CurrencyText amountToman={player.job.annualSalaryToman} />,
+                        tone: 'success',
+                      },
+                      {
+                        label: 'سابقه',
+                        value: `${toPersianDigits(player.job.yearsInJob)} سال`,
+                      },
+                      {
+                        label: 'استرس',
+                        value: `${toPersianDigits(player.job.stress)}٪`,
+                        tone: player.job.stress >= 70 ? 'danger' : 'default',
+                      },
+                    ]}
+                  />
+                ) : (
+                  <HubHeroCard
+                    icon={<IconCareerEdu className="h-5 w-5" />}
+                    title={player.age < 18 ? 'پیش از سن استخدام عمومی' : t('career.unemployed')}
+                    subtitle={
+                      player.age < 18
+                        ? 'استخدام عمومی از ۱۸ سالگی است؛ مسیرهای ویژه ورزشی و رسانه‌ای باز هستند.'
+                        : 'از بازار کار شغل انتخاب کن یا کسب‌وکار مستقل بساز.'
+                    }
+                    status="waiting"
+                    onInfo={() => setInfoTopic('career')}
+                    metrics={[
+                      { label: 'مدرک فعلی', value: currentStageLabel },
+                      {
+                        label: 'نقدینگی',
+                        value: <CurrencyText amountToman={player.moneyToman} />,
+                      },
+                      {
+                        label: 'مسیر ویژه',
+                        value: `${toPersianDigits(specialCareerCards.length)} مسیر`,
+                      },
+                    ]}
+                  />
                 )}
-                {player.job && (
-                  <Card className="space-y-3" data-testid="active-job-card">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <IconCareerEdu className="h-4 w-4 text-[var(--primary)]" />
-                          <span className="text-sm font-bold">{player.job.title}</span>
-                        </div>
-                        <div className="mt-1 text-xs text-[var(--text-muted)]">
-                          سابقه در شغل: {toPersianDigits(player.job.yearsInJob)} سال · استرس:{' '}
-                          {toPersianDigits(player.job.stress)}٪
-                          {promotionState && (
-                            <>
-                              {' '}
-                              · عملکرد: {toPersianDigits(promotionState.eligibility.performance)} از ۱۰۰
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-left">
-                        <Badge tone="success">
-                          خالص: <CurrencyText amountToman={player.job.annualSalaryToman} /> / سال
-                        </Badge>
-                        <div className="mt-1 text-[10px] text-[var(--text-muted)]">
-                          {formatUsdEquivalentHint(player.job.annualSalaryToman, state, gameDataset)}
-                        </div>
-                      </div>
-                    </div>
 
-                    {lastJobGross !== null && lastJobDeductions !== null && (
-                      <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[11px] text-[var(--text-muted)] tabular-nums">
-                        ناخالص سالانه: {formatToman(lastJobGross)} · کسورات، مالیات و هزینه جاری:{' '}
-                        {formatToman(lastJobDeductions)}
-                      </div>
-                    )}
-
-                    {/* Vertical Employee Ladder Timeline */}
-                    {promotionState && (
-                      <div
-                        className="space-y-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3"
-                        data-testid="career-ladder-timeline"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-[var(--text)]">
-                            {t('career.ladderTitle')}
-                          </span>
-                          <span className="text-[11px] text-[var(--text-muted)] tabular-nums">
-                            رده {toPersianDigits(promotionState.eligibility.currentStep.level)} از{' '}
-                            {toPersianDigits(promotionState.jobDef.ladder.length)}
-                          </span>
-                        </div>
-
-                        {promotionState.eligibility.noPromotions ? (
-                          <p className="text-xs leading-5 text-[var(--text-muted)]">
-                            {t('career.noPromotionsNote')}
-                          </p>
-                        ) : (
-                          <div className="space-y-2 pr-1">
-                            {promotionState.jobDef.ladder.map((step, idx) => {
-                              const currentLvl = promotionState.eligibility.currentStep.level;
-                              const isCurrent = step.level === currentLvl;
-                              const isCompleted = step.level < currentLvl;
-                              const isLast = idx === promotionState.jobDef.ladder.length - 1;
-                              return (
-                                <div key={step.level} className="relative flex items-start gap-2.5">
-                                  <div className="flex flex-col items-center pt-1">
-                                    <span
-                                      className={`h-2.5 w-2.5 rounded-full border ${
-                                        isCurrent
-                                          ? 'border-[var(--primary)] bg-[var(--primary)]'
-                                          : isCompleted
-                                            ? 'border-[var(--success)] bg-[var(--success)]'
-                                            : 'border-[var(--border)] bg-[var(--surface)]'
-                                      }`}
-                                    />
-                                    {!isLast && (
-                                      <span className="mt-1 h-4 w-px bg-[var(--border)]" />
-                                    )}
-                                  </div>
-                                  <div className="flex flex-1 items-center justify-between gap-2 text-xs">
-                                    <span
-                                      className={
-                                        isCurrent
-                                          ? 'font-bold text-[var(--primary-strong)]'
-                                          : isCompleted
-                                            ? 'text-[var(--text)]'
-                                            : 'text-[var(--text-muted)]'
-                                      }
-                                    >
-                                      {step.titleFa}
-                                    </span>
-                                    <div className="flex items-center gap-1.5 text-[10px]">
-                                      {isCurrent && (
-                                        <Badge tone="primary">جایگاه فعلی</Badge>
-                                      )}
-                                      {step.ceiling && (
-                                        <Badge tone="neutral">{t('career.ceilingBadge')}</Badge>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {/* Next step requirements */}
-                        {!promotionState.eligibility.atCeiling &&
-                          !promotionState.eligibility.noPromotions &&
-                          promotionState.eligibility.nextStep && (
-                            <div className="space-y-1 border-t border-[var(--border)] pt-2">
-                              <div className="flex items-center justify-between text-[11px] font-bold">
-                                <span>
-                                  پیش‌نیاز رده بعد: {promotionState.eligibility.nextStep.titleFa}
-                                </span>
-                                <span className="text-[var(--primary-strong)] tabular-nums">
-                                  شانس ترفیع: {toPersianDigits(promotionState.eligibility.estimatedChancePct)}٪
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                                {promotionState.eligibility.checks.map((chk) => (
-                                  <div
-                                    key={chk.id}
-                                    className="flex items-center justify-between rounded-lg bg-[var(--surface)] px-2 py-1 text-[11px]"
-                                  >
-                                    <span
-                                      className={
-                                        chk.met ? 'text-[var(--success)]' : 'text-[var(--text-muted)]'
-                                      }
-                                    >
-                                      {chk.met ? '✓' : '○'} {chk.labelFa}
-                                    </span>
-                                    <span className="tabular-nums text-[var(--text-muted)]">
-                                      {chk.currentTextFa} / {chk.requiredTextFa}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                        {/* At Ceiling Card (Non-owner career limit) */}
-                        {promotionState.eligibility.atCeiling &&
-                          !promotionState.eligibility.noPromotions && (
-                            <div
-                              className="space-y-2 border-t border-[var(--border)] pt-2.5"
-                              data-testid="career-ceiling-card"
-                            >
-                              <div className="text-xs font-bold text-[var(--primary-strong)]">
-                                {t('career.atCeilingTitle')}
-                              </div>
-                              <p className="text-[11px] leading-5 text-[var(--text-muted)]">
-                                {t('career.atCeilingBody')}
-                              </p>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                <button
-                                  type="button"
-                                  disabled={
-                                    getActionCooldownRemaining(state, 'change_workplace') > 0
-                                  }
-                                  onClick={() =>
-                                    onUpdateSave(changeWorkplaceAction(saveGame, gameDataset))
-                                  }
-                                  className="min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-bold text-[var(--text)] disabled:opacity-50"
-                                >
-                                  {t('career.changeWorkplace')}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setSubTab('skills')}
-                                  className="min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-bold text-[var(--text)]"
-                                >
-                                  ارتقای مهارت‌ها
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    jobBoardRef.current?.scrollIntoView({ behavior: 'smooth' })
-                                  }
-                                  className="min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-bold text-[var(--text)]"
-                                >
-                                  تغییر مسیر شغلی
-                                </button>
-                                {promotionState.jobDef.ownershipPath.allowed ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setPreferredBizTypeId(
-                                        promotionState.jobDef.ownershipPath.businessTypeId,
-                                      );
-                                      setOwnershipFlowOpen(true);
-                                      ownershipRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                    }}
-                                    className="min-h-[44px] rounded-xl border border-[var(--primary)] bg-[var(--primary-soft)] px-2 py-1.5 text-[11px] font-bold text-[var(--primary-strong)]"
-                                  >
-                                    {t('career.openOwnershipFlow')}
-                                  </button>
-                                ) : (
-                                  <div className="flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-center text-[10px] text-[var(--text-muted)]">
-                                    مالکیت هم‌زمان با شغل دولتی مجاز نیست
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                      </div>
-                    )}
-
-                    <div
-                      className={`grid gap-2 ${
-                        promotionState?.eligibility.noPromotions ? 'grid-cols-1' : 'grid-cols-2'
-                      }`}
-                    >
-                      <ActionButton
-                        label={t('career.overtime')}
-                        effectHint="پاداش نقدی · سلامت -۳"
-                        variant="secondary"
-                        disabled={getActionCooldownRemaining(state, 'career_overtime') > 0}
-                        disabledReason={
-                          getActionCooldownRemaining(state, 'career_overtime') > 0
-                            ? 'فقط یک بار در سال'
-                            : undefined
-                        }
-                        onClick={() =>
-                          onUpdateSave(performCareerAction(saveGame, 'overtime', gameDataset))
-                        }
+                {(player.job ||
+                  (!ownedBiz && pendingEmployerOffer) ||
+                  (!ownedBiz && pendingFamilyInheritance)) && (
+                  <SectionGroup title="اقدام‌های شغلی">
+                    {!ownedBiz && pendingEmployerOffer && (
+                      <ActionRow
+                        icon={<IconCoins className="h-4 w-4" />}
+                        emoji="💼"
+                        title="پیشنهاد واگذاری کارفرما"
+                        subtitle={pendingEmployerOffer.businessNameFa}
+                        value={formatToman(pendingEmployerOffer.discountedPriceToman)}
+                        state="recommended"
+                        isNew
+                        showChevron
+                        onClick={() => setOpenEmployerOfferSheet(true)}
                       />
-                      {!promotionState?.eligibility.noPromotions && (
-                        <ActionButton
-                          label={
-                            promotionState?.eligibility.atCeiling
-                              ? 'تعدیل دستمزد در سقف رده'
-                              : t('career.requestRaise')
+                    )}
+                    {!ownedBiz && pendingFamilyInheritance && (
+                      <ActionRow
+                        icon={<IconBuilding className="h-4 w-4" />}
+                        title="ماترک کسب‌وکار خانوادگی"
+                        subtitle={pendingFamilyInheritance.businessNameFa}
+                        state="recommended"
+                        isNew
+                        showChevron
+                        onClick={() => setOpenFamilyBizSheet(true)}
+                      />
+                    )}
+                    {player.job && (
+                      <>
+                        <ActionRow
+                          icon={<IconCareerEdu className="h-4 w-4" />}
+                          title={t('career.overtime')}
+                          subtitle="پاداش نقدی · سلامت -۳"
+                          state={
+                            getActionCooldownRemaining(state, 'career_overtime') > 0
+                              ? 'cooldown'
+                              : 'enabled'
                           }
-                          effectHint={
-                            promotionState?.eligibility.atCeiling
-                              ? 'تعدیل حقوق بدون تغییر رده'
-                              : 'ارزیابی ترفیع و تعدیل حقوق'
-                          }
-                          variant="secondary"
-                          disabled={getActionCooldownRemaining(state, 'career_raise') > 0}
-                          disabledReason={
-                            getActionCooldownRemaining(state, 'career_raise') > 0
-                              ? 'فقط یک بار در سال'
-                              : undefined
-                          }
+                          ctaLabel="انجام"
                           onClick={() =>
-                            onUpdateSave(performCareerAction(saveGame, 'raise', gameDataset))
+                            onUpdateSave(performCareerAction(saveGame, 'overtime', gameDataset))
                           }
                         />
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <ActionButton
-                        label={t('career.retire')}
-                        variant="secondary"
-                        disabled={player.age < 60 && player.job.yearsInJob < 25}
-                        disabledReason={
-                          player.age < 60 && player.job.yearsInJob < 25
-                            ? 'نیاز به ۶۰ سال سن یا ۲۵ سال سابقه'
-                            : undefined
-                        }
-                        onClick={() => setConfirmQuitMode('retire')}
-                      />
-                      <ActionButton
-                        label={t('career.quit')}
-                        variant="danger"
-                        onClick={() => setConfirmQuitMode('quit')}
-                      />
-                    </div>
-                  </Card>
-                )}
-                {!player.job && player.age >= 18 && (
-                  <EmptyState
-                    icon={<IconCareerEdu className="h-5 w-5" />}
-                    title={t('career.unemployed')}
-                    description="از بازار کار زیر شغل مناسب خودت را پیدا کن یا برای راه‌اندازی کسب‌وکار مستقل اقدام کن."
-                  />
-                )}
-
-                {/* Business Ownership, Explicit Flow & Licenses */}
-                {player.age >= 18 && (
-                  <div ref={ownershipRef}>
-                    <CareerOwnershipPanel
-                      saveGame={saveGame}
-                      preferredBusinessTypeId={preferredBizTypeId}
-                      flowExpanded={ownershipFlowOpen}
-                      onToggleFlow={setOwnershipFlowOpen}
-                      onUpdateSave={onUpdateSave}
-                    />
-                  </div>
-                )}
-
-                {/* Special Careers (Art, Sports, Media) */}
-                <div className="space-y-2.5">
-                  <SectionHeader
-                    title="مسیرهای حرفه‌ای ویژه"
-                    subtitle="ورود نیازمند گرایش کشف‌شده، مهارت کافی و قبولی در آزمون یا فراخوان است"
-                  />
-                  <FilterChips
-                    value={specialFilter}
-                    onChange={setSpecialFilter}
-                    items={[
-                      { value: 'all', label: 'همه مسیرهای ویژه' },
-                      { value: 'ready', label: 'مرتبط با گرایش‌های من' },
-                    ]}
-                  />
-                  <div className="space-y-2.5">
-                    {specialCareerCards
-                      .filter(
-                        (item) =>
-                          specialFilter === 'all' ||
-                          Boolean(item.eligibility.discovered) ||
-                          item.isCurrentSpecialJob ||
-                          item.isCurrentFallbackJob,
-                      )
-                      .map((item) => {
-                        const { career, eligibility } = item;
-                        const activeRoute: SpecialCareerRouteId =
-                          selectedRoutes[career.id] ?? career.alternativeRoutes[0].id;
-                        const routeNote = formatSpecialRouteChoiceSummary(
-                          career,
-                          activeRoute,
-                          state,
-                        );
-                        const cdRemaining = getActionCooldownRemaining(
-                          state,
-                          `special_${career.id}`,
-                          1,
-                        );
-                        const tryDisabled = !eligibility.eligible || cdRemaining > 0;
-                        const tryDisabledReason =
-                          cdRemaining > 0 ? 'فقط یک بار در سال' : eligibility.reason;
-
-                        return (
-                          <Card key={career.id} className="space-y-2.5">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-1.5">
-                                  <span className="text-sm font-bold text-[var(--text)]">
-                                    {career.titleFa}
-                                  </span>
-                                  {eligibility.currentStage > 0 && (
-                                    <Badge tone="success">
-                                      مرحله {toPersianDigits(eligibility.currentStage)} از ۴
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
-                                  مرحله بعدی: {eligibility.nextStageTitleFa} · سطح مهارت فعلی:{' '}
-                                  {getQualitativeSkillLabelFa(eligibility.currentSkill)}
-                                </div>
-                              </div>
-                              <Badge tone={eligibility.eligible ? 'primary' : 'neutral'}>
-                                {eligibility.eligible
-                                  ? `شانس ${toPersianDigits(eligibility.estimatedChancePct)}٪`
-                                  : 'در انتظار آمادگی'}
-                              </Badge>
-                            </div>
-
-                            {/* Alternative Routes */}
-                            <div className="flex flex-wrap gap-1.5">
-                              {career.alternativeRoutes.map((route) => {
-                                const selected = activeRoute === route.id;
-                                return (
-                                  <button
-                                    key={route.id}
-                                    type="button"
-                                    onClick={() =>
-                                      setSelectedRoutes((prev) => ({
-                                        ...prev,
-                                        [career.id]: route.id,
-                                      }))
-                                    }
-                                    className={`min-h-[36px] rounded-xl border px-2.5 py-1 text-[11px] font-bold transition-colors ${
-                                      selected
-                                        ? 'border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-strong)]'
-                                        : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)]'
-                                    }`}
-                                  >
-                                    {route.titleFa}
-                                  </button>
-                                );
-                              })}
-                            </div>
-
-                            {routeNote && (
-                              <p className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[11px] leading-5 text-[var(--text-muted)]">
-                                {routeNote}
-                              </p>
-                            )}
-
-                            <ActionButton
-                              label={
-                                item.isCurrentSpecialJob && eligibility.currentStage < 4
-                                  ? `ارتقا به مرحله بعد: ${eligibility.nextStageTitleFa}`
-                                  : `آزمون و پیگیری: ${eligibility.nextStageTitleFa}`
-                              }
-                              costText={item.salaryText}
-                              effectHint="درآمد واقعی متغیر + افزایش شهرت در صورت پذیرش"
-                              disabled={tryDisabled}
-                              disabledReason={tryDisabledReason}
-                              variant={eligibility.eligible ? 'primary' : 'secondary'}
-                              onClick={() =>
-                                onUpdateSave(
-                                  pursueSpecialCareerAction(
-                                    saveGame,
-                                    career.id,
-                                    activeRoute,
-                                    gameDataset,
-                                  ),
-                                )
-                              }
-                            />
-
-                            {item.fallbackEligible && !item.isCurrentFallbackJob && (
-                              <ActionButton
-                                label={`مسیر جایگزین پایدار: ${career.fallbackCareerFa}`}
-                                costText={item.fallbackSalaryText}
-                                effectHint="درآمد باثبات‌تر و اتکا به مهارت و آموزش"
-                                variant="secondary"
-                                onClick={() =>
-                                  onUpdateSave(
-                                    enterSpecialFallbackCareerAction(
-                                      saveGame,
-                                      career.id,
-                                      gameDataset,
-                                    ),
-                                  )
-                                }
-                              />
-                            )}
-                          </Card>
-                        );
-                      })}
-                  </div>
-                </div>
-
-                {/* Filterable Job Board (18+) */}
-                {player.age >= 18 && (
-                <div className="space-y-2.5" ref={jobBoardRef}>
-                  <SectionHeader
-                    title={t('career.jobBoard')}
-                    subtitle="مبالغ زیر خالص دریافتی پس از کسر کارمزد، هزینه جاری، بیمه و مالیات است"
-                  />
-                  <FilterChips
-                    value={jobFilter}
-                    onChange={setJobFilter}
-                    items={[
-                      { value: 'all', label: 'همه' },
-                      { value: 'دولتی', label: 'دولتی' },
-                      { value: 'خصوصی', label: 'خصوصی' },
-                      { value: 'آزاد', label: 'آزاد' },
-                      { value: 'خانوادگی', label: 'خانوادگی' },
-                    ]}
-                  />
-                  <div className="space-y-2">
-                    {filteredJobs.map((job: JobDefinition) => {
-                      const status = getJobApplicationStatus(job, state, gameDataset);
-                      const isCurrent = player.job?.jobId === job.id;
-                      const ceilingStep = job.ladder[job.ladder.length - 1];
-                      const requiredLicenseTitle = job.requiredLicenseId
-                        ? gameDataset.businesses.licenses.find((l) => l.id === job.requiredLicenseId)
-                            ?.titleFa
-                        : undefined;
-                      const deductions =
-                        status.breakdown.commission +
-                        status.breakdown.runningCosts +
-                        status.breakdown.bimeh +
-                        status.breakdown.incomeTax;
-                      return (
-                        <Card key={job.id} className="space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <div className="text-sm font-bold">{job.titleFa}</div>
-                              <div className="mt-0.5 flex flex-wrap gap-1.5 text-[11px] text-[var(--text-muted)]">
-                                <span>{job.employerType ?? 'خصوصی'}</span>
-                                <span>·</span>
-                                <span>حداقل مدرک: {t(`education.stageLabels.${job.minEducation}`)}</span>
-                                <span>·</span>
-                                <span>استرس {toPersianDigits(job.stress)}٪</span>
-                                {requiredLicenseTitle && (
-                                  <>
-                                    <span>·</span>
-                                    <span>نیازمند {requiredLicenseTitle}</span>
-                                  </>
-                                )}
-                                {job.entryExamRequired && (
-                                  <>
-                                    <span>·</span>
-                                    <span>آزمون ورودی</span>
-                                  </>
-                                )}
-                              </div>
-                              <div className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                                {job.noPromotions
-                                  ? 'شغل آزاد بدون ترفیع سازمانی'
-                                  : `سقف مسیر استخدامی: ${ceilingStep.titleFa}`}
-                              </div>
-                            </div>
-                            <Badge tone={status.eligible ? 'primary' : 'neutral'}>
-                              شانس {toPersianDigits(status.estimatedChancePct)}٪
-                            </Badge>
-                          </div>
-                          <ActionButton
-                            label={isCurrent ? 'شغل فعلی تو' : 'ارسال درخواست و مصاحبه'}
-                            costText={`خالص ${formatToman(status.estimatedSalary)} / سال`}
-                            effectHint={`ناخالص ${formatToman(status.breakdown.grossAnnual)} · کسورات ${formatToman(deductions)} · ${formatUsdEquivalentHint(status.estimatedSalary, state, gameDataset)}`}
-                            disabled={isCurrent || !status.eligible}
-                            disabledReason={isCurrent ? 'در حال فعالیت' : status.reason}
-                            variant={isCurrent ? 'disabled' : 'secondary'}
+                        {!promotionState?.eligibility.noPromotions && (
+                          <ActionRow
+                            icon={<IconTrophy className="h-4 w-4" />}
+                            title={
+                              promotionState?.eligibility.atCeiling
+                                ? 'تعدیل دستمزد در سقف رده'
+                                : t('career.requestRaise')
+                            }
+                            subtitle={
+                              promotionState?.eligibility.atCeiling
+                                ? 'تعدیل حقوق بدون تغییر رده'
+                                : 'ارزیابی ترفیع و تعدیل حقوق'
+                            }
+                            state={
+                              getActionCooldownRemaining(state, 'career_raise') > 0
+                                ? 'cooldown'
+                                : 'enabled'
+                            }
+                            ctaLabel="درخواست"
                             onClick={() =>
-                              onUpdateSave(applyForJobAction(saveGame, job, gameDataset))
+                              onUpdateSave(performCareerAction(saveGame, 'raise', gameDataset))
                             }
                           />
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
+                        )}
+                        {promotionState && !promotionState.eligibility.noPromotions && (
+                          <ActionRow
+                            icon={<IconStar className="h-4 w-4" />}
+                            iconTone="neutral"
+                            title={t('career.ladderTitle')}
+                            subtitle="پیش‌نیازهای رده بعد و تغییر محل کار"
+                            value={`رده ${toPersianDigits(promotionState.eligibility.currentStep.level)} از ${toPersianDigits(promotionState.jobDef.ladder.length)}`}
+                            showChevron
+                            onClick={() => setOpenLadderSheet(true)}
+                          />
+                        )}
+                      </>
+                    )}
+                  </SectionGroup>
                 )}
 
-                {/* Work History */}
-                {workHistory.length > 0 && (
-                  <Card className="space-y-2">
-                    <SectionHeader title={t('career.workHistory')} />
-                    {workHistory.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs"
-                      >
-                        <div>
-                          <div className="font-bold">{item.title}</div>
-                          <div className="text-[11px] text-[var(--text-muted)]">
-                            {item.employer}
-                          </div>
-                        </div>
-                        <span className="tabular-nums text-[var(--text-muted)]">
-                          {toPersianDigits(item.fromYear)} –{' '}
-                          {item.toYear ? toPersianDigits(item.toYear) : 'اکنون'}
-                        </span>
-                      </div>
-                    ))}
-                  </Card>
+                {ownedBiz && (
+                  <SectionGroup title="کسب‌وکار شخصی">
+                    <ActionRow
+                      testId="owned-business-row"
+                      icon={<IconBuilding className="h-4 w-4" />}
+                      title={ownedBiz.nameFa}
+                      subtitle={`${toPersianDigits(ownedBiz.branchCount)} شعبه · ${toPersianDigits(ownedBiz.yearsOperating)} سال فعالیت`}
+                      value={
+                        ownedBiz.yearsOperating === 0
+                          ? 'سال نخست'
+                          : formatToman(ownedBiz.lastYearProfitToman)
+                      }
+                      showChevron
+                      onClick={() => setOpenOwnedBizSheet(true)}
+                    />
+                  </SectionGroup>
+                )}
+
+                <SectionGroup title="بازار کار و مسیرها">
+                  {player.age >= 18 && (
+                    <ActionRow
+                      testId="job-board-entry"
+                      icon={<IconCareerEdu className="h-4 w-4" />}
+                      title={t('career.jobBoard')}
+                      subtitle="مشاغل دولتی، خصوصی، آزاد و خانوادگی"
+                      value={`${toPersianDigits(gameDataset.jobs.length)} شغل`}
+                      showChevron
+                      onClick={() => setOpenJobBoardSheet(true)}
+                    />
+                  )}
+                  {player.age >= 18 && !ownedBiz && (
+                    <ActionRow
+                      testId="ownership-flow-card"
+                      icon={<IconBuilding className="h-4 w-4" />}
+                      title={t('career.ownershipFlowTitle')}
+                      subtitle="تأسیس، خرید سرقفلی یا شراکت"
+                      showChevron
+                      onClick={() => {
+                        setPreferredBizTypeId(undefined);
+                        setOpenOwnershipFlowSheet(true);
+                      }}
+                    />
+                  )}
+                  <ActionRow
+                    icon={<IconTrophy className="h-4 w-4" />}
+                    title="مسیرهای حرفه‌ای ویژه"
+                    subtitle="ورزش، موسیقی، هنر، بازیگری و رسانه"
+                    value={`${toPersianDigits(specialCareerCards.length)} مسیر`}
+                    showChevron
+                    onClick={() => setOpenSpecialListSheet(true)}
+                  />
+                  {player.age >= 18 && (
+                    <ActionRow
+                      testId="licenses-card"
+                      icon={<IconShield className="h-4 w-4" />}
+                      title={t('career.licensesTitle')}
+                      subtitle="پروانه و مجوزهای تخصصی رسمی"
+                      value={`${toPersianDigits((player.licenses ?? []).length)} از ${toPersianDigits(licensesStatus.length)}`}
+                      showChevron
+                      onClick={() => setOpenLicensesSheet(true)}
+                    />
+                  )}
+                  {workHistory.length > 0 && (
+                    <ActionRow
+                      icon={<IconBook className="h-4 w-4" />}
+                      iconTone="neutral"
+                      title={t('career.workHistory')}
+                      subtitle="فهرست مشاغل و سال‌های گذشته"
+                      value={`${toPersianDigits(workHistory.length)} سابقه`}
+                      showChevron
+                      onClick={() => setOpenWorkHistorySheet(true)}
+                    />
+                  )}
+                </SectionGroup>
+
+                {player.job && (
+                  <DangerZoneGroup>
+                    <ActionRow
+                      variant="danger"
+                      title={t('career.retire')}
+                      subtitle="خروج از کار با مستمری بازنشستگی"
+                      state={
+                        player.age < 60 && player.job.yearsInJob < 25 ? 'locked' : 'enabled'
+                      }
+                      reason={
+                        player.age < 60 && player.job.yearsInJob < 25
+                          ? 'نیاز به ۶۰ سال سن یا ۲۵ سال سابقه'
+                          : undefined
+                      }
+                      ctaLabel="بررسی"
+                      onClick={() => setConfirmQuitMode('retire')}
+                    />
+                    <ActionRow
+                      variant="danger"
+                      title={t('career.quit')}
+                      subtitle="قطع همکاری فوری و بی‌درآمد شدن"
+                      ctaLabel="استعفا"
+                      onClick={() => setConfirmQuitMode('quit')}
+                    />
+                  </DangerZoneGroup>
                 )}
               </>
             )}
           </div>
         )}
 
-        {/* 3. SKILLS TAB */}
-        {subTab === 'skills' && (
+        {/* ================= 3. SKILLS HUB ================= */}
+        {effectiveSubTab === 'skills' && (
           <div className="space-y-4">
-            {/* Talent Discovery & Practice Section */}
-            <div className="space-y-2.5">
-              <SectionHeader
-                title="پرورش استعدادها و گرایش‌های فردی"
-                subtitle="تمرین و کلاس در طول زمان گرایش‌های پنهان را آشکار و مهارت را شکوفا می‌کند"
-              />
-              <FilterChips
-                value={talentFilter}
-                onChange={setTalentFilter}
-                items={[
-                  { value: 'all', label: 'همه زمینه‌ها' },
-                  { value: 'discovered', label: 'گرایش‌های کشف‌شده' },
-                ]}
-              />
-              {talentFilter === 'discovered' &&
-              talentOptions.every((opt) => !opt.isDiscovered) ? (
-                <Card>
-                  <p className="text-xs leading-6 text-[var(--text-muted)]">
-                    هنوز گرایش خاصی آشکار نشده است. با گذر سال‌ها یا امتحان کردن زمینه‌های مختلف،
-                    نشانه‌های استعدادت پیدا می‌شوند.
-                  </p>
-                </Card>
-              ) : (
-                <div className="space-y-2.5">
-                  {talentOptions
-                    .filter((opt) => talentFilter === 'all' || opt.isDiscovered)
-                    .map((opt) => {
+            <HubHeroCard
+              icon={<IconSkill className="h-5 w-5" />}
+              title="پرورش استعدادها و مهارت‌ها"
+              subtitle="تمرین سالانه گرایش‌های پنهان را کشف و شانس استخدام را تقویت می‌کند"
+              onInfo={() => setInfoTopic('skills')}
+              metrics={[
+                {
+                  label: 'استعداد کشف‌شده',
+                  value: `${toPersianDigits(discoveredTalentsCount)} از ${toPersianDigits(talentOptions.length)}`,
+                  tone: discoveredTalentsCount > 0 ? 'primary' : 'default',
+                },
+                {
+                  label: 'مهارت تکمیل‌شده',
+                  value: `${toPersianDigits(maxedSkillsCount)} از ${toPersianDigits(gameDataset.skills.length)}`,
+                },
+                {
+                  label: 'نقدینگی',
+                  value: <CurrencyText amountToman={player.moneyToman} />,
+                },
+              ]}
+            />
+
+            <SectionGroup
+              title="استعدادها و گرایش‌های فردی"
+              subtitle="برای تمرین، کلاس یا مسابقه روی هر زمینه بزن"
+              action={
+                <FilterChips
+                  value={talentFilter}
+                  onChange={setTalentFilter}
+                  items={[
+                    { value: 'all', label: 'همه' },
+                    { value: 'discovered', label: 'کشف‌شده' },
+                  ]}
+                />
+              }
+            >
+              {(() => {
+                const filteredTalents = talentOptions.filter(
+                  (opt) => talentFilter === 'all' || opt.isDiscovered,
+                );
+                if (talentFilter === 'discovered' && filteredTalents.length === 0) {
+                  return (
+                    <div className="p-4 text-xs leading-6 text-[var(--text-muted)]">
+                      هنوز گرایش خاصی آشکار نشده است. با تمرین در زمینه‌های مختلف نشانه‌های استعدادت پیدا می‌شوند.
+                    </div>
+                  );
+                }
+                const visibleTalents =
+                  filteredTalents.length > 7 ? filteredTalents.slice(0, 6) : filteredTalents;
+                return (
+                  <>
+                    {visibleTalents.map((opt) => {
                       const ageLocked = player.age < opt.minPracticeAge;
                       const cooledDown = opt.cooldownRemaining > 0;
-                      const cantAffordLesson = player.moneyToman < opt.lessonCostToman;
-                      const auditionCost = Math.round(opt.lessonCostToman * 0.5);
-                      const cantAffordAudition = player.moneyToman < auditionCost;
-                      const commonDisabledReason = ageLocked
-                        ? `از ${toPersianDigits(opt.minPracticeAge)} سالگی فعال می‌شود`
-                        : cooledDown
-                          ? 'فقط یک بار در سال برای هر زمینه'
-                          : undefined;
-
                       return (
-                        <Card key={opt.talentId} className="space-y-2.5">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <IconSkill className="h-4 w-4 text-[var(--primary)]" />
-                                <span className="text-sm font-bold text-[var(--text)]">
-                                  {opt.titleFa}
-                                </span>
-                                {opt.athleticDisciplineTitleFa && (
-                                  <Badge tone="neutral">{opt.athleticDisciplineTitleFa}</Badge>
-                                )}
-                              </div>
-                              <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
-                                {opt.categoryFa} · مهارت: {opt.skillLevelLabelFa}
-                              </div>
-                            </div>
-                            {opt.isDiscovered && opt.discoveredTierLabelFa ? (
-                              <Badge tone="primary">{opt.discoveredTierLabelFa}</Badge>
-                            ) : (
-                              <Badge tone="neutral">کشف‌نشده</Badge>
-                            )}
-                          </div>
-
-                          <div className="space-y-2">
-                            <ActionButton
-                              label="تمرین فردی"
-                              costText="رایگان"
-                              variant="secondary"
-                              disabled={Boolean(commonDisabledReason)}
-                              disabledReason={commonDisabledReason}
-                              onClick={() =>
-                                onUpdateSave(
-                                  developTalentAction(
-                                    saveGame,
-                                    opt.talentId,
-                                    'self_practice',
-                                    gameDataset,
-                                  ),
-                                )
-                              }
-                            />
-                            <ActionButton
-                              label={opt.lessonTitleFa}
-                              costText={formatToman(opt.lessonCostToman)}
-                              variant="secondary"
-                              disabled={Boolean(commonDisabledReason) || cantAffordLesson}
-                              disabledReason={
-                                commonDisabledReason ??
-                                (cantAffordLesson ? 'موجودی کافی نیست' : undefined)
-                              }
-                              onClick={() =>
-                                onUpdateSave(
-                                  developTalentAction(
-                                    saveGame,
-                                    opt.talentId,
-                                    'lesson_or_club',
-                                    gameDataset,
-                                  ),
-                                )
-                              }
-                            />
-                          </div>
-
-                          {player.age >= 10 && (
-                            <div className="space-y-2">
-                              <ActionButton
-                                label="مسابقه و فراخوان"
-                                costText={formatToman(auditionCost)}
-                                variant="secondary"
-                                disabled={Boolean(commonDisabledReason) || cantAffordAudition}
-                                disabledReason={
-                                  commonDisabledReason ??
-                                  (cantAffordAudition ? 'موجودی کافی نیست' : undefined)
-                                }
-                                onClick={() =>
-                                  onUpdateSave(
-                                    developTalentAction(
-                                      saveGame,
-                                      opt.talentId,
-                                      'audition_or_contest',
-                                      gameDataset,
-                                    ),
-                                  )
-                                }
-                              />
-                              {player.age >= 14 && (
-                                <ActionButton
-                                  label="انتشار آنلاین"
-                                  costText="رایگان"
-                                  variant="secondary"
-                                  disabled={Boolean(commonDisabledReason)}
-                                  disabledReason={commonDisabledReason}
-                                  onClick={() =>
-                                    onUpdateSave(
-                                      developTalentAction(
-                                        saveGame,
-                                        opt.talentId,
-                                        'publish_online',
-                                        gameDataset,
-                                      ),
-                                    )
-                                  }
-                                />
-                              )}
-                            </div>
-                          )}
-                        </Card>
+                        <ActionRow
+                          key={opt.talentId}
+                          icon={<IconSkill className="h-4 w-4" />}
+                          title={
+                            opt.athleticDisciplineTitleFa
+                              ? `${opt.titleFa} (${opt.athleticDisciplineTitleFa})`
+                              : opt.titleFa
+                          }
+                          subtitle={`${opt.categoryFa} · مهارت: ${opt.skillLevelLabelFa}`}
+                          statusChip={
+                            ageLocked
+                              ? 'locked'
+                              : opt.isDiscovered
+                                ? 'in_progress'
+                                : 'waiting'
+                          }
+                          value={cooledDown ? 'یک بار در سال' : opt.discoveredTierLabelFa}
+                          showChevron
+                          onClick={() => setSelectedTalentId(opt.talentId)}
+                        />
                       );
                     })}
-                </div>
-              )}
-            </div>
+                    {filteredTalents.length > 7 && (
+                      <ActionRow
+                        icon={<IconSkill className="h-4 w-4" />}
+                        iconTone="neutral"
+                        title={`مشاهده همه استعدادها (${toPersianDigits(filteredTalents.length)} زمینه)`}
+                        subtitle="فهرست کامل گرایش‌های هنری، ورزشی و مهارتی"
+                        showChevron
+                        onClick={() => setOpenAllTalentsSheet(true)}
+                      />
+                    )}
+                  </>
+                );
+              })()}
+            </SectionGroup>
 
-            {/* General Work Skills Section */}
-            <div className="space-y-2.5">
-              <SectionHeader
-                title={t('tabs.skills')}
-                subtitle="افزایش مهارت‌های شغلی شانس استخدام و درآمد را بالا می‌برد"
-              />
-              {gameDataset.skills.map((skill) => {
+            <SectionGroup
+              title="مهارت‌های کلیدی شغلی"
+              subtitle="یک ضربه برای تمرین و ارتقای مستقیم"
+            >
+              {gameDataset.skills.slice(0, 6).map((skill) => {
                 const level = getSkillLevel(state, skill.id);
                 const cost = getSkillTrainingCost(skill, state);
                 const cd = getActionCooldownRemaining(state, `skill_${skill.id}`);
                 const ageLocked = player.age < skill.minAge;
                 const maxed = level >= 5;
                 const poor = player.moneyToman < cost;
-                const disabledReason = maxed
-                  ? 'به حداکثر سطح رسیده است'
+                const rowState = maxed
+                  ? 'done'
                   : ageLocked
-                    ? `از ${toPersianDigits(skill.minAge)} سالگی فعال می‌شود`
+                    ? 'locked'
                     : cd > 0
-                      ? 'فقط یک بار در سال'
+                      ? 'cooldown'
                       : poor
-                        ? 'موجودی کافی نیست'
-                        : undefined;
+                        ? 'disabled'
+                        : 'enabled';
+                const reason = ageLocked
+                  ? `از ${toPersianDigits(skill.minAge)} سالگی`
+                  : poor
+                    ? 'موجودی کافی نیست'
+                    : undefined;
 
                 return (
-                  <Card key={skill.id} className="space-y-2.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <IconSkill className="h-4 w-4 text-[var(--primary)]" />
-                          <span className="text-sm font-bold">{skill.titleFa}</span>
-                        </div>
-                        <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                          {skill.descriptionFa}
-                        </p>
-                      </div>
-                      <Badge tone={maxed ? 'success' : 'primary'}>
-                        سطح {toPersianDigits(level)} / ۵
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-5 gap-1.5">
-                      {[1, 2, 3, 4, 5].map((step) => (
-                        <div
-                          key={step}
-                          className={`h-1.5 rounded-full ${
-                            step <= level ? 'bg-[var(--primary)]' : 'bg-[var(--surface-2)]'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <ActionButton
-                      label={maxed ? 'تکمیل شده' : 'تمرین و ارتقا'}
-                      costText={maxed ? undefined : formatToman(cost)}
-                      effectHint={skill.effectHintFa}
-                      disabled={Boolean(disabledReason)}
-                      disabledReason={disabledReason}
-                      variant="secondary"
-                      onClick={() => onUpdateSave(trainSkillAction(saveGame, skill))}
-                    />
-                  </Card>
+                  <ActionRow
+                    key={skill.id}
+                    icon={<IconSkill className="h-4 w-4" />}
+                    title={skill.titleFa}
+                    subtitle={skill.effectHintFa}
+                    value={maxed ? undefined : `${formatToman(cost)} · سطح ${toPersianDigits(level)}/۵`}
+                    state={rowState}
+                    reason={reason}
+                    ctaLabel={maxed ? undefined : 'ارتقا'}
+                    onClick={() => onUpdateSave(trainSkillAction(saveGame, skill))}
+                  />
                 );
               })}
-            </div>
+              {gameDataset.skills.length > 6 && (
+                <ActionRow
+                  icon={<IconBook className="h-4 w-4" />}
+                  iconTone="neutral"
+                  title={`مشاهده همه مهارت‌ها (${toPersianDigits(gameDataset.skills.length)} مورد)`}
+                  subtitle="فهرست کامل مهارت‌ها و نوار پیشرفت"
+                  showChevron
+                  onClick={() => setOpenAllSkillsSheet(true)}
+                />
+              )}
+            </SectionGroup>
           </div>
         )}
 
-        {/* 4. MILITARY SERVICE TAB (MALE 17+) */}
-        {subTab === 'military' && showMilitary && (
-          <div className="space-y-3">
-            <Card className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <IconShield className="h-4 w-4 text-[var(--primary)]" />
-                  <span className="text-sm font-bold">وضعیت فعلی نظام وظیفه</span>
-                </div>
-                <Badge tone="primary">{t(`military.${player.militaryStatus}`)}</Badge>
-              </div>
-              <p className="text-xs text-[var(--text-muted)]">
-                گزینه‌های پیش رو برای تعیین تکلیف خدمت سربازی:
-              </p>
-            </Card>
+        {/* ================= 4. MILITARY HUB ================= */}
+        {effectiveSubTab === 'military' && showMilitary && (
+          <div className="space-y-4">
+            <HubHeroCard
+              icon={<IconShield className="h-5 w-5" />}
+              title="نظام وظیفه و سربازی"
+              subtitle={`وضعیت فعلی: ${t(`military.${player.militaryStatus}`)}`}
+              status={
+                player.militaryStatus === 'serving'
+                  ? 'in_progress'
+                  : player.militaryStatus === 'completed' ||
+                      player.militaryStatus.startsWith('exempt')
+                    ? 'done'
+                    : 'waiting'
+              }
+              onInfo={() => setInfoTopic('military')}
+            />
 
             {player.militaryStatus === 'pending' ||
             player.militaryStatus === 'exempt_educational' ? (
-              <div className="space-y-2.5">
-                <ActionButton
-                  label="اعزام به خدمت سربازی (۲ سال)"
-                  costText="رایگان"
-                  effectHint="پس از پایان ۲ سال کارت پایان خدمت می‌گیری"
-                  onClick={() =>
-                    onUpdateSave(selectMilitaryOptionAction(saveGame, 'serve', gameDataset))
-                  }
-                />
-                <ActionButton
-                  label="درخواست امریه سربازی"
-                  costText="رایگان"
-                  effectHint="نیازمند مدرک کارشناسی یا بالاتر؛ خدمت در محیط اداری"
-                  variant="secondary"
-                  onClick={() =>
-                    onUpdateSave(selectMilitaryOptionAction(saveGame, 'amrieh', gameDataset))
-                  }
-                />
-                <ActionButton
-                  label="کمیسیون معافیت پزشکی"
-                  costText="رایگان"
-                  effectHint="شانس بیشتر در صورت سلامت پایین"
-                  variant="secondary"
-                  onClick={() =>
-                    onUpdateSave(
-                      selectMilitaryOptionAction(saveGame, 'exempt_medical', gameDataset),
-                    )
-                  }
-                />
-                <ActionButton
-                  label="درخواست معافیت کفالت"
-                  costText="رایگان"
-                  effectHint="ویژه سرپرستان خانواده"
-                  variant="secondary"
-                  onClick={() =>
-                    onUpdateSave(
-                      selectMilitaryOptionAction(saveGame, 'exempt_breadwinner', gameDataset),
-                    )
-                  }
-                />
-                <ActionButton
-                  label="خرید جریمه / معافیت نقدی"
-                  costText={formatToman(buyoutCost)}
-                  effectHint="حل فوری وضعیت نظام وظیفه"
-                  variant="secondary"
-                  disabled={player.moneyToman < buyoutCost}
-                  disabledReason={player.moneyToman < buyoutCost ? 'موجودی کافی نیست' : undefined}
-                  onClick={() =>
-                    onUpdateSave(selectMilitaryOptionAction(saveGame, 'buyout', gameDataset))
-                  }
-                />
-                <ActionButton
-                  label="به تعویق انداختن / غیبت"
-                  costText="بدون هزینه"
-                  effectHint="سلامت روان -۳ · محدودیت استخدام دولتی"
-                  variant="danger"
-                  onClick={() =>
-                    onUpdateSave(selectMilitaryOptionAction(saveGame, 'defer', gameDataset))
-                  }
-                />
-              </div>
+              <>
+                <SectionGroup title="مسیرهای تعیین تکلیف">
+                  <ActionRow
+                    icon={<IconShield className="h-4 w-4" />}
+                    title="اعزام به خدمت سربازی (۲ سال)"
+                    subtitle="پس از پایان ۲ سال کارت پایان خدمت می‌گیری"
+                    value="رایگان"
+                    ctaLabel="اعزام"
+                    onClick={() =>
+                      onUpdateSave(selectMilitaryOptionAction(saveGame, 'serve', gameDataset))
+                    }
+                  />
+                  <ActionRow
+                    icon={<IconCareerEdu className="h-4 w-4" />}
+                    title="درخواست امریه سربازی"
+                    subtitle="نیازمند مدرک کارشناسی یا بالاتر؛ خدمت اداری"
+                    value="رایگان"
+                    ctaLabel="درخواست"
+                    onClick={() =>
+                      onUpdateSave(selectMilitaryOptionAction(saveGame, 'amrieh', gameDataset))
+                    }
+                  />
+                  <ActionRow
+                    icon={<IconShield className="h-4 w-4" />}
+                    title="کمیسیون معافیت پزشکی"
+                    subtitle="شانس بیشتر در صورت سلامت پایین"
+                    value="رایگان"
+                    ctaLabel="بررسی"
+                    onClick={() =>
+                      onUpdateSave(
+                        selectMilitaryOptionAction(saveGame, 'exempt_medical', gameDataset),
+                      )
+                    }
+                  />
+                  <ActionRow
+                    icon={<IconShield className="h-4 w-4" />}
+                    title="درخواست معافیت کفالت"
+                    subtitle="ویژه سرپرستان خانواده"
+                    value="رایگان"
+                    ctaLabel="درخواست"
+                    onClick={() =>
+                      onUpdateSave(
+                        selectMilitaryOptionAction(saveGame, 'exempt_breadwinner', gameDataset),
+                      )
+                    }
+                  />
+                  <ActionRow
+                    icon={<IconCoins className="h-4 w-4" />}
+                    title="خرید جریمه / معافیت نقدی"
+                    subtitle="حل فوری وضعیت نظام وظیفه"
+                    value={formatToman(buyoutCost)}
+                    state={player.moneyToman < buyoutCost ? 'disabled' : 'enabled'}
+                    reason={player.moneyToman < buyoutCost ? 'موجودی کافی نیست' : undefined}
+                    ctaLabel="خرید"
+                    onClick={() =>
+                      onUpdateSave(selectMilitaryOptionAction(saveGame, 'buyout', gameDataset))
+                    }
+                  />
+                </SectionGroup>
+
+                <DangerZoneGroup>
+                  <ActionRow
+                    variant="danger"
+                    title="به تعویق انداختن / غیبت"
+                    subtitle="سلامت روان -۳ · محدودیت استخدام دولتی"
+                    ctaLabel="ثبت"
+                    onClick={() => setConfirmMilitaryDefer(true)}
+                  />
+                </DangerZoneGroup>
+              </>
             ) : (
-              <Card>
-                <p className="text-xs text-[var(--text-muted)]">
-                  وضعیت فعلی تو ({t(`military.${player.militaryStatus}`)}) ثبت شده است و تا
-                  پایان این مرحله نیازی به اقدام تازه نیست.
-                </p>
-              </Card>
+              <LockedNotice
+                message={`وضعیت فعلی تو (${t(`military.${player.militaryStatus}`)}) ثبت شده است و تا پایان این مرحله نیازی به اقدام تازه نیست.`}
+              />
             )}
           </div>
         )}
       </div>
+
+      {/* ================= DRILL-DOWN SHEETS: EDUCATION ================= */}
+      <DetailSheet
+        open={openTrackSheet}
+        onClose={() => setOpenTrackSheet(false)}
+        title={t('education.chooseTrack')}
+        subtitle="تأثیر مستقیم بر گرایش رشته‌های دانشگاهی"
+      >
+        <SectionGroup title="رشته‌های دوره دوم متوسطه">
+          {TRACK_INFO.map((tr) => {
+            const selected = player.education.highSchoolTrack === tr.id;
+            return (
+              <ActionRow
+                key={tr.id}
+                icon={<IconBook className="h-4 w-4" />}
+                title={tr.label}
+                subtitle={`${tr.focus} · مشاغل: ${tr.jobs}`}
+                state={selected ? 'done' : 'enabled'}
+                ctaLabel={selected ? undefined : 'انتخاب'}
+                onClick={() => {
+                  onUpdateSave(selectHighSchoolTrackAction(saveGame, tr.id));
+                  setOpenTrackSheet(false);
+                }}
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      <DetailSheet
+        open={openUniSheet}
+        onClose={() => setOpenUniSheet(false)}
+        title="انتخاب رشته و ثبت‌نام دانشگاه"
+        subtitle={
+          player.education.konkurRank
+            ? `رتبه فعلی: ${toPersianDigits(player.education.konkurRank.toLocaleString('en-US'))}`
+            : undefined
+        }
+      >
+        <SectionGroup title="گزینه‌های پذیرش دانشگاه">
+          {UNI_OFFERS.map((offer) => {
+            const tuition = getUniversityTuitionToman(
+              offer.tier,
+              offer.majorFa,
+              state,
+              gameDataset,
+            );
+            const rankOk = (player.education.konkurRank ?? 999999) <= offer.maxRank;
+            const moneyOk = player.moneyToman >= tuition;
+            return (
+              <ActionRow
+                key={`${offer.tier}_${offer.majorFa}`}
+                icon={<IconEducation className="h-4 w-4" />}
+                title={`${offer.majorFa} — ${offer.tierLabel}`}
+                subtitle={`${toPersianDigits(offer.years)} سال تحصیل`}
+                value={formatToman(tuition)}
+                state={!rankOk ? 'locked' : !moneyOk ? 'disabled' : 'enabled'}
+                reason={
+                  !rankOk
+                    ? `نیازمند رتبه بهتر از ${toPersianDigits(offer.maxRank.toLocaleString('en-US'))}`
+                    : !moneyOk
+                      ? 'موجودی کافی نیست'
+                      : undefined
+                }
+                ctaLabel="ثبت‌نام"
+                onClick={() => {
+                  const res = enrollUniversityAction(
+                    saveGame,
+                    offer.tier,
+                    offer.majorFa,
+                    offer.degree,
+                    offer.years,
+                    gameDataset,
+                  );
+                  onUpdateSave(res);
+                  if (res.success) setOpenUniSheet(false);
+                }}
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      <DetailSheet
+        open={openEduHistorySheet}
+        onClose={() => setOpenEduHistorySheet(false)}
+        title={t('education.graduateHistory')}
+      >
+        <SectionGroup title="مقاطع ثبت‌شده">
+          {eduHistory.map((item, idx) => (
+            <ActionRow
+              key={idx}
+              icon={<IconEducation className="h-4 w-4" />}
+              iconTone="neutral"
+              title={item.stageFa}
+              subtitle={item.detailFa}
+              value={toPersianDigits(item.year)}
+            />
+          ))}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* ================= DRILL-DOWN SHEETS: CAREER ================= */}
+      <DetailSheet
+        open={openLadderSheet}
+        onClose={() => setOpenLadderSheet(false)}
+        title={player.job?.title ?? t('career.ladderTitle')}
+        subtitle="جزئیات حقوق، رده شغلی و پیش‌نیاز ترفیع"
+        onInfo={() => setInfoTopic('salary_breakdown')}
+      >
+        {player.job && (
+          <>
+            <HubHeroCard
+              icon={<IconCareerEdu className="h-5 w-5" />}
+              title={player.job.title}
+              subtitle={formatUsdEquivalentHint(player.job.annualSalaryToman, state, gameDataset)}
+              status={promotionState?.eligibility.atCeiling ? 'done' : 'in_progress'}
+              onInfo={() => setInfoTopic('salary_breakdown')}
+              metrics={[
+                {
+                  label: 'خالص سالانه',
+                  value: <CurrencyText amountToman={player.job.annualSalaryToman} />,
+                  tone: 'success',
+                },
+                {
+                  label: 'ناخالص پارسال',
+                  value: lastJobGross !== null ? formatToman(lastJobGross) : '—',
+                },
+                {
+                  label: 'کسورات و مالیات',
+                  value: lastJobDeductions !== null ? formatToman(lastJobDeductions) : '—',
+                },
+              ]}
+            />
+
+            {promotionState && (
+              <Card className="space-y-3" data-testid="career-ladder-timeline">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold">{t('career.ladderTitle')}</span>
+                  <span className="tabular-nums text-[var(--text-muted)]">
+                    رده {toPersianDigits(promotionState.eligibility.currentStep.level)} از{' '}
+                    {toPersianDigits(promotionState.jobDef.ladder.length)}
+                  </span>
+                </div>
+                {promotionState.eligibility.noPromotions ? (
+                  <p className="text-xs leading-5 text-[var(--text-muted)]">
+                    {t('career.noPromotionsNote')}
+                  </p>
+                ) : (
+                  <ProgressStepper
+                    orientation="vertical"
+                    steps={promotionState.jobDef.ladder.map((step) => {
+                      const curr = promotionState.eligibility.currentStep.level;
+                      return {
+                        id: String(step.level),
+                        title: step.titleFa,
+                        subtitle: step.ceiling ? t('career.ceilingBadge') : undefined,
+                        status: step.level < curr ? 'done' : step.level === curr ? 'current' : 'upcoming',
+                      };
+                    })}
+                  />
+                )}
+              </Card>
+            )}
+
+            {promotionState &&
+              !promotionState.eligibility.atCeiling &&
+              !promotionState.eligibility.noPromotions &&
+              promotionState.eligibility.nextStep && (
+                <RequirementsChecklist
+                  title={`پیش‌نیاز رده بعد: ${promotionState.eligibility.nextStep.titleFa} (شانس ${toPersianDigits(promotionState.eligibility.estimatedChancePct)}٪)`}
+                  items={promotionState.eligibility.checks.map((chk) => ({
+                    id: chk.id,
+                    label: chk.labelFa,
+                    met: chk.met,
+                    currentText: chk.currentTextFa,
+                    requiredText: chk.requiredTextFa,
+                  }))}
+                />
+              )}
+
+            {promotionState &&
+              promotionState.eligibility.atCeiling &&
+              !promotionState.eligibility.noPromotions && (
+                <SectionGroup title={t('career.atCeilingTitle')} subtitle={t('career.atCeilingBody')}>
+                  <ActionRow
+                    title={t('career.changeWorkplace')}
+                    subtitle="تلاش برای فرصت جدید در همین سطح"
+                    state={
+                      getActionCooldownRemaining(state, 'change_workplace') > 0
+                        ? 'cooldown'
+                        : 'enabled'
+                    }
+                    ctaLabel="تغییر"
+                    onClick={() => onUpdateSave(changeWorkplaceAction(saveGame, gameDataset))}
+                  />
+                  <ActionRow
+                    title="ارتقای مهارت‌ها"
+                    subtitle="تقویت توانمندی برای مشاغل بالاتر"
+                    showChevron
+                    onClick={() => {
+                      setOpenLadderSheet(false);
+                      setSubTab('skills');
+                    }}
+                  />
+                  <ActionRow
+                    title="تغییر مسیر شغلی"
+                    subtitle="جست‌وجو در بازار کار"
+                    showChevron
+                    onClick={() => {
+                      setOpenLadderSheet(false);
+                      setOpenJobBoardSheet(true);
+                    }}
+                  />
+                  {promotionState.jobDef.ownershipPath.allowed ? (
+                    <ActionRow
+                      title={t('career.openOwnershipFlow')}
+                      subtitle="راه‌اندازی کسب‌وکار مستقل در همین حوزه"
+                      state="recommended"
+                      showChevron
+                      onClick={() => {
+                        setPreferredBizTypeId(
+                          promotionState.jobDef.ownershipPath.businessTypeId,
+                        );
+                        setOpenLadderSheet(false);
+                        setOpenOwnershipFlowSheet(true);
+                      }}
+                    />
+                  ) : (
+                    <ActionRow
+                      title="راه‌اندازی کسب‌وکار هم‌زمان"
+                      state="locked"
+                      reason="مالکیت هم‌زمان با شغل دولتی مجاز نیست"
+                    />
+                  )}
+                </SectionGroup>
+              )}
+          </>
+        )}
+      </DetailSheet>
+
+      {/* Job Board DetailSheet */}
+      <DetailSheet
+        open={openJobBoardSheet}
+        onClose={() => setOpenJobBoardSheet(false)}
+        title={t('career.jobBoard')}
+        subtitle="برای مشاهده جزئیات، کسورات و شرایط روی هر شغل بزن"
+        stickySubHeader={
+          <FilterChips
+            value={jobFilter}
+            onChange={setJobFilter}
+            items={[
+              { value: 'all', label: 'همه' },
+              { value: 'دولتی', label: 'دولتی' },
+              { value: 'خصوصی', label: 'خصوصی' },
+              { value: 'آزاد', label: 'آزاد' },
+              { value: 'خانوادگی', label: 'خانوادگی' },
+            ]}
+          />
+        }
+      >
+        <SectionGroup title="فهرست مشاغل">
+          {filteredJobs.map((job) => {
+            const status = getJobApplicationStatus(job, state, gameDataset);
+            const isCurrent = player.job?.jobId === job.id;
+            return (
+              <ActionRow
+                key={job.id}
+                icon={<IconCareerEdu className="h-4 w-4" />}
+                iconTone={isCurrent ? 'success' : status.eligible ? 'primary' : 'neutral'}
+                title={job.titleFa}
+                subtitle={`${job.employerType ?? 'خصوصی'} · استرس ${toPersianDigits(job.stress)}٪ · شانس ${toPersianDigits(status.estimatedChancePct)}٪`}
+                value={formatToman(status.estimatedSalary)}
+                statusChip={isCurrent ? 'done' : status.eligible ? 'in_progress' : 'locked'}
+                showChevron
+                onClick={() => setSelectedJobDetail(job)}
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* Single Job DetailSheet (z-[56]) */}
+      <DetailSheet
+        open={Boolean(selectedJobDetail && activeJobDetailStatus)}
+        onClose={() => setSelectedJobDetail(null)}
+        title={selectedJobDetail?.titleFa ?? ''}
+        subtitle={selectedJobDetail?.employerType ?? 'خصوصی'}
+        zIndexClass="z-[56]"
+        footer={
+          selectedJobDetail && activeJobDetailStatus ? (
+            <ActionButton
+              label={player.job?.jobId === selectedJobDetail.id ? 'شغل فعلی تو' : 'ارسال درخواست و مصاحبه'}
+              costText={`خالص ${formatToman(activeJobDetailStatus.estimatedSalary)} / سال`}
+              disabled={player.job?.jobId === selectedJobDetail.id || !activeJobDetailStatus.eligible}
+              disabledReason={
+                player.job?.jobId === selectedJobDetail.id
+                  ? 'در حال فعالیت'
+                  : activeJobDetailStatus.reason
+              }
+              onClick={() => {
+                const res = applyForJobAction(saveGame, selectedJobDetail, gameDataset);
+                onUpdateSave(res);
+                if (res.success) {
+                  setSelectedJobDetail(null);
+                  setOpenJobBoardSheet(false);
+                }
+              }}
+            />
+          ) : undefined
+        }
+      >
+        {selectedJobDetail && activeJobDetailStatus && (
+          <>
+            <HubHeroCard
+              icon={<IconCareerEdu className="h-5 w-5" />}
+              title={selectedJobDetail.titleFa}
+              subtitle={
+                selectedJobDetail.noPromotions
+                  ? 'شغل آزاد بدون ترفیع سازمانی'
+                  : `سقف مسیر استخدامی: ${selectedJobDetail.ladder[selectedJobDetail.ladder.length - 1].titleFa}`
+              }
+              status={
+                player.job?.jobId === selectedJobDetail.id
+                  ? 'done'
+                  : activeJobDetailStatus.eligible
+                    ? 'in_progress'
+                    : 'locked'
+              }
+              metrics={[
+                {
+                  label: 'خالص سالانه',
+                  value: formatToman(activeJobDetailStatus.estimatedSalary),
+                  tone: 'success',
+                },
+                { label: 'استرس', value: `${toPersianDigits(selectedJobDetail.stress)}٪` },
+                {
+                  label: 'شانس پذیرش',
+                  value: `${toPersianDigits(activeJobDetailStatus.estimatedChancePct)}٪`,
+                  tone: 'primary',
+                },
+              ]}
+            />
+
+            <SectionGroup title="برآورد حقوق و کسورات">
+              <ActionRow
+                title="ناخالص سالانه"
+                value={formatToman(activeJobDetailStatus.breakdown.grossAnnual)}
+              />
+              <ActionRow
+                title="کسورات، بیمه و مالیات"
+                value={formatToman(
+                  activeJobDetailStatus.breakdown.commission +
+                    activeJobDetailStatus.breakdown.runningCosts +
+                    activeJobDetailStatus.breakdown.bimeh +
+                    activeJobDetailStatus.breakdown.incomeTax,
+                )}
+              />
+              <ActionRow
+                title="معادل ارزی"
+                value={formatUsdEquivalentHint(
+                  activeJobDetailStatus.estimatedSalary,
+                  state,
+                  gameDataset,
+                )}
+              />
+            </SectionGroup>
+
+            <RequirementsChecklist
+              title="پیش‌نیازهای استخدام"
+              items={[
+                {
+                  id: 'age18',
+                  label: 'حداقل ۱۸ سال سن',
+                  met: player.age >= 18,
+                  currentText: `${toPersianDigits(player.age)} سال`,
+                  requiredText: '۱۸ سال',
+                },
+                {
+                  id: 'edu',
+                  label: `حداقل مدرک: ${t(`education.stageLabels.${selectedJobDetail.minEducation}`)}`,
+                  met: activeJobDetailStatus.reason !== 'مدرک تحصیلی کافی نیست',
+                },
+                ...(selectedJobDetail.requiredLicenseId
+                  ? [
+                      {
+                        id: 'lic',
+                        label: `دریافت ${
+                          gameDataset.businesses.licenses.find(
+                            (l) => l.id === selectedJobDetail.requiredLicenseId,
+                          )?.titleFa ?? 'مجوز تخصصی'
+                        }`,
+                        met: (player.licenses ?? []).includes(selectedJobDetail.requiredLicenseId),
+                      },
+                    ]
+                  : []),
+                ...(selectedJobDetail.employerType === 'دولتی'
+                  ? [
+                      {
+                        id: 'gov_rec',
+                        label: 'نداشتن سوءپیشینه کیفری',
+                        met: player.criminalRecord === 0,
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          </>
+        )}
+      </DetailSheet>
+
+      {/* Special Careers List DetailSheet */}
+      <DetailSheet
+        open={openSpecialListSheet}
+        onClose={() => setOpenSpecialListSheet(false)}
+        title="مسیرهای حرفه‌ای ویژه"
+        subtitle="هنر، ورزش، موسیقی، بازیگری و تولید محتوا"
+        stickySubHeader={
+          <FilterChips
+            value={specialFilter}
+            onChange={setSpecialFilter}
+            items={[
+              { value: 'all', label: 'همه مسیرهای ویژه' },
+              { value: 'ready', label: 'مرتبط با گرایش‌های من' },
+            ]}
+          />
+        }
+      >
+        <SectionGroup title="فهرست مسیرهای ویژه">
+          {specialCareerCards
+            .filter(
+              (item) =>
+                specialFilter === 'all' ||
+                Boolean(item.eligibility.discovered) ||
+                item.isCurrentSpecialJob ||
+                item.isCurrentFallbackJob,
+            )
+            .map((item) => {
+              const { career, eligibility } = item;
+              return (
+                <ActionRow
+                  key={career.id}
+                  icon={<IconTrophy className="h-4 w-4" />}
+                  title={career.titleFa}
+                  subtitle={`مرحله بعدی: ${eligibility.nextStageTitleFa} · مهارت: ${getQualitativeSkillLabelFa(eligibility.currentSkill)}`}
+                  statusChip={
+                    item.isCurrentSpecialJob
+                      ? 'in_progress'
+                      : eligibility.eligible
+                        ? 'waiting'
+                        : 'locked'
+                  }
+                  value={item.salaryText}
+                  showChevron
+                  onClick={() => setSelectedSpecialId(career.id)}
+                />
+              );
+            })}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* Single Special Career DetailSheet (z-[56]) */}
+      <DetailSheet
+        open={Boolean(activeSpecialCard)}
+        onClose={() => setSelectedSpecialId(null)}
+        title={activeSpecialCard?.career.titleFa ?? ''}
+        subtitle="مراحل پیشرفت و مسیرهای ورود"
+        zIndexClass="z-[56]"
+      >
+        {activeSpecialCard && (() => {
+          const { career, eligibility } = activeSpecialCard;
+          const activeRoute: SpecialCareerRouteId =
+            selectedRoutes[career.id] ?? career.alternativeRoutes[0].id;
+          const routeNote = formatSpecialRouteChoiceSummary(career, activeRoute, state);
+          const cdRemaining = getActionCooldownRemaining(state, `special_${career.id}`, 1);
+          const tryDisabled = !eligibility.eligible || cdRemaining > 0;
+          const tryDisabledReason =
+            cdRemaining > 0 ? 'فقط یک بار در سال' : eligibility.reason;
+
+          return (
+            <>
+              <HubHeroCard
+                icon={<IconTrophy className="h-5 w-5" />}
+                title={career.titleFa}
+                subtitle={`مرحله فعلی: ${toPersianDigits(eligibility.currentStage)} از ۴ · مهارت: ${getQualitativeSkillLabelFa(eligibility.currentSkill)}`}
+                status={
+                  activeSpecialCard.isCurrentSpecialJob
+                    ? 'in_progress'
+                    : eligibility.eligible
+                      ? 'waiting'
+                      : 'locked'
+                }
+                metrics={[
+                  { label: 'درآمد مرحله بعد', value: activeSpecialCard.salaryText, tone: 'success' },
+                  { label: 'شانس پذیرش', value: `${toPersianDigits(eligibility.estimatedChancePct)}٪` },
+                  { label: 'جایگزین پایدار', value: career.fallbackCareerFa },
+                ]}
+              />
+
+              <Card className="space-y-3">
+                <div className="text-xs font-bold">مراحل حرفه‌ای مسیر</div>
+                <ProgressStepper
+                  orientation="vertical"
+                  steps={career.stageTitlesFa.slice(0, 4).map((titleFa, idx) => ({
+                    id: `stg_${idx}`,
+                    title: titleFa,
+                    status:
+                      idx < eligibility.currentStage
+                        ? 'done'
+                        : idx === eligibility.currentStage
+                          ? 'current'
+                          : 'upcoming',
+                  }))}
+                />
+              </Card>
+
+              <SectionGroup title="انتخاب مسیر ورود">
+                <div className="p-2.5 space-y-2">
+                  <SegmentedControl
+                    value={activeRoute}
+                    onChange={(routeId) =>
+                      setSelectedRoutes((prev) => ({ ...prev, [career.id]: routeId }))
+                    }
+                    items={career.alternativeRoutes.map((r) => ({
+                      value: r.id,
+                      label: r.titleFa,
+                    }))}
+                  />
+                  {routeNote && (
+                    <p className="text-[11px] leading-5 text-[var(--text-muted)]">{routeNote}</p>
+                  )}
+                </div>
+              </SectionGroup>
+
+              <div className="space-y-2">
+                <ActionButton
+                  label={
+                    activeSpecialCard.isCurrentSpecialJob && eligibility.currentStage < 4
+                      ? `ارتقا به مرحله بعد: ${eligibility.nextStageTitleFa}`
+                      : `آزمون و پیگیری: ${eligibility.nextStageTitleFa}`
+                  }
+                  costText={activeSpecialCard.salaryText}
+                  effectHint="درآمد متغیر + شهرت در صورت پذیرش"
+                  disabled={tryDisabled}
+                  disabledReason={tryDisabledReason}
+                  onClick={() =>
+                    onUpdateSave(
+                      pursueSpecialCareerAction(saveGame, career.id, activeRoute, gameDataset),
+                    )
+                  }
+                />
+                {activeSpecialCard.fallbackEligible && !activeSpecialCard.isCurrentFallbackJob && (
+                  <ActionButton
+                    label={`مسیر جایگزین پایدار: ${career.fallbackCareerFa}`}
+                    costText={activeSpecialCard.fallbackSalaryText}
+                    effectHint="درآمد باثبات‌تر و اتکا به مهارت"
+                    variant="secondary"
+                    onClick={() =>
+                      onUpdateSave(
+                        enterSpecialFallbackCareerAction(saveGame, career.id, gameDataset),
+                      )
+                    }
+                  />
+                )}
+              </div>
+            </>
+          );
+        })()}
+      </DetailSheet>
+
+      {/* Work History DetailSheet */}
+      <DetailSheet
+        open={openWorkHistorySheet}
+        onClose={() => setOpenWorkHistorySheet(false)}
+        title={t('career.workHistory')}
+      >
+        <SectionGroup title="سوابق کاری ثبت‌شده">
+          {workHistory.map((item, idx) => (
+            <ActionRow
+              key={idx}
+              icon={<IconCareerEdu className="h-4 w-4" />}
+              iconTone="neutral"
+              title={item.title}
+              subtitle={item.employer}
+              value={`${toPersianDigits(item.fromYear)} – ${item.toYear ? toPersianDigits(item.toYear) : 'اکنون'}`}
+            />
+          ))}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* Ownership & Business DetailSheets */}
+      {ownedBiz && (
+        <OwnedBusinessDetailSheet
+          open={openOwnedBizSheet}
+          saveGame={saveGame}
+          ownedBiz={ownedBiz}
+          onClose={() => setOpenOwnedBizSheet(false)}
+          onUpdateSave={onUpdateSave}
+        />
+      )}
+
+      <OwnershipFlowDetailSheet
+        open={openOwnershipFlowSheet}
+        saveGame={saveGame}
+        preferredBusinessTypeId={preferredBizTypeId}
+        onClose={() => setOpenOwnershipFlowSheet(false)}
+        onUpdateSave={onUpdateSave}
+      />
+
+      <LicensesDetailSheet
+        open={openLicensesSheet}
+        saveGame={saveGame}
+        onClose={() => setOpenLicensesSheet(false)}
+        onUpdateSave={onUpdateSave}
+      />
+
+      {pendingEmployerOffer && (
+        <EmployerOfferDetailSheet
+          open={openEmployerOfferSheet}
+          saveGame={saveGame}
+          offer={pendingEmployerOffer}
+          onClose={() => setOpenEmployerOfferSheet(false)}
+          onUpdateSave={onUpdateSave}
+        />
+      )}
+
+      {pendingFamilyInheritance && (
+        <FamilyInheritanceDetailSheet
+          open={openFamilyBizSheet}
+          saveGame={saveGame}
+          pending={pendingFamilyInheritance}
+          onClose={() => setOpenFamilyBizSheet(false)}
+          onUpdateSave={onUpdateSave}
+        />
+      )}
+
+      {/* ================= DRILL-DOWN SHEETS: SKILLS ================= */}
+      <DetailSheet
+        open={openAllTalentsSheet}
+        onClose={() => setOpenAllTalentsSheet(false)}
+        title="همه استعدادها و گرایش‌ها"
+        subtitle="برای تمرین، کلاس یا مسابقه روی هر زمینه بزن"
+      >
+        <SectionGroup title="زمینه‌های فردی">
+          {talentOptions.map((opt) => {
+            const ageLocked = player.age < opt.minPracticeAge;
+            const cooledDown = opt.cooldownRemaining > 0;
+            return (
+              <ActionRow
+                key={opt.talentId}
+                icon={<IconSkill className="h-4 w-4" />}
+                title={
+                  opt.athleticDisciplineTitleFa
+                    ? `${opt.titleFa} (${opt.athleticDisciplineTitleFa})`
+                    : opt.titleFa
+                }
+                subtitle={`${opt.categoryFa} · مهارت: ${opt.skillLevelLabelFa}`}
+                statusChip={
+                  ageLocked ? 'locked' : opt.isDiscovered ? 'in_progress' : 'waiting'
+                }
+                value={cooledDown ? 'یک بار در سال' : opt.discoveredTierLabelFa}
+                showChevron
+                onClick={() => setSelectedTalentId(opt.talentId)}
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      <DetailSheet
+        open={Boolean(activeTalent)}
+        onClose={() => setSelectedTalentId(null)}
+        title={activeTalent?.titleFa ?? ''}
+        subtitle={
+          activeTalent
+            ? `${activeTalent.categoryFa} · مهارت: ${activeTalent.skillLevelLabelFa}`
+            : undefined
+        }
+        zIndexClass="z-[56]"
+      >
+        {activeTalent && (() => {
+          const ageLocked = player.age < activeTalent.minPracticeAge;
+          const cooledDown = activeTalent.cooldownRemaining > 0;
+          const cantAffordLesson = player.moneyToman < activeTalent.lessonCostToman;
+          const auditionCost = Math.round(activeTalent.lessonCostToman * 0.5);
+          const cantAffordAudition = player.moneyToman < auditionCost;
+          const commonBlockedState = ageLocked ? 'locked' : cooledDown ? 'cooldown' : 'enabled';
+          const commonReason = ageLocked
+            ? `از ${toPersianDigits(activeTalent.minPracticeAge)} سالگی فعال می‌شود`
+            : undefined;
+
+          return (
+            <>
+              <HubHeroCard
+                icon={<IconSkill className="h-5 w-5" />}
+                title={activeTalent.titleFa}
+                subtitle={
+                  activeTalent.athleticDisciplineTitleFa
+                    ? `رشته: ${activeTalent.athleticDisciplineTitleFa}`
+                    : activeTalent.categoryFa
+                }
+                status={
+                  ageLocked ? 'locked' : activeTalent.isDiscovered ? 'in_progress' : 'waiting'
+                }
+                metrics={[
+                  {
+                    label: 'وضعیت استعداد',
+                    value: activeTalent.discoveredTierLabelFa ?? 'کشف‌نشده',
+                    tone: activeTalent.isDiscovered ? 'primary' : 'default',
+                  },
+                  { label: 'سطح مهارت', value: activeTalent.skillLevelLabelFa },
+                  { label: 'هزینه کلاس', value: formatToman(activeTalent.lessonCostToman) },
+                ]}
+              />
+
+              <SectionGroup title="روش‌های پرورش و شکوفایی">
+                <ActionRow
+                  title="تمرین فردی"
+                  subtitle="افزایش تدریجی مهارت و احتمال کشف گرایش"
+                  value="رایگان"
+                  state={commonBlockedState}
+                  reason={commonReason}
+                  ctaLabel="تمرین"
+                  onClick={() =>
+                    onUpdateSave(
+                      developTalentAction(
+                        saveGame,
+                        activeTalent.talentId,
+                        'self_practice',
+                        gameDataset,
+                      ),
+                    )
+                  }
+                />
+                <ActionRow
+                  title={activeTalent.lessonTitleFa}
+                  subtitle="رشد سریع‌تر زیر نظر مربی یا استاد"
+                  value={formatToman(activeTalent.lessonCostToman)}
+                  state={
+                    commonBlockedState !== 'enabled'
+                      ? commonBlockedState
+                      : cantAffordLesson
+                        ? 'disabled'
+                        : 'enabled'
+                  }
+                  reason={
+                    commonReason ?? (cantAffordLesson ? 'موجودی کافی نیست' : undefined)
+                  }
+                  ctaLabel="شرکت"
+                  onClick={() =>
+                    onUpdateSave(
+                      developTalentAction(
+                        saveGame,
+                        activeTalent.talentId,
+                        'lesson_or_club',
+                        gameDataset,
+                      ),
+                    )
+                  }
+                />
+                {player.age >= 10 && (
+                  <ActionRow
+                    title="مسابقه و فراخوان"
+                    subtitle="آزمون توانمندی و افزایش شهرت"
+                    value={formatToman(auditionCost)}
+                    state={
+                      commonBlockedState !== 'enabled'
+                        ? commonBlockedState
+                        : cantAffordAudition
+                          ? 'disabled'
+                          : 'enabled'
+                    }
+                    reason={
+                      commonReason ?? (cantAffordAudition ? 'موجودی کافی نیست' : undefined)
+                    }
+                    ctaLabel="شرکت"
+                    onClick={() =>
+                      onUpdateSave(
+                        developTalentAction(
+                          saveGame,
+                          activeTalent.talentId,
+                          'audition_or_contest',
+                          gameDataset,
+                        ),
+                      )
+                    }
+                  />
+                )}
+                {player.age >= 14 && (
+                  <ActionRow
+                    title="انتشار آنلاین"
+                    subtitle="نمایش نمونه کار و جذب مخاطب"
+                    value="رایگان"
+                    state={commonBlockedState}
+                    reason={commonReason}
+                    ctaLabel="انتشار"
+                    onClick={() =>
+                      onUpdateSave(
+                        developTalentAction(
+                          saveGame,
+                          activeTalent.talentId,
+                          'publish_online',
+                          gameDataset,
+                        ),
+                      )
+                    }
+                  />
+                )}
+              </SectionGroup>
+            </>
+          );
+        })()}
+      </DetailSheet>
+
+      <DetailSheet
+        open={openAllSkillsSheet}
+        onClose={() => setOpenAllSkillsSheet(false)}
+        title="همه مهارت‌های کلیدی شغلی"
+        subtitle="فهرست کامل مهارت‌ها و ارتقای یک‌ضرب"
+      >
+        <SectionGroup title="مهارت‌های تخصصی و عمومی">
+          {gameDataset.skills.map((skill) => {
+            const level = getSkillLevel(state, skill.id);
+            const cost = getSkillTrainingCost(skill, state);
+            const cd = getActionCooldownRemaining(state, `skill_${skill.id}`);
+            const ageLocked = player.age < skill.minAge;
+            const maxed = level >= 5;
+            const poor = player.moneyToman < cost;
+            const rowState = maxed
+              ? 'done'
+              : ageLocked
+                ? 'locked'
+                : cd > 0
+                  ? 'cooldown'
+                  : poor
+                    ? 'disabled'
+                    : 'enabled';
+            const reason = ageLocked
+              ? `از ${toPersianDigits(skill.minAge)} سالگی`
+              : poor
+                ? 'موجودی کافی نیست'
+                : undefined;
+
+            return (
+              <ActionRow
+                key={skill.id}
+                icon={<IconSkill className="h-4 w-4" />}
+                title={skill.titleFa}
+                subtitle={skill.descriptionFa}
+                value={maxed ? undefined : `${formatToman(cost)} · سطح ${toPersianDigits(level)}/۵`}
+                state={rowState}
+                reason={reason}
+                ctaLabel={maxed ? undefined : 'ارتقا'}
+                onClick={() => onUpdateSave(trainSkillAction(saveGame, skill))}
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* ================= INFO & CONFIRM DIALOGS ================= */}
+      <InfoSheet
+        open={infoTopic === 'education'}
+        onClose={() => setInfoTopic(null)}
+        title="راهنمای تحصیل و کنکور"
+        bullets={[
+          'تلاش درسی بالاتر معدل و شانس کنکور را افزایش می‌دهد اما فشار روانی را بالا می‌برد.',
+          'کلاس تقویتی یک بار در سال قابل استفاده است و جهش قابل توجهی در معدل ایجاد می‌کند.',
+          'پس از اخذ دیپلم، با شرکت در کنکور می‌توانی بر اساس رتبه در دانشگاه ثبت‌نام کنی.',
+        ]}
+      />
+
+      <InfoSheet
+        open={infoTopic === 'career'}
+        onClose={() => setInfoTopic(null)}
+        title="راهنمای بازار کار و مالکیت"
+        bullets={[
+          'مبالغ نمایش‌داده‌شده در بازار کار، خالص دریافتی پس از کسر بیمه، مالیات و هزینه جاری هستند.',
+          'در هر شغل کارمندی می‌توانی تا سقف رده استخدامی ارتقا بگیری و سپس به فکر تغییر مسیر یا کسب‌وکار باشی.',
+        ]}
+      />
+
+      <InfoSheet
+        open={infoTopic === 'salary_breakdown'}
+        onClose={() => setInfoTopic(null)}
+        title="جزئیات فیش حقوقی سالانه"
+        bullets={[
+          'حقوق ناخالص شامل پایه حقوق، مزایا و اضافه‌کاری‌های احتمالی است.',
+          'مالیات بر درآمد پلکانی، حق بیمه و هزینه‌های شغلی از حقوق ناخالص کسر می‌شوند.',
+          'در صورت رسیدن به سقف رده سازمانی، می‌توانی تعدیل دستمزد بگیری یا کسب‌وکار مستقل باز کنی.',
+        ]}
+      />
+
+      <InfoSheet
+        open={infoTopic === 'skills'}
+        onClose={() => setInfoTopic(null)}
+        title="استعدادهای پنهان و مهارت شغلی"
+        bullets={[
+          'تمرین مستمر در یک زمینه می‌تواند گرایش ذاتی تو را آشکار کند.',
+          'کشف استعداد و رساندن مهارت به سطح مناسب، دروازه ورود به مسیرهای ویژه هنری و ورزشی است.',
+        ]}
+      />
+
+      <InfoSheet
+        open={infoTopic === 'military'}
+        onClose={() => setInfoTopic(null)}
+        title="قوانین نظام وظیفه"
+        bullets={[
+          'در زمان تحصیل دانشگاهی از معافیت تحصیلی برخوردار هستی.',
+          'در حین خدمت سربازی تمام‌وقت، استخدام عمومی موقتاً متوقف می‌شود.',
+          'غیبت و تعویق مکرر محدودیت استخدام دولتی ایجاد می‌کند.',
+        ]}
+      />
 
       <ConfirmDialog
         open={confirmQuitMode !== null}
@@ -1370,7 +1890,7 @@ export function WorkEducationSheet({
         message={
           confirmQuitMode === 'retire'
             ? 'آیا می‌خواهی بازنشسته شوی و حقوق مستمری سالانه دریافت کنی؟'
-            : 'آیا مطمئنی که می‌خواهی از شغل فعلی استعفا بدهی؟'
+            : 'آیا مطمئنی که می‌خواهی از شغل فعلی استعفا بدهی؟ درآمد شغلی متوقف می‌شود.'
         }
         destructive={confirmQuitMode === 'quit'}
         onCancel={() => setConfirmQuitMode(null)}
@@ -1381,6 +1901,19 @@ export function WorkEducationSheet({
           setConfirmQuitMode(null);
         }}
       />
+
+      <ConfirmDialog
+        open={confirmMilitaryDefer}
+        title="تأیید به تعویق انداختن خدمت"
+        message="ثبت غیبت یا تعویق موجب افت سلامت روان و محدودیت در استخدام‌های دولتی می‌شود. ادامه می‌دهی؟"
+        destructive
+        onCancel={() => setConfirmMilitaryDefer(false)}
+        onConfirm={() => {
+          onUpdateSave(selectMilitaryOptionAction(saveGame, 'defer', gameDataset));
+          setConfirmMilitaryDefer(false);
+        }}
+      />
     </FullScreenSheet>
   );
 }
+

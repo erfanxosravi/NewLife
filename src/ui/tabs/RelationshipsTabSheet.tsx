@@ -14,22 +14,33 @@ import {
   getNpcHistory,
   getRelationshipActionCosts,
 } from '../../state/selectors';
-import { BottomSheet } from '../components/BottomSheet';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
-  ActionButton,
-  Badge,
+  ActionRow,
   Card,
   ConfirmDialog,
+  DangerZoneGroup,
+  DetailSheet,
   EmptyState,
   FilterChips,
-  ListRow,
-  SectionHeader,
+  HubHeroCard,
+  InfoSheet,
+  SectionGroup,
   SegmentedControl,
   StatBar,
 } from '../components/Primitives';
 import { FamilyTreeView } from '../FamilyTreeView';
-import { IconBaby, IconHeart, IconRelations, IconUser } from '../icons';
+import {
+  IconBaby,
+  IconGift,
+  IconHeart,
+  IconPlane,
+  IconRelations,
+  IconSparkles,
+  IconStar,
+  IconUser,
+  IconWarning,
+} from '../icons';
 
 interface RelationshipsTabSheetProps {
   open: boolean;
@@ -53,10 +64,13 @@ export function RelationshipsTabSheet({
 
   const [subTab, setSubTab] = useState<RelTab>('all');
   const [sortBy, setSortBy] = useState<SortMode>('closeness');
-  const [showMemorial, setShowMemorial] = useState(false);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+  const [showAllDirectory, setShowAllDirectory] = useState(false);
+  const [showAllMemories, setShowAllMemories] = useState(false);
   const [showFamilyTree, setShowFamilyTree] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [confirmDivorce, setConfirmDivorce] = useState(false);
+  const [confirmMarry, setConfirmMarry] = useState(false);
 
   const grouped = useMemo(() => getGroupedRelationships(state), [state]);
 
@@ -77,6 +91,12 @@ export function RelationshipsTabSheet({
     );
   }, [grouped, subTab, sortBy]);
 
+  const avgCloseness = useMemo(() => {
+    if (grouped.allAlive.length === 0) return 0;
+    const sum = grouped.allAlive.reduce((acc, item) => acc + item.rel.closeness, 0);
+    return Math.round(sum / grouped.allAlive.length);
+  }, [grouped.allAlive]);
+
   const selectedEntry = useMemo(() => {
     if (!selectedPersonId) return null;
     const rel = state.relationships.find((r) => r.personId === selectedPersonId);
@@ -87,29 +107,48 @@ export function RelationshipsTabSheet({
 
   const { giftCost, tripCost, weddingCost } = getRelationshipActionCosts(state, gameDataset);
 
+  const openPersonSheet = (personId: string) => {
+    setShowAllMemories(false);
+    setSelectedPersonId(personId);
+  };
+
   const renderPersonRow = ({ rel, person }: { rel: Relationship; person: Person }) => {
     const initial = person.firstName.trim().charAt(0) || '؟';
     return (
-      <ListRow
+      <ActionRow
         key={person.id}
+        icon={<span className="text-sm font-bold">{initial}</span>}
+        iconTone={rel.closeness >= 70 ? 'success' : rel.closeness >= 40 ? 'primary' : 'neutral'}
         title={`${person.firstName} ${person.lastName}`}
         subtitle={`${t(`relations.roles.${rel.role}`)} · ${formatAgeLabel(person.age)} · ${person.jobTitle}`}
-        leading={
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--primary-soft)] text-sm font-bold text-[var(--primary-strong)]">
-            {initial}
-          </div>
-        }
-        trailing={
-          <div className="text-left">
-            <Badge tone={rel.closeness >= 70 ? 'success' : rel.closeness >= 40 ? 'primary' : 'danger'}>
-              {toPersianDigits(rel.closeness)}٪
-            </Badge>
-          </div>
-        }
-        onClick={() => setSelectedPersonId(person.id)}
+        value={`${toPersianDigits(rel.closeness)}٪`}
+        showChevron
+        onClick={() => openPersonSheet(person.id)}
       />
     );
   };
+
+  const canFindFriend = subTab === 'friends' || subTab === 'all';
+  const canFindPartner =
+    (subTab === 'romance' || subTab === 'all') &&
+    contentSettings.allowRomance &&
+    player.age >= 18 &&
+    player.maritalStatus !== 'married' &&
+    grouped.romance.length === 0;
+
+  const visibleRows = activeList.length > 7 ? activeList.slice(0, 6) : activeList;
+  const hasOverflowRows = activeList.length > 7;
+
+  const directoryChunks = useMemo(() => {
+    const chunks: { rel: Relationship; person: Person }[][] = [];
+    for (let i = 0; i < activeList.length; i += 7) {
+      chunks.push(activeList.slice(i, i + 7));
+    }
+    return chunks;
+  }, [activeList]);
+
+  const npcMemories = selectedEntry ? getNpcHistory(state, selectedEntry.person.id) : [];
+  const displayedMemories = showAllMemories ? npcMemories : npcMemories.slice(-5);
 
   return (
     <FullScreenSheet
@@ -117,17 +156,8 @@ export function RelationshipsTabSheet({
       onClose={onClose}
       title={t('nav.relations')}
       subtitle={`وضعیت تأهل: ${t(`marital.${player.maritalStatus}`)}`}
-      headerRight={
-        <button
-          type="button"
-          onClick={() => setShowFamilyTree(true)}
-          className="min-h-[38px] rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2.5 text-xs font-bold text-[var(--primary-strong)]"
-        >
-          شجره‌نامه
-        </button>
-      }
-    >
-      <div className="space-y-3.5">
+      scrollKey={subTab}
+      stickySubHeader={
         <SegmentedControl
           value={subTab}
           onChange={setSubTab}
@@ -139,8 +169,59 @@ export function RelationshipsTabSheet({
             { value: 'children', label: t('tabs.children') },
           ]}
         />
+      }
+    >
+      <div className="space-y-4">
+        <HubHeroCard
+          icon={<IconRelations className="h-5 w-5" />}
+          title={t(`marital.${player.maritalStatus}`)}
+          subtitle="برای گفت‌وگو، هدیه یا تصمیم‌های خانوادگی روی هر فرد بزن"
+          detailsLabel="شجره‌نامه"
+          onDetails={() => setShowFamilyTree(true)}
+          onInfo={() => setInfoOpen(true)}
+          metrics={[
+            { label: 'حلقه نزدیکان', value: `${toPersianDigits(grouped.allAlive.length)} نفر` },
+            { label: 'میانگین صمیمیت', value: `${toPersianDigits(avgCloseness)}٪` },
+            { label: 'فرزندان', value: `${toPersianDigits(grouped.children.length)} فرزند` },
+          ]}
+        />
 
-        <div className="flex items-center justify-between gap-2">
+        {(canFindFriend || canFindPartner) && (
+          <SectionGroup title="آشنایی تازه">
+            {canFindFriend && (
+              <ActionRow
+                icon={<IconUser className="h-4 w-4" />}
+                title="پیدا کردن دوست جدید"
+                subtitle="آشنایی با هم‌صحبت تازه در محیط کار یا محله"
+                value="رایگان"
+                state={getActionCooldownRemaining(state, 'find_friend') > 0 ? 'cooldown' : 'enabled'}
+                ctaLabel="آشنایی"
+                onClick={() =>
+                  onUpdateSave(findNewRelationshipAction(saveGame, 'friend', gameDataset))
+                }
+              />
+            )}
+            {canFindPartner && (
+              <ActionRow
+                icon={<IconHeart className="h-4 w-4" />}
+                title="آشنایی عاطفی و مقدمات ازدواج"
+                subtitle="آشنایی با شریک زندگی بالقوه"
+                value="رایگان"
+                state={
+                  getActionCooldownRemaining(state, 'find_partner') > 0
+                    ? 'cooldown'
+                    : 'recommended'
+                }
+                ctaLabel="شروع"
+                onClick={() =>
+                  onUpdateSave(findNewRelationshipAction(saveGame, 'partner', gameDataset))
+                }
+              />
+            )}
+          </SectionGroup>
+        )}
+
+        {activeList.length > 0 && (
           <FilterChips
             value={sortBy}
             onChange={setSortBy}
@@ -149,49 +230,25 @@ export function RelationshipsTabSheet({
               { value: 'age', label: 'مرتب: سن' },
             ]}
           />
-        </div>
-
-        {/* Quick Meet Actions */}
-        {(subTab === 'friends' || subTab === 'all') && (
-          <ActionButton
-            label="پیدا کردن دوست جدید"
-            costText="رایگان"
-            effectHint="آشنایی با هم‌صحبت تازه در محیط کار یا محله"
-            variant="secondary"
-            disabled={getActionCooldownRemaining(state, 'find_friend') > 0}
-            disabledReason={
-              getActionCooldownRemaining(state, 'find_friend') > 0
-                ? 'فقط یک بار در سال'
-                : undefined
-            }
-            onClick={() => onUpdateSave(findNewRelationshipAction(saveGame, 'friend', gameDataset))}
-          />
         )}
 
-        {(subTab === 'romance' || subTab === 'all') &&
-          contentSettings.allowRomance &&
-          player.age >= 18 &&
-          player.maritalStatus !== 'married' &&
-          grouped.romance.length === 0 && (
-            <ActionButton
-              label="آشنایی عاطفی و مقدمات ازدواج"
-              costText="رایگان"
-              effectHint="آشنایی با شریک زندگی بالقوه"
-              disabled={getActionCooldownRemaining(state, 'find_partner') > 0}
-              disabledReason={
-                getActionCooldownRemaining(state, 'find_partner') > 0
-                  ? 'فقط یک بار در سال'
-                  : undefined
-              }
-              onClick={() =>
-                onUpdateSave(findNewRelationshipAction(saveGame, 'partner', gameDataset))
-              }
-            />
-          )}
-
-        {/* List */}
         {activeList.length > 0 ? (
-          <div className="space-y-2">{activeList.map(renderPersonRow)}</div>
+          <SectionGroup
+            title={t(`tabs.${subTab}`)}
+            subtitle={`${toPersianDigits(activeList.length)} نفر`}
+          >
+            {visibleRows.map(renderPersonRow)}
+            {hasOverflowRows && (
+              <ActionRow
+                icon={<IconRelations className="h-4 w-4" />}
+                title={`مشاهده همه افراد (${toPersianDigits(activeList.length)} نفر)`}
+                subtitle="فهرست کامل این بخش"
+                state="recommended"
+                showChevron
+                onClick={() => setShowAllDirectory(true)}
+              />
+            )}
+          </SectionGroup>
         ) : (
           <EmptyState
             icon={
@@ -208,43 +265,51 @@ export function RelationshipsTabSheet({
           />
         )}
 
-        {/* Collapsed Deceased Memorial */}
         {grouped.deceased.length > 0 && (
-          <Card className="space-y-2">
-            <button
-              type="button"
-              onClick={() => setShowMemorial((v) => !v)}
-              className="flex min-h-[40px] w-full items-center justify-between text-xs font-bold text-[var(--text-muted)]"
-            >
-              <span>
-                {t('relations.memorial')} ({toPersianDigits(grouped.deceased.length)})
-              </span>
-              <span>{showMemorial ? 'بستن' : 'نمایش'}</span>
-            </button>
-            {showMemorial && (
-              <div className="space-y-1.5 pt-1">
-                {grouped.deceased.map(({ rel, person }) => (
-                  <div
-                    key={person.id}
-                    className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs opacity-80"
-                  >
-                    <span className="font-bold">
-                      {person.firstName} {person.lastName}
-                    </span>
-                    <span className="text-[var(--text-muted)]">
-                      {t(`relations.roles.${rel.role}`)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
+          <SectionGroup
+            title={`${t('relations.memorial')} (${toPersianDigits(grouped.deceased.length)})`}
+            collapsible
+            defaultCollapsed
+          >
+            {grouped.deceased.slice(0, 7).map(({ rel, person }) => (
+              <ActionRow
+                key={person.id}
+                icon={<span className="text-sm font-bold">{person.firstName.trim().charAt(0) || '؟'}</span>}
+                iconTone="neutral"
+                title={`${person.firstName} ${person.lastName}`}
+                subtitle={t(`relations.roles.${rel.role}`)}
+                value={formatAgeLabel(person.age)}
+              />
+            ))}
+          </SectionGroup>
         )}
       </div>
 
-      {/* Person Detail BottomSheet */}
-      <BottomSheet
-        open={Boolean(selectedEntry)}
+      {/* DRILL-DOWN: Full Relationships Directory when > 7 */}
+      <DetailSheet
+        open={showAllDirectory}
+        onClose={() => setShowAllDirectory(false)}
+        title={`فهرست کامل (${t(`tabs.${subTab}`)})`}
+        subtitle={`${toPersianDigits(activeList.length)} نفر`}
+        zIndexClass="z-[55]"
+      >
+        {directoryChunks.map((chunk, idx) => (
+          <SectionGroup
+            key={idx}
+            title={
+              directoryChunks.length === 1
+                ? 'همه افراد'
+                : `بخش ${toPersianDigits(idx + 1)} از ${toPersianDigits(directoryChunks.length)}`
+            }
+          >
+            {chunk.map(renderPersonRow)}
+          </SectionGroup>
+        ))}
+      </DetailSheet>
+
+      {/* DRILL-DOWN: Person Detail Sheet */}
+      <DetailSheet
+        open={selectedEntry !== null}
         onClose={() => setSelectedPersonId(null)}
         title={
           selectedEntry
@@ -253,21 +318,33 @@ export function RelationshipsTabSheet({
         }
         subtitle={
           selectedEntry
-            ? `${t(`relations.roles.${selectedEntry.rel.role}`)} · ${formatAgeLabel(selectedEntry.person.age)} · ${selectedEntry.person.jobTitle}`
+            ? `${t(`relations.roles.${selectedEntry.rel.role}`)} · ${formatAgeLabel(selectedEntry.person.age)}`
             : undefined
         }
-        snap="full"
+        zIndexClass="z-[56]"
       >
         {selectedEntry && (
-          <div className="space-y-4">
+          <>
+            <HubHeroCard
+              icon={
+                <span className="text-base font-bold">
+                  {selectedEntry.person.firstName.trim().charAt(0) || '؟'}
+                </span>
+              }
+              title={`${selectedEntry.person.firstName} ${selectedEntry.person.lastName}`}
+              subtitle={`${t(`relations.roles.${selectedEntry.rel.role}`)} · ${selectedEntry.person.jobTitle}${
+                selectedEntry.person.traits.length > 0
+                  ? ` · ${selectedEntry.person.traits.join('، ')}`
+                  : ''
+              }`}
+              metrics={[
+                { label: t('relations.closeness'), value: `${toPersianDigits(selectedEntry.rel.closeness)}٪` },
+                { label: t('relations.respect'), value: `${toPersianDigits(selectedEntry.rel.respect)}٪` },
+                { label: 'سن', value: formatAgeLabel(selectedEntry.person.age) },
+              ]}
+            />
+
             <Card className="space-y-2.5">
-              <div className="flex flex-wrap gap-1.5">
-                {selectedEntry.person.traits.map((tr) => (
-                  <Badge key={tr} tone="primary">
-                    {tr}
-                  </Badge>
-                ))}
-              </div>
               <StatBar
                 label={t('relations.closeness')}
                 value={selectedEntry.rel.closeness}
@@ -287,77 +364,55 @@ export function RelationshipsTabSheet({
               )}
             </Card>
 
-            <div className="space-y-2">
-              <SectionHeader title="گفت‌وگو و اقدام" />
-              <ActionButton
-                label="گپ صمیمی و احوال‌پرسی"
-                costText="رایگان"
-                effectHint="صمیمیت +۸ · شادی +۳"
-                disabled={
+            <SectionGroup title="گفت‌وگو و تعامل">
+              <ActionRow
+                icon={<IconRelations className="h-4 w-4" />}
+                title="گپ صمیمی و احوال‌پرسی"
+                subtitle="صمیمیت +۸ · شادی +۳"
+                value="رایگان"
+                state={
                   getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_talk`) > 0
+                    ? 'cooldown'
+                    : 'recommended'
                 }
-                disabledReason={
-                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_talk`) > 0
-                    ? 'فقط یک بار در سال'
-                    : undefined
-                }
+                ctaLabel="گفت‌وگو"
                 onClick={() =>
                   onUpdateSave(
-                    interactWithPersonAction(
-                      saveGame,
-                      selectedEntry.person.id,
-                      'talk',
-                      gameDataset,
-                    ),
+                    interactWithPersonAction(saveGame, selectedEntry.person.id, 'talk', gameDataset),
                   )
                 }
               />
-              <ActionButton
-                label="خرید هدیه"
-                costText={formatToman(giftCost)}
-                effectHint="صمیمیت +۱۴ · احترام +۸"
-                variant="secondary"
-                disabled={
-                  player.moneyToman < giftCost ||
+              <ActionRow
+                icon={<IconGift className="h-4 w-4" />}
+                title="خرید هدیه"
+                subtitle="صمیمیت +۱۴ · احترام +۸"
+                value={formatToman(giftCost)}
+                state={
                   getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_gift`) > 0
-                }
-                disabledReason={
-                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_gift`) > 0
-                    ? 'فقط یک بار در سال'
+                    ? 'cooldown'
                     : player.moneyToman < giftCost
-                      ? 'موجودی کافی نیست'
-                      : undefined
+                      ? 'disabled'
+                      : 'enabled'
                 }
+                reason={player.moneyToman < giftCost ? 'موجودی کافی نیست' : undefined}
+                ctaLabel="هدیه"
                 onClick={() =>
                   onUpdateSave(
-                    interactWithPersonAction(
-                      saveGame,
-                      selectedEntry.person.id,
-                      'gift',
-                      gameDataset,
-                    ),
+                    interactWithPersonAction(saveGame, selectedEntry.person.id, 'gift', gameDataset),
                   )
                 }
               />
-              <ActionButton
-                label="تعریف و قدردانی"
-                costText="رایگان"
-                effectHint="احترام +۶ · صمیمیت +۶"
-                variant="secondary"
-                disabled={
-                  getActionCooldownRemaining(
-                    state,
-                    `rel_${selectedEntry.person.id}_compliment`,
-                  ) > 0
+              <ActionRow
+                icon={<IconStar className="h-4 w-4" />}
+                title="تعریف و قدردانی"
+                subtitle="احترام +۶ · صمیمیت +۶"
+                value="رایگان"
+                state={
+                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_compliment`) > 0
+                    ? 'cooldown'
+                    : 'enabled'
                 }
-                disabledReason={
-                  getActionCooldownRemaining(
-                    state,
-                    `rel_${selectedEntry.person.id}_compliment`,
-                  ) > 0
-                    ? 'فقط یک بار در سال'
-                    : undefined
-                }
+                ctaLabel="قدردانی"
                 onClick={() =>
                   onUpdateSave(
                     interactWithPersonAction(
@@ -369,66 +424,37 @@ export function RelationshipsTabSheet({
                   )
                 }
               />
-              <ActionButton
-                label="سفر و تفریح مشترک"
-                costText={formatToman(tripCost)}
-                effectHint="صمیمیت +۱۶ · سلامت روان +۶"
-                variant="secondary"
-                disabled={
-                  player.moneyToman < tripCost ||
+              <ActionRow
+                icon={<IconPlane className="h-4 w-4" />}
+                title="سفر و تفریح مشترک"
+                subtitle="صمیمیت +۱۶ · سلامت روان +۶"
+                value={formatToman(tripCost)}
+                state={
                   getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_trip`) > 0
-                }
-                disabledReason={
-                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_trip`) > 0
-                    ? 'فقط یک بار در سال'
+                    ? 'cooldown'
                     : player.moneyToman < tripCost
-                      ? 'موجودی کافی نیست'
-                      : undefined
+                      ? 'disabled'
+                      : 'enabled'
                 }
+                reason={player.moneyToman < tripCost ? 'موجودی کافی نیست' : undefined}
+                ctaLabel="سفر"
                 onClick={() =>
                   onUpdateSave(
-                    interactWithPersonAction(
-                      saveGame,
-                      selectedEntry.person.id,
-                      'trip',
-                      gameDataset,
-                    ),
-                  )
-                }
-              />
-              <ActionButton
-                label="بحث و دلخوری"
-                costText="بدون هزینه"
-                effectHint="کاهش صمیمیت و احترام"
-                variant="secondary"
-                disabled={
-                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_argue`) > 0
-                }
-                disabledReason={
-                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_argue`) > 0
-                    ? 'فقط یک بار در سال'
-                    : undefined
-                }
-                onClick={() =>
-                  onUpdateSave(
-                    interactWithPersonAction(
-                      saveGame,
-                      selectedEntry.person.id,
-                      'argue',
-                      gameDataset,
-                    ),
+                    interactWithPersonAction(saveGame, selectedEntry.person.id, 'trip', gameDataset),
                   )
                 }
               />
 
-              {/* Marriage & Family Flow */}
               {selectedEntry.rel.role === 'partner' &&
                 contentSettings.allowRomance &&
                 player.maritalStatus !== 'engaged' && (
-                  <ActionButton
-                    label="خواستگاری و بله‌برون"
-                    costText="رایگان"
-                    effectHint="آغاز نامزدی رسمی و آمادگی برای ازدواج"
+                  <ActionRow
+                    icon={<IconHeart className="h-4 w-4" />}
+                    title="خواستگاری و بله‌برون"
+                    subtitle="آغاز نامزدی رسمی و آمادگی برای ازدواج"
+                    value="رایگان"
+                    state="recommended"
+                    ctaLabel="نامزدی"
                     onClick={() =>
                       onUpdateSave(
                         interactWithPersonAction(
@@ -443,94 +469,106 @@ export function RelationshipsTabSheet({
                 )}
 
               {selectedEntry.rel.role === 'partner' && contentSettings.allowRomance && (
-                <ActionButton
-                  label="برگزاری مراسم ازدواج و تعیین مهریه"
-                  costText={formatToman(weddingCost)}
-                  effectHint="شادی +۱۲ · آغاز زندگی مشترک رسمی"
-                  disabled={player.moneyToman < weddingCost}
-                  disabledReason={
-                    player.moneyToman < weddingCost ? 'موجودی کافی نیست' : undefined
+                <ActionRow
+                  icon={<IconSparkles className="h-4 w-4" />}
+                  title="برگزاری مراسم ازدواج و تعیین مهریه"
+                  subtitle="شادی +۱۲ · آغاز زندگی مشترک رسمی"
+                  value={formatToman(weddingCost)}
+                  state={player.moneyToman < weddingCost ? 'disabled' : 'recommended'}
+                  reason={player.moneyToman < weddingCost ? 'موجودی کافی نیست' : undefined}
+                  ctaLabel="ازدواج"
+                  onClick={() => setConfirmMarry(true)}
+                />
+              )}
+
+              {selectedEntry.rel.role === 'spouse' && (
+                <ActionRow
+                  icon={<IconBaby className="h-4 w-4" />}
+                  title="فرزندآوری"
+                  subtitle="تولد فرزند جدید و ثبت در شجره‌نامه"
+                  value="رایگان"
+                  state={
+                    getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_have_child`) >
+                    0
+                      ? 'cooldown'
+                      : player.age > 48
+                        ? 'locked'
+                        : 'enabled'
                   }
+                  reason={player.age > 48 ? 'سن مناسب فرزندآوری گذشته است' : undefined}
+                  ctaLabel="اقدام"
                   onClick={() =>
                     onUpdateSave(
                       interactWithPersonAction(
                         saveGame,
                         selectedEntry.person.id,
-                        'marry',
+                        'have_child',
                         gameDataset,
                       ),
                     )
                   }
                 />
               )}
+            </SectionGroup>
 
-              {selectedEntry.rel.role === 'spouse' && (
+            <SectionGroup title="خاطرات مشترک">
+              {npcMemories.length === 0 ? (
+                <div className="px-3.5 py-3 text-xs text-[var(--text-muted)]">
+                  هنوز خاطره‌ای ثبت نشده است.
+                </div>
+              ) : (
                 <>
-                  <ActionButton
-                    label="فرزندآوری"
-                    costText="رایگان"
-                    effectHint="تولد فرزند جدید و ثبت در شجره‌نامه"
-                    disabled={
-                      player.age > 48 ||
-                      getActionCooldownRemaining(
-                        state,
-                        `rel_${selectedEntry.person.id}_have_child`,
-                      ) > 0
-                    }
-                    disabledReason={
-                      getActionCooldownRemaining(
-                        state,
-                        `rel_${selectedEntry.person.id}_have_child`,
-                      ) > 0
-                        ? 'فقط یک بار در سال'
-                        : player.age > 48
-                          ? 'سن مناسب فرزندآوری گذشته است'
-                          : undefined
-                    }
-                    onClick={() =>
-                      onUpdateSave(
-                        interactWithPersonAction(
-                          saveGame,
-                          selectedEntry.person.id,
-                          'have_child',
-                          gameDataset,
-                        ),
-                      )
-                    }
-                  />
-                  <ActionButton
-                    label="جدایی و طلاق"
-                    variant="danger"
-                    onClick={() => setConfirmDivorce(true)}
-                  />
+                  {displayedMemories.map((h, i) => (
+                    <ActionRow
+                      key={i}
+                      title={formatAgeLabel(h.age)}
+                      subtitle={h.text}
+                    />
+                  ))}
+                  {npcMemories.length > 5 && !showAllMemories && (
+                    <ActionRow
+                      icon={<IconRelations className="h-4 w-4" />}
+                      title={`نمایش همه خاطرات (${toPersianDigits(npcMemories.length)} مورد)`}
+                      showChevron
+                      onClick={() => setShowAllMemories(true)}
+                    />
+                  )}
                 </>
               )}
-            </div>
+            </SectionGroup>
 
-            {/* Interaction History */}
-            <Card className="space-y-2">
-              <SectionHeader title="خاطرات مشترک" />
-              {getNpcHistory(state, selectedEntry.person.id).length === 0 ? (
-                <p className="text-xs text-[var(--text-muted)]">
-                  هنوز خاطره‌ای ثبت نشده است.
-                </p>
-              ) : (
-                getNpcHistory(state, selectedEntry.person.id).map((h, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs leading-relaxed"
-                  >
-                    <span className="font-bold text-[var(--primary-strong)]">
-                      {formatAgeLabel(h.age)}:
-                    </span>{' '}
-                    {h.text}
-                  </div>
-                ))
+            <DangerZoneGroup title="گزینه‌های حساس">
+              <ActionRow
+                variant="danger"
+                icon={<IconWarning className="h-4 w-4" />}
+                title="بحث و دلخوری"
+                subtitle="کاهش صمیمیت و احترام"
+                state={
+                  getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_argue`) > 0
+                    ? 'cooldown'
+                    : 'enabled'
+                }
+                ctaLabel="اجرا"
+                onClick={() =>
+                  onUpdateSave(
+                    interactWithPersonAction(saveGame, selectedEntry.person.id, 'argue', gameDataset),
+                  )
+                }
+              />
+              {selectedEntry.rel.role === 'spouse' && (
+                <ActionRow
+                  variant="danger"
+                  icon={<IconWarning className="h-4 w-4" />}
+                  title="جدایی و طلاق"
+                  subtitle="پایان دادن به زندگی مشترک رسمی"
+                  ctaLabel="جدایی"
+                  onClick={() => setConfirmDivorce(true)}
+                />
               )}
-            </Card>
-          </div>
+            </DangerZoneGroup>
+          </>
         )}
-      </BottomSheet>
+      </DetailSheet>
 
       {/* Family Tree FullScreenSheet */}
       <FullScreenSheet
@@ -538,14 +576,52 @@ export function RelationshipsTabSheet({
         onClose={() => setShowFamilyTree(false)}
         title="شجره‌نامه خانواده"
         subtitle={`${player.firstName} ${player.lastName}`}
+        zIndexClass="z-[55]"
       >
         <FamilyTreeView state={state} />
       </FullScreenSheet>
+
+      <InfoSheet
+        open={infoOpen}
+        onClose={() => setInfoOpen(false)}
+        title="مدیریت روابط"
+        bullets={[
+          'گفت‌وگو، هدیه و سفر صمیمیت و احترام را در طول سال‌ها زنده نگه می‌دارند.',
+          'بیشتر تعاملات برای هر فرد یک بار در سال انجام می‌شوند.',
+          'تصمیم‌های حساس مثل بحث یا جدایی در پایین صفحه جزئیات فرد قرار دارند.',
+        ]}
+      />
+
+      <ConfirmDialog
+        open={confirmMarry}
+        title="برگزاری مراسم ازدواج"
+        message={
+          selectedEntry
+            ? `آیا برای آغاز زندگی مشترک رسمی با ${selectedEntry.person.firstName} ${selectedEntry.person.lastName} به هزینه ${formatToman(weddingCost)} آماده‌ای؟`
+            : ''
+        }
+        confirmLabel="برگزاری مراسم"
+        onCancel={() => setConfirmMarry(false)}
+        onConfirm={() => {
+          if (selectedEntry) {
+            onUpdateSave(
+              interactWithPersonAction(
+                saveGame,
+                selectedEntry.person.id,
+                'marry',
+                gameDataset,
+              ),
+            );
+          }
+          setConfirmMarry(false);
+        }}
+      />
 
       <ConfirmDialog
         open={confirmDivorce}
         title="تأیید جدایی"
         message="آیا مطمئنی می‌خواهی زندگی مشترک را به پایان برسانی؟ این تصمیم بر شادی و آرامش اثر می‌گذارد."
+        confirmLabel="تأیید جدایی"
         destructive
         onCancel={() => setConfirmDivorce(false)}
         onConfirm={() => {

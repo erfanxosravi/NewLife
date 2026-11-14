@@ -12,6 +12,8 @@ interface EndOfLifeScreenProps {
   state?: GameState;
   lifeCode?: string;
   onPlayAgain: () => void;
+  onContinueDynasty?: () => void;
+  onOpenDynasty?: () => void;
   onShareDone: (msg: string) => void;
 }
 
@@ -21,6 +23,8 @@ export function EndOfLifeScreen({
   state,
   lifeCode,
   onPlayAgain,
+  onContinueDynasty,
+  onOpenDynasty,
   onShareDone,
 }: EndOfLifeScreenProps) {
   const { t } = useI18n();
@@ -198,10 +202,49 @@ export function EndOfLifeScreen({
         </ul>
       </Card>
 
+      {state?.horizonEnded && (
+        <Card tinted className="space-y-1.5">
+          <div className="text-xs font-bold text-[var(--primary-strong)]">
+            پایان یک دوران تاریخی
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            تقویم شبیه‌سازی به افق مدل اقتصادی ({toPersianDigits(gameDataset.inheritance.rules.maxMacroJalaliYear)}) رسید. می‌توانی تمام فصل‌های خاندان را در تاریخچه دودمان مرور کنی یا زندگی تازه‌ای بسازی.
+          </p>
+        </Card>
+      )}
+
+      {state?.dynasty?.isClosed && (
+        <Card tinted className="space-y-1.5">
+          <div className="text-xs font-bold text-[var(--success)]">
+            {state.dynasty.charityFoundationNameFa
+              ? `بنیاد «${state.dynasty.charityFoundationNameFa}» ثبت شد`
+              : 'دفتر دودمان با احترام بسته شد'}
+          </div>
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+            امتیاز دودمان: {toPersianDigits(state.dynasty.dynastyScore)} · نسل‌های ثبت‌شده:{' '}
+            {toPersianDigits(Math.max(1, state.dynasty.chapters.length))}
+          </p>
+        </Card>
+      )}
+
       <div className="space-y-2 pt-1">
+        {onContinueDynasty && !state?.horizonEnded && !state?.dynasty?.isClosed && (
+          <ActionButton
+            label={t('legacy.continueDynasty')}
+            onClick={onContinueDynasty}
+          />
+        )}
+        {onOpenDynasty && (
+          <ActionButton
+            label={t('legacy.viewDynasty')}
+            variant="secondary"
+            onClick={onOpenDynasty}
+          />
+        )}
         <ActionButton
           label={t('endOfLife.playAgain')}
           icon={<IconReset className="h-4 w-4" />}
+          variant={onContinueDynasty && !state?.horizonEnded && !state?.dynasty?.isClosed ? 'secondary' : 'primary'}
           onClick={onPlayAgain}
         />
         <ActionButton

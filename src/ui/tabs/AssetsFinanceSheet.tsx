@@ -2,7 +2,14 @@ import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
 import { calculateNetWorthToman } from '../../engine/economy';
 import { formatToman, toPersianDigits } from '../../engine/jalali';
-import type { Asset, SaveGame, ShopCategory } from '../../engine/types';
+import type {
+  Asset,
+  HousingListing,
+  SaveGame,
+  ShopCategory,
+  ShopItemDefinition,
+  VehicleCatalogItem,
+} from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
 import {
   applyHousingAction,
@@ -41,25 +48,31 @@ import {
 } from '../../state/selectors';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
-  ActionButton,
-  Badge,
+  ActionRow,
   Card,
+  ConfirmDialog,
   CurrencyText,
+  DangerZoneGroup,
+  DetailSheet,
   FilterChips,
+  HubHeroCard,
+  InfoSheet,
   LockedNotice,
   ProgressRing,
-  SectionHeader,
+  SectionGroup,
   SegmentedControl,
   Sparkline,
   Toggle,
 } from '../components/Primitives';
 import {
+  IconAssets,
+  IconBank,
   IconCar,
   IconCard,
   IconCoins,
   IconHome,
-  IconInfo,
   IconShop,
+  IconSparkles,
   IconTrendDown,
   IconTrendUp,
   IconWarning,
@@ -70,15 +83,33 @@ interface AssetsFinanceSheetProps {
   saveGame: SaveGame;
   onClose: () => void;
   onUpdateSave: (outcome: ActionOutcome) => void;
+  onOpenWill?: () => void;
 }
 
 type SubTab = 'overview' | 'investments' | 'housing' | 'loans' | 'shop';
+type InfoTopic = 'netWorth' | 'macro' | 'investments' | 'housing' | 'loans' | null;
+type InvestmentId = 'inv_usd' | 'inv_gold' | 'inv_bourse' | 'inv_deposit' | 'inv_crypto';
+
+type PendingAssetConfirm =
+  | {
+      kind: 'sell_investment';
+      id: InvestmentId;
+      titleFa: string;
+      assetType: Asset['type'];
+      amountToman: number;
+    }
+  | { kind: 'housing'; listing: HousingListing; extraDeposit: number; upfrontToman: number }
+  | { kind: 'buy_vehicle'; vehicle: VehicleCatalogItem; priceToman: number }
+  | { kind: 'sell_vehicle'; carId: string; titleFa: string; priceToman: number }
+  | { kind: 'loan'; loanKind: 'personal' | 'housing'; labelFa: string; principalToman: number }
+  | { kind: 'buy_shop'; item: ShopItemDefinition; priceToman: number };
 
 export function AssetsFinanceSheet({
   open,
   saveGame,
   onClose,
   onUpdateSave,
+  onOpenWill,
 }: AssetsFinanceSheetProps) {
   const { t } = useI18n();
   const { state } = saveGame;
@@ -86,8 +117,14 @@ export function AssetsFinanceSheet({
 
   const [subTab, setSubTab] = useState<SubTab>('overview');
   const [shopFilter, setShopFilter] = useState<'all' | ShopCategory>('all');
-  const [showInflationTip, setShowInflationTip] = useState(false);
   const [preferHigherRahn, setPreferHigherRahn] = useState(false);
+
+  const [showMarketDetail, setShowMarketDetail] = useState(false);
+  const [selectedInvId, setSelectedInvId] = useState<InvestmentId | null>(null);
+  const [housingDrill, setHousingDrill] = useState<'market' | 'showroom' | null>(null);
+  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
+  const [infoTopic, setInfoTopic] = useState<InfoTopic>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<PendingAssetConfirm | null>(null);
 
   const bankRatePct = Math.round(
     gameDataset.economy.baseline1405.policyAndModel.bankDepositAnnualRate.value * 100,
@@ -97,7 +134,7 @@ export function AssetsFinanceSheet({
 
   const investmentOptions = useMemo<
     {
-      id: 'inv_usd' | 'inv_gold' | 'inv_bourse' | 'inv_deposit' | 'inv_crypto';
+      id: InvestmentId;
       titleFa: string;
       assetType: Asset['type'];
       riskLabel: string;
@@ -163,24 +200,228 @@ export function AssetsFinanceSheet({
   const usdUp = ratesHist.usd.length < 2 || usdRate >= ratesHist.usd[ratesHist.usd.length - 2];
   const goldUp = ratesHist.gold.length < 2 || goldRate >= ratesHist.gold[ratesHist.gold.length - 2];
 
+  const totalLoanDebt = state.loans.reduce((s, l) => s + l.principalRemainingToman, 0);
+  const totalDebtAll = player.debtToman + totalLoanDebt;
+
   const ownedCars = state.assets.filter((a) => a.type === 'car');
+  const selectedCar = ownedCars.find((c) => c.id === selectedCarId) ?? null;
+
+  const totalPortfolioVal = useMemo(
+    () =>
+      investmentOptions.reduce((sum, opt) => {
+        const held = state.assets.find((a) => a.id === opt.id);
+        return sum + (held?.currentValueToman ?? 0);
+      }, 0),
+    [investmentOptions, state.assets],
+  );
+
+  const totalPortfolioPnl = useMemo(
+    () =>
+      investmentOptions.reduce((sum, opt) => {
+        const held = state.assets.find((a) => a.id === opt.id);
+        return sum + (held ? held.currentValueToman - held.purchasePriceToman : 0);
+      }, 0),
+    [investmentOptions, state.assets],
+  );
+
+  const selectedInvestment = investmentOptions.find((o) => o.id === selectedInvId) ?? null;
+  const selectedInvHeld = selectedInvestment
+    ? state.assets.find((a) => a.id === selectedInvestment.id)
+    : undefined;
+
   const filteredShop = useMemo(() => {
     if (shopFilter === 'all') return gameDataset.shop;
     return gameDataset.shop.filter((item) => item.category === shopFilter);
   }, [shopFilter]);
 
+  const shopSections = useMemo(() => {
+    if (shopFilter !== 'all' || filteredShop.length <= 7) {
+      return [{ title: 'فهرست کالاها', items: filteredShop }];
+    }
+    const lifestyleIds = new Set<ShopCategory>(['clothing', 'nutrition', 'gift', 'appliances']);
+    const first = filteredShop.filter((item) => lifestyleIds.has(item.category));
+    const second = filteredShop.filter((item) => !lifestyleIds.has(item.category));
+    return [
+      { title: 'روزمره، سلامت و خانه', items: first },
+      { title: 'فناوری، سفر و لوکس', items: second },
+    ].filter((group) => group.items.length > 0);
+  }, [filteredShop, shopFilter]);
+
   const quickTradeAmount = getQuickTradeAmountToman(state, gameDataset);
   const debtPayoffChunk = getDebtPayoffChunkToman(state, gameDataset);
   const loanPresets = getLoanPresets(state, gameDataset);
+
+  const renderShopRow = (item: ShopItemDefinition) => {
+    const price = getShopItemPriceToman(item, state);
+    const alreadyOwned = !item.repeatable && ownedShopIds.includes(item.id);
+    const ageLocked = player.age < item.minAge;
+    const cantAfford = player.moneyToman < price;
+    const reason = alreadyOwned
+      ? 'قبلاً خریداری شده'
+      : ageLocked
+        ? `از ${toPersianDigits(item.minAge)} سالگی فعال می‌شود`
+        : cantAfford
+          ? 'موجودی کافی نیست'
+          : undefined;
+    const isMajorPurchase = item.category === 'luxury' || price >= 50_000_000;
+
+    return (
+      <ActionRow
+        key={item.id}
+        icon={<IconShop className="h-4 w-4" />}
+        title={item.titleFa}
+        subtitle={`${t(`shop.categories.${item.category}`)} · ${item.effectHintFa}`}
+        value={formatToman(price)}
+        state={alreadyOwned ? 'done' : ageLocked ? 'locked' : cantAfford ? 'disabled' : 'enabled'}
+        reason={reason}
+        ctaLabel={alreadyOwned ? undefined : t('buy')}
+        onClick={() => {
+          if (isMajorPurchase) {
+            setPendingConfirm({ kind: 'buy_shop', item, priceToman: price });
+          } else {
+            onUpdateSave(buyShopItemAction(saveGame, item));
+          }
+        }}
+      />
+    );
+  };
+
+  const confirmDialogSpec = (() => {
+    if (!pendingConfirm) return null;
+    if (pendingConfirm.kind === 'sell_investment') {
+      return {
+        title: `فروش کل ${pendingConfirm.titleFa}`,
+        message: `با فروش تمام موجودی این دارایی، مبلغ ${formatToman(pendingConfirm.amountToman)} به نقدینگی تو اضافه می‌شود.`,
+        destructive: false,
+        confirmLabel: 'فروش کل',
+      };
+    }
+    if (pendingConfirm.kind === 'housing') {
+      return {
+        title: `تأیید معامله: ${pendingConfirm.listing.titleFa}`,
+        message:
+          pendingConfirm.listing.mode === 'rent'
+            ? `مبلغ پیش‌پرداخت (ودیعه + اجاره ماه اول) برابر با ${formatToman(pendingConfirm.upfrontToman)} است و جایگزین مسکن فعلی می‌شود.`
+            : `قیمت قطعی معامله ${formatToman(pendingConfirm.upfrontToman)} است. با تسویه ملک قبلی انجام می‌شود.`,
+        destructive: false,
+        confirmLabel: 'امضای قرارداد',
+      };
+    }
+    if (pendingConfirm.kind === 'buy_vehicle') {
+      return {
+        title: `خرید ${pendingConfirm.vehicle.titleFa}`,
+        message: `مبلغ ${formatToman(pendingConfirm.priceToman)} از نقدینگی کسر می‌شود و هزینه نگهداری سالانه دارد.`,
+        destructive: false,
+        confirmLabel: 'خرید خودرو',
+      };
+    }
+    if (pendingConfirm.kind === 'sell_vehicle') {
+      return {
+        title: `فروش ${pendingConfirm.titleFa}`,
+        message: `خودرو به قیمت روز ${formatToman(pendingConfirm.priceToman)} فروخته می‌شود و قابل بازگشت نیست.`,
+        destructive: true,
+        confirmLabel: 'فروش خودرو',
+      };
+    }
+    if (pendingConfirm.kind === 'loan') {
+      return {
+        title: `دریافت ${pendingConfirm.labelFa}`,
+        message: `مبلغ ${formatToman(pendingConfirm.principalToman)} واریز می‌شود و اقساط آن به‌صورت خودکار سالانه کسر خواهد شد.`,
+        destructive: false,
+        confirmLabel: 'دریافت وام',
+      };
+    }
+    return {
+      title: `تأیید خرید: ${pendingConfirm.item.titleFa}`,
+      message: `مبلغ ${formatToman(pendingConfirm.priceToman)} بابت این کالا پرداخت می‌شود. ${pendingConfirm.item.effectHintFa}.`,
+      destructive: false,
+      confirmLabel: 'تأیید خرید',
+    };
+  })();
+
+  const handleConfirmExecute = () => {
+    if (!pendingConfirm) return;
+    if (pendingConfirm.kind === 'sell_investment') {
+      onUpdateSave(
+        tradeInvestmentAction(
+          saveGame,
+          pendingConfirm.id,
+          pendingConfirm.titleFa,
+          pendingConfirm.assetType,
+          pendingConfirm.amountToman,
+          'sell',
+        ),
+      );
+    } else if (pendingConfirm.kind === 'housing') {
+      onUpdateSave(
+        applyHousingAction(
+          saveGame,
+          pendingConfirm.listing,
+          gameDataset,
+          pendingConfirm.extraDeposit,
+        ),
+      );
+      setHousingDrill(null);
+    } else if (pendingConfirm.kind === 'buy_vehicle') {
+      onUpdateSave(buyVehicleAction(saveGame, pendingConfirm.vehicle));
+      setHousingDrill(null);
+    } else if (pendingConfirm.kind === 'sell_vehicle') {
+      onUpdateSave(sellVehicleAction(saveGame, pendingConfirm.carId));
+      setSelectedCarId(null);
+    } else if (pendingConfirm.kind === 'loan') {
+      onUpdateSave(takeLoanAction(saveGame, pendingConfirm.loanKind, gameDataset));
+    } else if (pendingConfirm.kind === 'buy_shop') {
+      onUpdateSave(buyShopItemAction(saveGame, pendingConfirm.item));
+    }
+    setPendingConfirm(null);
+  };
+
+  const infoContent: Record<Exclude<InfoTopic, null>, { title: string; bullets: string[] }> = {
+    netWorth: {
+      title: 'دارایی خالص و قدرت خرید',
+      bullets: [
+        'دارایی خالص برابر مجموع نقدینگی، ملک، خودرو و سبد سرمایه‌گذاری منهای بدهی و مانده وام‌هاست.',
+        'معادل واحد ۷۰ متری تهران بر اساس میانگین قیمت روز مسکن محاسبه می‌شود تا اثر تورم ملموس بماند.',
+      ],
+    },
+    macro: {
+      title: 'شاخص‌های بازار و تورم',
+      bullets: [
+        'شاخص‌ها از سال ۱۳۴۰ تا ۱۴۰۵ بر پایه داده‌های واقعی اقتصاد ایران و پس از آن بر اساس سناریوی تورمی شبیه‌سازی تنظیم شده‌اند.',
+        `حداقل مزد ماهانه فعلی در مدل اقتصاد: ${formatToman(minWageMonthly)}.`,
+      ],
+    },
+    investments: {
+      title: 'بازارهای سرمایه‌گذاری',
+      bullets: [
+        'دلار و طلا بیشتر برای حفظ ارزش در برابر تورم کاربرد دارند.',
+        'بورس و رمزارز نوسان سالانه بالاتری دارند و در سپرده بانکی سود اسمی ثابت دریافت می‌کنی.',
+      ],
+    },
+    housing: {
+      title: 'مسکن و خودرو',
+      bullets: [
+        'قیمت قطعی معامله مسکن ۱۰ درصد پایین‌تر از قیمت آگهی لحاظ می‌شود.',
+        'در معاملات اجاره می‌توانی نیمی از اجاره ماهانه را به ودیعه رهن تبدیل کنی.',
+      ],
+    },
+    loans: {
+      title: 'رتبه اعتباری و وام',
+      bullets: [
+        'پرداخت به‌موقع اقساط سالانه، رتبه اعتباری بانکی تو را تقویت می‌کند.',
+        'در صورت کمبود نقدینگی هنگام پرداخت قسط، مبلغ معوق به بدهی افزوده می‌شود.',
+      ],
+    },
+  };
 
   return (
     <FullScreenSheet
       open={open}
       onClose={onClose}
       title={t('nav.assets')}
-      subtitle={`نقدینگی: ${formatToman(player.moneyToman)} · ${formatUsdEquivalentHint(player.moneyToman, state, gameDataset)}`}
-    >
-      <div className="space-y-4">
+      subtitle={`نقدینگی: ${formatToman(player.moneyToman)}`}
+      scrollKey={subTab}
+      stickySubHeader={
         <SegmentedControl
           value={subTab}
           onChange={setSubTab}
@@ -192,490 +433,312 @@ export function AssetsFinanceSheet({
             { value: 'shop', label: t('tabs.shop') },
           ]}
         />
-
-        {/* 1. OVERVIEW TAB */}
+      }
+    >
+      <div className="space-y-4">
+        {/* 1. OVERVIEW HUB */}
         {subTab === 'overview' && (
-          <div className="space-y-3.5">
-            {/* Hero Net Worth Card */}
-            <section className="rounded-3xl bg-gradient-to-bl from-[var(--primary)] to-[var(--primary-strong)] p-4 text-[var(--on-primary)] shadow-md">
-              <div className="flex items-center justify-between text-xs opacity-90">
-                <span>{t('netWorthLabel')}</span>
-                <span>{netWorthPP.labelFa}</span>
-              </div>
-              <div className="mt-1 text-2xl font-bold tabular-nums">
-                <CurrencyText amountToman={netWorth} />
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] opacity-90">
-                <span>{formatUsdEquivalentHint(netWorth, state, gameDataset)}</span>
-                <span>·</span>
-                <span>
-                  معادل {toPersianDigits(netWorthPP.tehran70SqmApts)} واحد ۷۰ متری تهران
-                </span>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl bg-black/15 p-2.5 text-xs">
-                <div>
-                  <div className="opacity-80">{t('cashLabel')}</div>
-                  <div className="font-bold tabular-nums">
-                    <CurrencyText amountToman={player.moneyToman} />
-                  </div>
-                </div>
-                <div>
-                  <div className="opacity-80">کل بدهی و وام</div>
-                  <div className="font-bold tabular-nums">
-                    <CurrencyText
-                      amountToman={
-                        player.debtToman +
-                        state.loans.reduce((s, l) => s + l.principalRemainingToman, 0)
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
+          <>
+            <HubHeroCard
+              tone="primary"
+              icon={<IconAssets className="h-5 w-5" />}
+              title={formatToman(netWorth)}
+              subtitle={`${t('netWorthLabel')} · ${netWorthPP.labelFa} · معادل ${toPersianDigits(netWorthPP.tehran70SqmApts)} واحد ۷۰ متری`}
+              onInfo={() => setInfoTopic('netWorth')}
+              detailsLabel="تحلیل بازار"
+              onDetails={() => setShowMarketDetail(true)}
+              metrics={[
+                { label: t('cashLabel'), value: <CurrencyText amountToman={player.moneyToman} /> },
+                {
+                  label: 'خالص درآمد سالانه',
+                  value: <CurrencyText amountToman={annualIncome} />,
+                },
+                { label: 'کل بدهی و وام', value: <CurrencyText amountToman={totalDebtAll} /> },
+              ]}
+            />
 
-            {/* Net Worth Sparkline */}
-            <Card>
-              <SectionHeader title="روند تغییر دارایی خالص" />
-              <Sparkline values={netWorthSeries} colorVar="--primary" height={44} />
-            </Card>
-
-            {/* Income vs Expense */}
-            <Card className="grid grid-cols-2 gap-3">
-              <div>
-                <div className="text-[11px] text-[var(--text-muted)]">خالص درآمد سالانه</div>
-                <div className="mt-0.5 text-sm font-bold text-[var(--success)]">
-                  <CurrencyText amountToman={annualIncome} />
-                </div>
-                {annualIncome > 0 && (
-                  <div className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                    {formatUsdEquivalentHint(annualIncome, state, gameDataset)}
-                  </div>
-                )}
+            <SectionGroup
+              title="روند دارایی و شاخص بازار"
+              subtitle={`تورم سال ${toPersianDigits(state.currentJalaliYear)}: ${toPersianDigits(inflationPct)}٪`}
+            >
+              <div className="p-3">
+                <Sparkline values={netWorthSeries} colorVar="--primary" height={40} />
               </div>
-              <div>
-                <div className="text-[11px] text-[var(--text-muted)]">هزینه برآوردی سالانه</div>
-                <div className="mt-0.5 text-sm font-bold text-[var(--danger)]">
-                  <CurrencyText amountToman={annualExpenses} />
-                </div>
-                {annualExpenses > 0 && (
-                  <div className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                    {formatUsdEquivalentHint(annualExpenses, state, gameDataset)}
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Economy & Inflation Panel */}
-            <Card className="space-y-2.5">
-              <SectionHeader
-                title={`شاخص‌های بازار (${toPersianDigits(state.currentJalaliYear)})`}
-                action={
-                  <button
-                    type="button"
-                    onClick={() => setShowInflationTip((v) => !v)}
-                    aria-label="توضیح تورم"
-                    className="flex min-h-[32px] items-center gap-1 rounded-lg bg-[var(--surface-2)] px-2 text-[11px] font-bold text-[var(--primary-strong)]"
-                  >
-                    <IconInfo className="h-3.5 w-3.5" />
-                    <span>تورم: {toPersianDigits(inflationPct)}٪</span>
-                  </button>
-                }
+              <ActionRow
+                icon={<IconTrendUp className="h-4 w-4" />}
+                title={`نرخ‌های بازار (${toPersianDigits(state.currentJalaliYear)})`}
+                subtitle={`دلار: ${formatToman(usdRate)} · طلای ۱۸: ${formatToman(goldRate)}`}
+                value={`${toPersianDigits(inflationPct)}٪ تورم`}
+                showChevron
+                onClick={() => setShowMarketDetail(true)}
               />
-              {showInflationTip && (
-                <p className="rounded-xl bg-[var(--surface-2)] p-2.5 text-[11px] leading-relaxed text-[var(--text-muted)]">
-                  شاخص‌ها از سال ۱۳۴۰ تا ۱۴۰۵ بر پایه داده‌های واقعی اقتصاد ایران و پس از آن بر اساس
-                  سناریوی تورمی شبیه‌سازی تنظیم شده‌اند. حداقل مزد ماهانه فعلی:{' '}
-                  {formatToman(minWageMonthly)}.
-                </p>
+            </SectionGroup>
+
+            <SectionGroup title="بخش‌های مالی">
+              <ActionRow
+                icon={<IconCoins className="h-4 w-4" />}
+                title={t('tabs.investments')}
+                subtitle={
+                  totalPortfolioVal > 0
+                    ? `ارزش سبد: ${formatToman(totalPortfolioVal)}`
+                    : 'ارز، طلا، بورس و سپرده بانکی'
+                }
+                showChevron
+                onClick={() => setSubTab('investments')}
+              />
+              <ActionRow
+                icon={<IconHome className="h-4 w-4" />}
+                title={t('tabs.housing')}
+                subtitle={`مسکن: ${t(`housingLabels.${player.housing.type}`)} · ${toPersianDigits(ownedCars.length)} خودرو`}
+                showChevron
+                onClick={() => setSubTab('housing')}
+              />
+              <ActionRow
+                icon={<IconCard className="h-4 w-4" />}
+                title={t('tabs.loans')}
+                subtitle={`رتبه اعتباری ${toPersianDigits(creditScore)} · ${toPersianDigits(state.loans.length)} وام فعال`}
+                showChevron
+                onClick={() => setSubTab('loans')}
+              />
+              {onOpenWill && (
+                <ActionRow
+                  icon={<IconBank className="h-4 w-4" />}
+                  title={t('legacy.willTitle')}
+                  subtitle={
+                    state.will
+                      ? `ثبت‌شده در ${toPersianDigits(state.will.updatedAtAge)} سالگی`
+                      : 'تنظیم وصیت‌نامه و قواعد ارث'
+                  }
+                  state={state.will ? 'done' : 'enabled'}
+                  showChevron
+                  onClick={onOpenWill}
+                />
               )}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
-                  <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-                    <span>نرخ دلار آزاد</span>
-                    {usdUp ? (
-                      <IconTrendUp className="h-3.5 w-3.5 text-[var(--danger)]" />
-                    ) : (
-                      <IconTrendDown className="h-3.5 w-3.5 text-[var(--success)]" />
-                    )}
-                  </div>
-                  <div className="mt-1 text-xs font-bold tabular-nums">
-                    <CurrencyText amountToman={usdRate} />
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
-                  <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-                    <span>طلای ۱۸ عیار (گرم)</span>
-                    {goldUp ? (
-                      <IconTrendUp className="h-3.5 w-3.5 text-[var(--primary-strong)]" />
-                    ) : (
-                      <IconTrendDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
-                    )}
-                  </div>
-                  <div className="mt-1 text-xs font-bold tabular-nums">
-                    <CurrencyText amountToman={goldRate} />
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
-                  <div className="text-[11px] text-[var(--text-muted)]">سکه امامی</div>
-                  <div className="mt-1 text-xs font-bold tabular-nums">
-                    <CurrencyText amountToman={coinRate} />
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
-                  <div className="text-[11px] text-[var(--text-muted)]">متری آگهی مسکن تهران</div>
-                  <div className="mt-1 text-xs font-bold tabular-nums">
-                    <CurrencyText amountToman={tehranSqm} />
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-[11px] text-[var(--text-muted)]">
-                آپارتمان ۷۰ متری معامله تهران ≈{' '}
-                <span className="font-bold text-[var(--text)]">{formatToman(tehran70SqmPrice)}</span>{' '}
-                ({formatUsdEquivalentHint(tehran70SqmPrice, state, gameDataset)})
-              </div>
-            </Card>
-          </div>
+            </SectionGroup>
+          </>
         )}
 
-        {/* 2. INVESTMENTS TAB */}
+        {/* 2. INVESTMENTS HUB */}
         {subTab === 'investments' && (
-          <div className="space-y-2.5">
+          <>
             {player.age < 18 ? (
               <LockedNotice message="سرمایه‌گذاری مستقیم در بازارها از ۱۸ سالگی فعال می‌شود." />
             ) : (
-              investmentOptions.map((opt) => {
-                const held = state.assets.find((a) => a.id === opt.id);
-                const heldVal = held?.currentValueToman ?? 0;
-                const pnl = held ? held.currentValueToman - held.purchasePriceToman : 0;
-                return (
-                  <Card key={opt.id} className="space-y-2.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <IconCoins className="h-4 w-4 text-[var(--primary)]" />
-                          <span className="text-sm font-bold">{opt.titleFa}</span>
-                        </div>
-                        <p className="mt-0.5 text-xs text-[var(--text-muted)]">{opt.hint}</p>
-                      </div>
-                      <Badge tone="neutral">ریسک: {opt.riskLabel}</Badge>
-                    </div>
-                    <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs">
-                      <span>ارزش فعلی دارایی:</span>
-                      <div className="text-left">
-                        <div className="flex items-center gap-2 font-bold">
-                          <CurrencyText amountToman={heldVal} />
-                          {held && pnl !== 0 && (
-                            <span
-                              className={
-                                pnl > 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
-                              }
-                            >
-                              ({pnl > 0 ? '+' : ''}
-                              <CurrencyText amountToman={pnl} />)
-                            </span>
-                          )}
-                        </div>
-                        {heldVal > 0 && (
-                          <div className="text-[10px] text-[var(--text-muted)]">
-                            {formatUsdEquivalentHint(heldVal, state, gameDataset)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <ActionButton
-                        label="خرید"
-                        costText={formatToman(quickTradeAmount)}
-                        disabled={player.moneyToman < quickTradeAmount}
-                        disabledReason={
-                          player.moneyToman < quickTradeAmount ? 'موجودی کافی نیست' : undefined
-                        }
-                        onClick={() =>
-                          onUpdateSave(
-                            tradeInvestmentAction(
-                              saveGame,
-                              opt.id,
-                              opt.titleFa,
-                              opt.assetType,
-                              quickTradeAmount,
-                              'buy',
-                            ),
-                          )
-                        }
+              <>
+                <HubHeroCard
+                  icon={<IconCoins className="h-5 w-5" />}
+                  title="سبد سرمایه‌گذاری"
+                  subtitle="برای خرید سریع یا فروش، هر بازار را باز کن"
+                  onInfo={() => setInfoTopic('investments')}
+                  metrics={[
+                    { label: 'ارزش کل سبد', value: formatToman(totalPortfolioVal) },
+                    {
+                      label: 'سود یا زیان',
+                      value: <CurrencyText amountToman={totalPortfolioPnl} showSign />,
+                      tone: totalPortfolioPnl >= 0 ? 'success' : 'danger',
+                    },
+                    { label: 'نقدینگی آزاد', value: formatToman(player.moneyToman) },
+                  ]}
+                />
+
+                <SectionGroup title="بازارهای سرمایه‌گذاری">
+                  {investmentOptions.map((opt) => {
+                    const held = state.assets.find((a) => a.id === opt.id);
+                    const heldVal = held?.currentValueToman ?? 0;
+                    return (
+                      <ActionRow
+                        key={opt.id}
+                        icon={<IconCoins className="h-4 w-4" />}
+                        title={opt.titleFa}
+                        subtitle={`ریسک: ${opt.riskLabel} · ${opt.hint}`}
+                        value={heldVal > 0 ? formatToman(heldVal) : 'بدون موجودی'}
+                        state={heldVal > 0 ? 'recommended' : 'enabled'}
+                        showChevron
+                        onClick={() => setSelectedInvId(opt.id)}
                       />
-                      <ActionButton
-                        label="فروش کل"
-                        costText={heldVal > 0 ? formatToman(heldVal) : undefined}
-                        variant="secondary"
-                        disabled={heldVal <= 0}
-                        disabledReason={heldVal <= 0 ? 'موجودی نداری' : undefined}
-                        onClick={() =>
-                          onUpdateSave(
-                            tradeInvestmentAction(
-                              saveGame,
-                              opt.id,
-                              opt.titleFa,
-                              opt.assetType,
-                              heldVal,
-                              'sell',
-                            ),
-                          )
-                        }
-                      />
-                    </div>
-                  </Card>
-                );
-              })
+                    );
+                  })}
+                </SectionGroup>
+              </>
             )}
-          </div>
+          </>
         )}
 
-        {/* 3. HOUSING & VEHICLES TAB */}
+        {/* 3. HOUSING & VEHICLES HUB */}
         {subTab === 'housing' && (
-          <div className="space-y-4">
-            <Card className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <IconHome className="h-4 w-4 text-[var(--primary)]" />
-                  <span className="text-sm font-bold">مسکن فعلی</span>
-                </div>
-                <Badge tone="primary">{t(`housingLabels.${player.housing.type}`)}</Badge>
-              </div>
-              {player.housing.monthlyRentToman > 0 && (
-                <div className="text-xs text-[var(--text-muted)]">
-                  اجاره ماهانه: <CurrencyText amountToman={player.housing.monthlyRentToman} /> ·
-                  ودیعه رهن: <CurrencyText amountToman={player.housing.depositRahnToman} />
-                </div>
-              )}
-              {player.housing.propertyValueToman > 0 && (
-                <div className="text-xs text-[var(--text-muted)]">
-                  ارزش روز ملک: <CurrencyText amountToman={player.housing.propertyValueToman} /> ·{' '}
-                  {formatUsdEquivalentHint(player.housing.propertyValueToman, state, gameDataset)}
-                </div>
-              )}
-            </Card>
+          <>
+            <HubHeroCard
+              icon={<IconHome className="h-5 w-5" />}
+              title={`مسکن: ${t(`housingLabels.${player.housing.type}`)}`}
+              subtitle={
+                player.housing.propertyValueToman > 0
+                  ? `ارزش روز ملک: ${formatToman(player.housing.propertyValueToman)}`
+                  : player.housing.monthlyRentToman > 0
+                    ? `ودیعه: ${formatToman(player.housing.depositRahnToman)} · اجاره: ${formatToman(player.housing.monthlyRentToman)}`
+                    : 'اقامت خانوادگی بدون هزینه اجاره'
+              }
+              onInfo={() => setInfoTopic('housing')}
+              metrics={[
+                {
+                  label: 'دارایی یا رهن ملک',
+                  value: formatToman(
+                    player.housing.propertyValueToman || player.housing.depositRahnToman,
+                  ),
+                },
+                { label: 'تعداد خودرو', value: `${toPersianDigits(ownedCars.length)} دستگاه` },
+                { label: 'نقدینگی', value: formatToman(player.moneyToman) },
+              ]}
+            />
 
             {player.age < 18 ? (
               <LockedNotice message="تغییر مسکن و خرید خودرو از ۱۸ سالگی فعال می‌شود." />
             ) : (
               <>
-                <div className="space-y-2.5">
-                  <SectionHeader
-                    title="فهرست مسکن"
-                    subtitle="قیمت قطعی معامله ۱۰٪ پایین‌تر از قیمت آگهی محاسبه می‌شود"
-                  />
-                  <Card className="py-2.5">
-                    <Toggle
-                      checked={preferHigherRahn}
-                      onChange={setPreferHigherRahn}
-                      label="تبدیل ۵۰٪ اجاره به ودیعه رهن"
-                      description="هر ۳ میلیون اجاره معادل ۱۰۰ میلیون ودیعه بیشتر محاسبه می‌شود"
-                    />
-                  </Card>
-                  {gameDataset.housing.housingListings.map((listing) => {
-                    const quote = getHousingListingQuote(listing, state, gameDataset);
-                    const extraDeposit =
-                      listing.mode === 'rent' && preferHigherRahn
-                        ? Math.round((quote.monthlyRentToman * 0.5) / depositRentRate)
-                        : 0;
-                    const rentalTerms =
-                      listing.mode === 'rent'
-                        ? getConvertedRentalPair(
-                            quote.depositRahnToman,
-                            quote.monthlyRentToman,
-                            extraDeposit,
-                            gameDataset,
-                          )
-                        : null;
-                    const upfront =
-                      listing.mode === 'rent' && rentalTerms
-                        ? rentalTerms.deposit + rentalTerms.monthlyRent
-                        : quote.transactionPriceToman;
-                    const available =
-                      listing.mode === 'rent'
-                        ? player.moneyToman + player.housing.depositRahnToman
-                        : player.moneyToman +
-                          player.housing.propertyValueToman +
-                          player.housing.depositRahnToman;
-                    const cantAfford = available < upfront;
-                    return (
-                      <ActionButton
-                        key={listing.id}
-                        label={listing.titleFa}
-                        costText={formatToman(upfront)}
-                        effectHint={
-                          listing.mode === 'rent' && rentalTerms
-                            ? `ودیعه ${formatToman(rentalTerms.deposit)} + اجاره ماهانه ${formatToman(rentalTerms.monthlyRent)}`
-                            : `متراژ ${toPersianDigits(listing.areaSqm)} متر · آگهی: ${formatToman(quote.listingPriceToman)} · ${formatUsdEquivalentHint(quote.transactionPriceToman, state, gameDataset)}`
-                        }
-                        variant="secondary"
-                        disabled={cantAfford}
-                        disabledReason={cantAfford ? 'موجودی کافی نیست' : undefined}
-                        onClick={() =>
-                          onUpdateSave(
-                            applyHousingAction(saveGame, listing, gameDataset, extraDeposit),
-                          )
-                        }
-                      />
-                    );
-                  })}
-                </div>
-
                 {ownedCars.length > 0 && (
-                  <div className="space-y-2">
-                    <SectionHeader title="خودروهای تو" />
-                    {ownedCars.map((car) => {
-                      const repairCost = getCarRepairCostToman(car.currentValueToman, gameDataset);
-                      return (
-                        <Card key={car.id} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="flex items-center gap-1.5 text-sm font-bold">
-                              <IconCar className="h-4 w-4 text-[var(--primary)]" />
-                              {car.name}
-                            </span>
-                            <CurrencyText
-                              amountToman={car.currentValueToman}
-                              className="text-xs font-bold text-[var(--primary-strong)]"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <ActionButton
-                              label="سرویس دوره‌ای"
-                              costText={formatToman(repairCost)}
-                              variant="secondary"
-                              onClick={() =>
-                                onUpdateSave(repairVehicleAction(saveGame, car.id, gameDataset))
-                              }
-                            />
-                            <ActionButton
-                              label="فروش خودرو"
-                              costText={formatToman(car.currentValueToman)}
-                              variant="secondary"
-                              onClick={() => onUpdateSave(sellVehicleAction(saveGame, car.id))}
-                            />
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
+                  <SectionGroup title="خودروهای من">
+                    {ownedCars.slice(0, 7).map((car) => (
+                      <ActionRow
+                        key={car.id}
+                        icon={<IconCar className="h-4 w-4" />}
+                        title={car.name}
+                        subtitle="نگهداری، سرویس دوره‌ای و فروش"
+                        value={formatToman(car.currentValueToman)}
+                        showChevron
+                        onClick={() => setSelectedCarId(car.id)}
+                      />
+                    ))}
+                  </SectionGroup>
                 )}
 
-                <div className="space-y-2">
-                  <SectionHeader title="نمایشگاه خودرو" />
-                  {gameDataset.housing.vehicleCatalog.map((veh) => {
-                    const price = getAdjustedPriceToman(veh.basePriceToman, state);
-                    const poor = player.moneyToman < price;
-                    return (
-                      <ActionButton
-                        key={veh.id}
-                        label={veh.titleFa}
-                        costText={formatToman(price)}
-                        effectHint={`شادی +${toPersianDigits(veh.happinessBonus)} · ریسک تصادف: ${veh.accidentRiskLabel} · ${formatUsdEquivalentHint(price, state, gameDataset)}`}
-                        variant="secondary"
-                        disabled={poor}
-                        disabledReason={poor ? 'موجودی کافی نیست' : undefined}
-                        onClick={() => onUpdateSave(buyVehicleAction(saveGame, veh))}
-                      />
-                    );
-                  })}
-                </div>
+                <SectionGroup title="معاملات مسکن و خودرو">
+                  <ActionRow
+                    icon={<IconHome className="h-4 w-4" />}
+                    title="فهرست مسکن (خرید و اجاره)"
+                    subtitle={`متری تهران: ${formatToman(tehranSqm)} · ${toPersianDigits(gameDataset.housing.housingListings.length)} فایل`}
+                    showChevron
+                    onClick={() => setHousingDrill('market')}
+                  />
+                  <ActionRow
+                    icon={<IconCar className="h-4 w-4" />}
+                    title="نمایشگاه خودرو"
+                    subtitle={`${toPersianDigits(gameDataset.housing.vehicleCatalog.length)} مدل خودرو قابل خرید`}
+                    showChevron
+                    onClick={() => setHousingDrill('showroom')}
+                  />
+                </SectionGroup>
               </>
             )}
-          </div>
+          </>
         )}
 
-        {/* 4. LOANS & DEBT TAB */}
+        {/* 4. LOANS & DEBT HUB */}
         {subTab === 'loans' && (
-          <div className="space-y-3.5">
-            <Card className="flex items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-1.5 text-sm font-bold">
-                  <IconCard className="h-4 w-4 text-[var(--primary)]" />
-                  <span>رتبه اعتباری بانکی</span>
-                </div>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  پرداخت به‌موقع اقساط، امتیاز اعتباری را تقویت می‌کند.
-                </p>
-              </div>
-              <ProgressRing
-                value={creditScore}
-                max={850}
-                label={toPersianDigits(creditScore)}
-                colorVar={creditScore >= 600 ? '--success' : '--warning'}
-              />
-            </Card>
+          <>
+            <HubHeroCard
+              icon={<IconCard className="h-5 w-5" />}
+              title="رتبه اعتباری بانکی"
+              subtitle="پرداخت به‌موقع اقساط، اعتبار بانکی را تقویت می‌کند"
+              onInfo={() => setInfoTopic('loans')}
+              badge={
+                <ProgressRing
+                  value={creditScore}
+                  max={850}
+                  size={54}
+                  strokeWidth={5}
+                  label={toPersianDigits(creditScore)}
+                  colorVar={creditScore >= 600 ? '--success' : '--warning'}
+                />
+              }
+              metrics={[
+                {
+                  label: 'بدهی معوق',
+                  value: formatToman(player.debtToman),
+                  tone: player.debtToman > 0 ? 'danger' : 'default',
+                },
+                { label: 'مانده وام‌ها', value: formatToman(totalLoanDebt) },
+                { label: 'تعداد وام فعال', value: `${toPersianDigits(state.loans.length)} فقره` },
+              ]}
+            />
 
             {(player.debtToman > 0 || state.loans.length > 0) && (
-              <Card className="space-y-2.5 border-[var(--warning)]/40 bg-[var(--surface-2)]">
-                <div className="flex items-center gap-2 text-xs font-bold text-[var(--warning)]">
-                  <IconWarning className="h-4 w-4" />
-                  <span>بدهی و اقساط فعال</span>
-                </div>
+              <SectionGroup title="بدهی و اقساط فعال">
                 {player.debtToman > 0 && (
-                  <div className="text-xs">
-                    بدهی معوق: <CurrencyText amountToman={player.debtToman} className="font-bold" />
-                  </div>
+                  <ActionRow
+                    icon={<IconWarning className="h-4 w-4" />}
+                    iconTone="warning"
+                    title="بدهی معوق"
+                    subtitle="در اولویت بازپرداخت قرار دارد"
+                    value={formatToman(player.debtToman)}
+                  />
                 )}
-                {state.loans.map((loan) => (
-                  <div
+                {state.loans.slice(0, 5).map((loan) => (
+                  <ActionRow
                     key={loan.id}
-                    className="flex items-center justify-between rounded-xl bg-[var(--surface)] px-3 py-2 text-xs"
-                  >
-                    <div>
-                      <div className="font-bold">{loan.name}</div>
-                      <div className="text-[11px] text-[var(--text-muted)]">
-                        قسط سالانه: <CurrencyText amountToman={loan.annualPaymentToman} /> ·{' '}
-                        {toPersianDigits(loan.yearsRemaining)} سال باقی‌مانده
-                      </div>
-                    </div>
-                    <CurrencyText amountToman={loan.principalRemainingToman} className="font-bold" />
-                  </div>
+                    icon={<IconBank className="h-4 w-4" />}
+                    title={loan.name}
+                    subtitle={`قسط سالانه: ${formatToman(loan.annualPaymentToman)} · ${toPersianDigits(loan.yearsRemaining)} سال باقی‌مانده`}
+                    value={formatToman(loan.principalRemainingToman)}
+                  />
                 ))}
-                <ActionButton
-                  label="پرداخت بخشی از بدهی یا وام"
-                  costText={formatToman(Math.min(player.moneyToman, debtPayoffChunk))}
-                  disabled={player.moneyToman <= 0}
-                  disabledReason={player.moneyToman <= 0 ? 'موجودی نقد نداری' : undefined}
+                <ActionRow
+                  icon={<IconCoins className="h-4 w-4" />}
+                  title="پرداخت بخشی از بدهی یا وام"
+                  subtitle="کاهش سریع بدهی و بهبود رتبه اعتباری"
+                  value={formatToman(Math.min(player.moneyToman, debtPayoffChunk))}
+                  state={player.moneyToman <= 0 ? 'disabled' : 'recommended'}
+                  reason={player.moneyToman <= 0 ? 'موجودی نقد نداری' : undefined}
+                  ctaLabel="پرداخت"
                   onClick={() =>
                     onUpdateSave(
                       payOffDebtAction(saveGame, Math.min(player.moneyToman, debtPayoffChunk)),
                     )
                   }
                 />
-              </Card>
+              </SectionGroup>
             )}
 
             {player.age < 18 ? (
               <LockedNotice message="دریافت وام بانکی از ۱۸ سالگی فعال می‌شود." />
             ) : (
-              <div className="space-y-2">
-                <SectionHeader title="وام‌های قابل درخواست" />
-                <ActionButton
-                  label={loanPresets.personal.labelFa}
-                  costText={`سقف ${formatToman(loanPresets.personal.principalToman)}`}
-                  effectHint="واریز فوری به نقدینگی · قسط خودکار سالانه"
-                  variant="secondary"
-                  onClick={() => onUpdateSave(takeLoanAction(saveGame, 'personal', gameDataset))}
+              <SectionGroup title="وام‌های قابل درخواست">
+                <ActionRow
+                  icon={<IconCard className="h-4 w-4" />}
+                  title={loanPresets.personal.labelFa}
+                  subtitle="واریز فوری به نقدینگی · قسط خودکار سالانه"
+                  value={`سقف ${formatToman(loanPresets.personal.principalToman)}`}
+                  ctaLabel="درخواست"
+                  onClick={() =>
+                    setPendingConfirm({
+                      kind: 'loan',
+                      loanKind: 'personal',
+                      labelFa: loanPresets.personal.labelFa,
+                      principalToman: loanPresets.personal.principalToman,
+                    })
+                  }
                 />
-                <ActionButton
-                  label={loanPresets.housing.labelFa}
-                  costText={`سقف ${formatToman(loanPresets.housing.principalToman)}`}
-                  effectHint="مناسب خرید یا رهن مسکن"
-                  variant="secondary"
-                  onClick={() => onUpdateSave(takeLoanAction(saveGame, 'housing', gameDataset))}
+                <ActionRow
+                  icon={<IconHome className="h-4 w-4" />}
+                  title={loanPresets.housing.labelFa}
+                  subtitle="مناسب خرید یا رهن مسکن"
+                  value={`سقف ${formatToman(loanPresets.housing.principalToman)}`}
+                  ctaLabel="درخواست"
+                  onClick={() =>
+                    setPendingConfirm({
+                      kind: 'loan',
+                      loanKind: 'housing',
+                      labelFa: loanPresets.housing.labelFa,
+                      principalToman: loanPresets.housing.principalToman,
+                    })
+                  }
                 />
-              </div>
+              </SectionGroup>
             )}
-          </div>
+          </>
         )}
 
-        {/* 5. SHOP TAB */}
+        {/* 5. SHOP HUB */}
         {subTab === 'shop' && (
-          <div className="space-y-3">
-            <SectionHeader
-              title="بازار و خرید کالا"
-              subtitle="قیمت‌ها بر اساس نرخ تورم سال جاری تنظیم شده‌اند"
-            />
+          <>
             <FilterChips
               value={shopFilter}
               onChange={setShopFilter}
@@ -690,46 +753,339 @@ export function AssetsFinanceSheet({
                 { value: 'luxury', label: t('shop.categories.luxury') },
               ]}
             />
-            <div className="space-y-2">
-              {filteredShop.map((item) => {
-                const price = getShopItemPriceToman(item, state);
-                const alreadyOwned = !item.repeatable && ownedShopIds.includes(item.id);
-                const ageLocked = player.age < item.minAge;
-                const cantAfford = player.moneyToman < price;
-                const reason = alreadyOwned
-                  ? 'قبلاً خریداری شده'
-                  : ageLocked
-                    ? `از ${toPersianDigits(item.minAge)} سالگی فعال می‌شود`
-                    : cantAfford
-                      ? 'موجودی کافی نیست'
-                      : undefined;
-                return (
-                  <Card key={item.id} className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <IconShop className="h-4 w-4 text-[var(--primary)]" />
-                        <span className="text-sm font-bold">{item.titleFa}</span>
-                      </div>
-                      <Badge tone={alreadyOwned ? 'success' : 'neutral'}>
-                        {t(`shop.categories.${item.category}`)}
-                      </Badge>
-                    </div>
-                    <ActionButton
-                      label={alreadyOwned ? 'در اختیار تو' : t('buy')}
-                      costText={formatToman(price)}
-                      effectHint={item.effectHintFa}
-                      variant="secondary"
-                      disabled={Boolean(reason)}
-                      disabledReason={reason}
-                      onClick={() => onUpdateSave(buyShopItemAction(saveGame, item))}
-                    />
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
+
+            {shopSections.map((group) => (
+              <SectionGroup
+                key={group.title}
+                title={group.title}
+                subtitle="قیمت‌ها بر اساس تورم سال جاری تنظیم شده‌اند"
+              >
+                {group.items.map(renderShopRow)}
+              </SectionGroup>
+            ))}
+          </>
         )}
       </div>
+
+      {/* DRILL-DOWN: Market & Macro Analysis */}
+      <DetailSheet
+        open={showMarketDetail}
+        onClose={() => setShowMarketDetail(false)}
+        title={`تحلیل بازار (${toPersianDigits(state.currentJalaliYear)})`}
+        subtitle="شاخص‌های کلان، درآمد و روند دارایی"
+        onInfo={() => setInfoTopic('macro')}
+      >
+        <HubHeroCard
+          icon={usdUp ? <IconTrendUp className="h-5 w-5" /> : <IconTrendDown className="h-5 w-5" />}
+          title={`تورم سال جاری: ${toPersianDigits(inflationPct)}٪`}
+          subtitle={`حداقل مزد ماهانه: ${formatToman(minWageMonthly)} · ${formatUsdEquivalentHint(netWorth, state, gameDataset)}`}
+          metrics={[
+            { label: 'خالص درآمد سالانه', value: formatToman(annualIncome), tone: 'success' },
+            { label: 'هزینه سالانه', value: formatToman(annualExpenses), tone: 'danger' },
+            { label: 'آپارتمان ۷۰ متری', value: formatToman(tehran70SqmPrice) },
+          ]}
+        />
+
+        <SectionGroup title="روند تغییر دارایی خالص">
+          <div className="p-3">
+            <Sparkline values={netWorthSeries} colorVar="--primary" height={48} />
+          </div>
+        </SectionGroup>
+
+        <SectionGroup title="نرخ‌های روز بازار">
+          <ActionRow
+            icon={
+              usdUp ? (
+                <IconTrendUp className="h-4 w-4 text-[var(--danger)]" />
+              ) : (
+                <IconTrendDown className="h-4 w-4 text-[var(--success)]" />
+              )
+            }
+            title="نرخ دلار آزاد"
+            subtitle="تأثیرگذار بر کالاهای وارداتی و سفر"
+            value={formatToman(usdRate)}
+          />
+          <ActionRow
+            icon={<IconCoins className="h-4 w-4" />}
+            title="طلای ۱۸ عیار (گرم)"
+            subtitle="نوسان همگام با سکه و ارز"
+            value={formatToman(goldRate)}
+          />
+          <ActionRow
+            icon={<IconSparkles className="h-4 w-4" />}
+            title="سکه امامی"
+            subtitle="شاخص رایج پس‌انداز بلندمدت"
+            value={formatToman(coinRate)}
+          />
+          <ActionRow
+            icon={<IconHome className="h-4 w-4" />}
+            title="متری آگهی مسکن تهران"
+            subtitle={`واحد ۷۰ متری معامله: ${formatToman(tehran70SqmPrice)}`}
+            value={formatToman(tehranSqm)}
+          />
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* DRILL-DOWN: Investment Trade Sheet */}
+      <DetailSheet
+        open={selectedInvestment !== null}
+        onClose={() => setSelectedInvId(null)}
+        title={selectedInvestment?.titleFa ?? ''}
+        subtitle={selectedInvestment ? `ریسک: ${selectedInvestment.riskLabel}` : undefined}
+        onInfo={() => setInfoTopic('investments')}
+      >
+        {selectedInvestment && (() => {
+          const heldVal = selectedInvHeld?.currentValueToman ?? 0;
+          const pnl = selectedInvHeld
+            ? selectedInvHeld.currentValueToman - selectedInvHeld.purchasePriceToman
+            : 0;
+          return (
+            <>
+              <HubHeroCard
+                icon={<IconCoins className="h-5 w-5" />}
+                title={formatToman(heldVal)}
+                subtitle={selectedInvestment.hint}
+                status={heldVal > 0 ? 'in_progress' : 'waiting'}
+                metrics={[
+                  {
+                    label: 'سود یا زیان',
+                    value: <CurrencyText amountToman={pnl} showSign />,
+                    tone: pnl > 0 ? 'success' : pnl < 0 ? 'danger' : 'default',
+                  },
+                  { label: 'حجم خرید سریع', value: formatToman(quickTradeAmount) },
+                  { label: 'نقدینگی آزاد', value: formatToman(player.moneyToman) },
+                ]}
+              />
+
+              <SectionGroup title="معامله سریع">
+                <ActionRow
+                  icon={<IconCoins className="h-4 w-4" />}
+                  title="خرید سریع"
+                  subtitle="افزودن به دارایی با نرخ روز"
+                  value={formatToman(quickTradeAmount)}
+                  state={player.moneyToman < quickTradeAmount ? 'disabled' : 'recommended'}
+                  reason={player.moneyToman < quickTradeAmount ? 'موجودی کافی نیست' : undefined}
+                  ctaLabel="خرید"
+                  onClick={() =>
+                    onUpdateSave(
+                      tradeInvestmentAction(
+                        saveGame,
+                        selectedInvestment.id,
+                        selectedInvestment.titleFa,
+                        selectedInvestment.assetType,
+                        quickTradeAmount,
+                        'buy',
+                      ),
+                    )
+                  }
+                />
+                <ActionRow
+                  icon={<IconAssets className="h-4 w-4" />}
+                  title="فروش کل دارایی"
+                  subtitle="تبدیل کامل این دارایی به نقدینگی"
+                  value={heldVal > 0 ? formatToman(heldVal) : '۰ تومان'}
+                  state={heldVal <= 0 ? 'disabled' : 'enabled'}
+                  reason={heldVal <= 0 ? 'موجودی نداری' : undefined}
+                  ctaLabel="فروش کل"
+                  onClick={() =>
+                    setPendingConfirm({
+                      kind: 'sell_investment',
+                      id: selectedInvestment.id,
+                      titleFa: selectedInvestment.titleFa,
+                      assetType: selectedInvestment.assetType,
+                      amountToman: heldVal,
+                    })
+                  }
+                />
+              </SectionGroup>
+            </>
+          );
+        })()}
+      </DetailSheet>
+
+      {/* DRILL-DOWN: Housing Market */}
+      <DetailSheet
+        open={housingDrill === 'market'}
+        onClose={() => setHousingDrill(null)}
+        title="بازار مسکن"
+        subtitle="قیمت قطعی معامله ۱۰٪ پایین‌تر از آگهی محاسبه می‌شود"
+        onInfo={() => setInfoTopic('housing')}
+      >
+        <Card className="py-2.5">
+          <Toggle
+            checked={preferHigherRahn}
+            onChange={setPreferHigherRahn}
+            label="تبدیل ۵۰٪ اجاره به ودیعه رهن"
+            description="هر ۳ میلیون اجاره معادل ۱۰۰ میلیون ودیعه بیشتر محاسبه می‌شود"
+          />
+        </Card>
+
+        <SectionGroup title="فایل‌های موجود">
+          {gameDataset.housing.housingListings.map((listing) => {
+            const quote = getHousingListingQuote(listing, state, gameDataset);
+            const extraDeposit =
+              listing.mode === 'rent' && preferHigherRahn
+                ? Math.round((quote.monthlyRentToman * 0.5) / depositRentRate)
+                : 0;
+            const rentalTerms =
+              listing.mode === 'rent'
+                ? getConvertedRentalPair(
+                    quote.depositRahnToman,
+                    quote.monthlyRentToman,
+                    extraDeposit,
+                    gameDataset,
+                  )
+                : null;
+            const upfront =
+              listing.mode === 'rent' && rentalTerms
+                ? rentalTerms.deposit + rentalTerms.monthlyRent
+                : quote.transactionPriceToman;
+            const available =
+              listing.mode === 'rent'
+                ? player.moneyToman + player.housing.depositRahnToman
+                : player.moneyToman +
+                  player.housing.propertyValueToman +
+                  player.housing.depositRahnToman;
+            const cantAfford = available < upfront;
+
+            return (
+              <ActionRow
+                key={listing.id}
+                icon={<IconHome className="h-4 w-4" />}
+                title={listing.titleFa}
+                subtitle={
+                  listing.mode === 'rent' && rentalTerms
+                    ? `ودیعه ${formatToman(rentalTerms.deposit)} + اجاره ${formatToman(rentalTerms.monthlyRent)}`
+                    : `متراژ ${toPersianDigits(listing.areaSqm)} متر · قیمت آگهی: ${formatToman(quote.listingPriceToman)}`
+                }
+                value={formatToman(upfront)}
+                state={cantAfford ? 'disabled' : 'enabled'}
+                reason={cantAfford ? 'موجودی کافی نیست' : undefined}
+                ctaLabel={listing.mode === 'rent' ? 'اجاره' : 'خرید'}
+                onClick={() =>
+                  setPendingConfirm({
+                    kind: 'housing',
+                    listing,
+                    extraDeposit,
+                    upfrontToman: upfront,
+                  })
+                }
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* DRILL-DOWN: Vehicle Showroom */}
+      <DetailSheet
+        open={housingDrill === 'showroom'}
+        onClose={() => setHousingDrill(null)}
+        title="نمایشگاه خودرو"
+        subtitle={`نقدینگی: ${formatToman(player.moneyToman)}`}
+      >
+        <SectionGroup title="مدل‌های قابل خرید">
+          {gameDataset.housing.vehicleCatalog.map((veh) => {
+            const price = getAdjustedPriceToman(veh.basePriceToman, state);
+            const poor = player.moneyToman < price;
+            return (
+              <ActionRow
+                key={veh.id}
+                icon={<IconCar className="h-4 w-4" />}
+                title={veh.titleFa}
+                subtitle={`شادی +${toPersianDigits(veh.happinessBonus)} · ریسک تصادف: ${veh.accidentRiskLabel}`}
+                value={formatToman(price)}
+                state={poor ? 'disabled' : 'enabled'}
+                reason={poor ? 'موجودی کافی نیست' : undefined}
+                ctaLabel="خرید"
+                onClick={() =>
+                  setPendingConfirm({
+                    kind: 'buy_vehicle',
+                    vehicle: veh,
+                    priceToman: price,
+                  })
+                }
+              />
+            );
+          })}
+        </SectionGroup>
+      </DetailSheet>
+
+      {/* DRILL-DOWN: Owned Car Maintenance & Sale */}
+      <DetailSheet
+        open={selectedCar !== null}
+        onClose={() => setSelectedCarId(null)}
+        title={selectedCar?.name ?? ''}
+        subtitle="مدیریت نگهداری و فروش خودرو"
+      >
+        {selectedCar && (() => {
+          const repairCost = getCarRepairCostToman(selectedCar.currentValueToman, gameDataset);
+          return (
+            <>
+              <HubHeroCard
+                icon={<IconCar className="h-5 w-5" />}
+                title={selectedCar.name}
+                subtitle={`ارزش روز: ${formatToman(selectedCar.currentValueToman)}`}
+                metrics={[
+                  { label: 'ارزش روز', value: formatToman(selectedCar.currentValueToman) },
+                  { label: 'هزینه سرویس', value: formatToman(repairCost) },
+                  { label: 'نقدینگی', value: formatToman(player.moneyToman) },
+                ]}
+              />
+
+              <SectionGroup title="نگهداری">
+                <ActionRow
+                  icon={<IconCar className="h-4 w-4" />}
+                  title="سرویس دوره‌ای"
+                  subtitle="حفظ سلامت فنی و ارزش فروش خودرو"
+                  value={formatToman(repairCost)}
+                  state={player.moneyToman < repairCost ? 'disabled' : 'enabled'}
+                  reason={player.moneyToman < repairCost ? 'موجودی کافی نیست' : undefined}
+                  ctaLabel="سرویس"
+                  onClick={() =>
+                    onUpdateSave(repairVehicleAction(saveGame, selectedCar.id, gameDataset))
+                  }
+                />
+              </SectionGroup>
+
+              <DangerZoneGroup title="گزینه‌های حساس">
+                <ActionRow
+                  variant="danger"
+                  icon={<IconWarning className="h-4 w-4" />}
+                  title="فروش خودرو"
+                  subtitle="فروش فوری به قیمت روز بازار"
+                  value={formatToman(selectedCar.currentValueToman)}
+                  ctaLabel="فروش"
+                  onClick={() =>
+                    setPendingConfirm({
+                      kind: 'sell_vehicle',
+                      carId: selectedCar.id,
+                      titleFa: selectedCar.name,
+                      priceToman: selectedCar.currentValueToman,
+                    })
+                  }
+                />
+              </DangerZoneGroup>
+            </>
+          );
+        })()}
+      </DetailSheet>
+
+      <InfoSheet
+        open={infoTopic !== null}
+        onClose={() => setInfoTopic(null)}
+        title={infoTopic ? infoContent[infoTopic].title : ''}
+        bullets={infoTopic ? infoContent[infoTopic].bullets : undefined}
+      />
+
+      <ConfirmDialog
+        open={confirmDialogSpec !== null}
+        title={confirmDialogSpec?.title ?? ''}
+        message={confirmDialogSpec?.message ?? ''}
+        confirmLabel={confirmDialogSpec?.confirmLabel ?? 'تأیید'}
+        destructive={confirmDialogSpec?.destructive ?? false}
+        onCancel={() => setPendingConfirm(null)}
+        onConfirm={handleConfirmExecute}
+      />
     </FullScreenSheet>
   );
 }

@@ -1022,6 +1022,11 @@ export interface LifeChapterSummary {
   legacyTitle: string;
   inheritedFromNameFa?: string;
   relationshipToPrevFa?: string;
+  educationLevel?: EducationLevel;
+  didEmigrate?: boolean;
+  charityContributionToman?: number;
+  fameAtDeath?: number;
+  summaryFa?: string;
 }
 
 export interface DynastyWealthPoint {
@@ -1116,6 +1121,8 @@ export interface InheritanceDataset {
     minCharityReal1405Toman?: number;
     minPeakReal1405Toman?: number;
     minReputation?: number;
+    minEducatedChapters?: number;
+    requiresEmigration?: boolean;
   }[];
 }
 

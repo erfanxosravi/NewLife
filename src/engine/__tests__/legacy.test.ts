@@ -360,7 +360,7 @@ describe('Legacy, Inheritance & Dynasty Engine', () => {
 
       // Run a full life (with synthetic child injection every ~6th life to stress 6-gen chains within 5000 lives!)
       let chainGen = 1;
-      const maxChainForThisSeed = i % 10 === 0 ? 6 : 1;
+      const maxChainForThisSeed = i % 6 === 0 ? 6 : 1;
 
       while (chainGen <= maxChainForThisSeed) {
         let safety = 0;
@@ -406,18 +406,24 @@ describe('Legacy, Inheritance & Dynasty Engine', () => {
           save,
           heirId: chosen.personId,
           homeDecision,
-          businessDecision,
+          businessDecision: bizDecision,
           dataset: gameDataset,
         });
 
         const { settlement } = nextOutcome;
         const distributed = settlement.shares.reduce((s, l) => s + l.totalToman, 0);
-        expect(
+        const totalAccounted =
           settlement.funeralCostToman +
-            settlement.debtsPaidToman +
-            settlement.settlementFeeToman +
-            distributed,
-        ).toBe(settlement.grossAssetsToman);
+          settlement.debtsPaidToman +
+          settlement.settlementFeeToman +
+          distributed;
+        if (settlement.grossAssetsToman <= Number.MAX_SAFE_INTEGER) {
+          expect(totalAccounted).toBe(settlement.grossAssetsToman);
+        } else {
+          expect(Math.abs(totalAccounted - settlement.grossAssetsToman)).toBeLessThanOrEqual(
+            Math.ceil(settlement.grossAssetsToman * 1e-13),
+          );
+        }
         expect(nextOutcome.save.state.player.moneyToman).toBeGreaterThanOrEqual(0);
         expect(nextOutcome.save.state.player.debtToman).toBe(0);
 
@@ -433,4 +439,101 @@ describe('Legacy, Inheritance & Dynasty Engine', () => {
 
     expect(multiGenTransitions).toBeGreaterThan(2000);
   }, 45000);
+
+  it('unlocks educated & migrant dynasty ribbons and surfaces ancestor memories in inherited lives', () => {
+    let gen1 = createNewSaveGame({ seed: 'ribbon-mem-test', birthJalaliYear: 1365 }, gameDataset);
+    for (let y = 0; y < 30 && gen1.state.isAlive; y += 1) {
+      gen1 = advanceYear(gen1, gameDataset);
+    }
+    gen1.state.player.education.level = 'master';
+    gen1.state.player.countryId = 'canada';
+    gen1.state.npcs['npc_child_edu'] = {
+      id: 'npc_child_edu',
+      firstName: 'سهراب',
+      lastName: gen1.state.player.lastName,
+      gender: 'male',
+      age: 24,
+      traits: ['باهوش'],
+      jobTitle: 'مهندس',
+      isAlive: true,
+    };
+    gen1.state.relationships.push({
+      personId: 'npc_child_edu',
+      role: 'child',
+      closeness: 90,
+      respect: 90,
+      romance: 0,
+    });
+    gen1.state.isAlive = false;
+    gen1.state.deathSummary = {
+      ageAtDeath: 30,
+      jalaliYearOfDeath: gen1.state.currentJalaliYear,
+      causeOfDeath: 'سکته قلبی',
+      finalNetWorthToman: gen1.state.player.moneyToman,
+      lifeScore: 620,
+      legacyTitle: 'پیشگام مهاجرت',
+      highlights: ['مهاجرت موفق'],
+    };
+
+    const out2 = inheritFromDeceasedToHeir({
+      save: gen1,
+      heirId: 'npc_child_edu',
+      homeDecision: 'sell_and_split',
+      businessDecision: 'sell_and_split',
+      dataset: gameDataset,
+    });
+
+    expect(out2.save.state.dynasty?.unlockedDynastyRibbons).toContain('dyn_migrant_family');
+    expect(out2.save.state.dynasty?.ancestorMemoriesFa.length).toBeGreaterThan(0);
+
+    let gen2 = out2.save;
+    gen2.state.player.education.level = 'phd';
+    gen2.state.npcs['npc_child_g3'] = {
+      id: 'npc_child_g3',
+      firstName: 'نیما',
+      lastName: gen2.state.player.lastName,
+      gender: 'male',
+      age: 20,
+      traits: ['پرتلاش'],
+      jobTitle: 'پژوهشگر',
+      isAlive: true,
+    };
+    gen2.state.relationships.push({
+      personId: 'npc_child_g3',
+      role: 'child',
+      closeness: 88,
+      respect: 88,
+      romance: 0,
+    });
+
+    let sawAncestorMemory = false;
+    for (let y = 0; y < 25 && gen2.state.isAlive; y += 1) {
+      gen2 = advanceYear(gen2, gameDataset);
+      if (gen2.state.timeline.some((entry) => entry.title === 'یادگار نسل‌های پیشین')) {
+        sawAncestorMemory = true;
+      }
+    }
+    expect(sawAncestorMemory).toBe(true);
+
+    gen2.state.isAlive = false;
+    gen2.state.deathSummary = {
+      ageAtDeath: gen2.state.player.age,
+      jalaliYearOfDeath: gen2.state.currentJalaliYear,
+      causeOfDeath: 'کهولت سن',
+      finalNetWorthToman: gen2.state.player.moneyToman,
+      lifeScore: 700,
+      legacyTitle: 'استاد دانشگاه',
+      highlights: ['پژوهش علمی'],
+    };
+
+    const out3 = inheritFromDeceasedToHeir({
+      save: gen2,
+      heirId: 'npc_child_g3',
+      homeDecision: 'sell_and_split',
+      businessDecision: 'sell_and_split',
+      dataset: gameDataset,
+    });
+
+    expect(out3.save.state.dynasty?.unlockedDynastyRibbons).toContain('dyn_educated_family');
+  });
 });

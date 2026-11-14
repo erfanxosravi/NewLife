@@ -72,6 +72,8 @@ interface MenuSheetProps {
   onStartDebugRun?: (createdSave: SaveGame) => void;
   onDeleteSlot: (slotId: string) => void;
   onOpenStyleGuide: () => void;
+  onOpenDynasty?: () => void;
+  onOpenWill?: () => void;
   onNotify: (message: string, tone?: 'primary' | 'success' | 'danger' | 'warning') => void;
   onClose: () => void;
 }
@@ -98,6 +100,8 @@ export function MenuSheet({
   onStartDebugRun,
   onDeleteSlot,
   onOpenStyleGuide,
+  onOpenDynasty,
+  onOpenWill,
   onNotify,
   onClose,
 }: MenuSheetProps) {
@@ -198,11 +202,29 @@ export function MenuSheet({
             onClick={() => setSection('achievements')}
           />
           <ListRow
-            title={t('menu.familyTree')}
-            subtitle="ساختار والدین، همسر و فرزندان"
+            title={t('legacy.dynastyScreenTitle')}
+            subtitle={`نسل ${toPersianDigits(state.dynasty?.currentGeneration ?? 1)} · شجره‌نامه، آمار و تالار افتخار`}
             leading={<IconRelations className="h-5 w-5 text-[var(--primary)]" />}
-            onClick={() => setSection('family_tree')}
+            onClick={() => {
+              if (onOpenDynasty) {
+                onClose();
+                onOpenDynasty();
+              } else {
+                setSection('family_tree');
+              }
+            }}
           />
+          {onOpenWill && (
+            <ListRow
+              title={t('legacy.willTitle')}
+              subtitle={t('legacy.willSubtitle')}
+              leading={<IconShield className="h-5 w-5 text-[var(--primary)]" />}
+              onClick={() => {
+                onClose();
+                onOpenWill();
+              }}
+            />
+          )}
           <ListRow
             title={t('menu.saves')}
             subtitle="مدیریت اسلات‌ها، خروجی و بازیابی JSON"

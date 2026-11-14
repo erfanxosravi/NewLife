@@ -561,6 +561,29 @@ export function advanceYear(save: SaveGame, dataset: GameDataset): SaveGame {
       text: note.text,
       type: note.type,
     });
+
+    const memories = nextState.dynasty?.ancestorMemoriesFa ?? [];
+    const memoryCount =
+      typeof nextState.flags['legacy_memory_count'] === 'number'
+        ? (nextState.flags['legacy_memory_count'] as number)
+        : 0;
+    if (memories.length > 0 && age >= 8 && memoryCount < 2 && rng.chance(0.14)) {
+      const chosenMemory = memories[memoryCount % memories.length];
+      nextState.flags['legacy_memory_count'] = memoryCount + 1;
+      nextState.player.stats = applyStatDelta(nextState.player.stats, {
+        happiness: 2,
+        mentalHealth: 1,
+      });
+      nextState.timeline.push({
+        id: `turn_${nextState.turn}_ancestor_memory`,
+        age,
+        jalaliYear: nextState.currentJalaliYear,
+        title: 'یادگار نسل‌های پیشین',
+        text: chosenMemory,
+        type: 'event',
+        statChanges: { happiness: 2, mentalHealth: 1 },
+      });
+    }
   }
 
   return {

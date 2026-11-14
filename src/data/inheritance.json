@@ -115,6 +115,18 @@
       "titleFa": "نام نیکو در شهر",
       "descriptionFa": "رسیدن اعتبار خانوادگی دودمان به بالای ۷۵ امتیاز",
       "minReputation": 75
+    },
+    {
+      "id": "dyn_educated_family",
+      "titleFa": "خانواده‌ی تحصیل‌کرده",
+      "descriptionFa": "داشتن دست‌کم دو نسل با تحصیلات دانشگاهی در تاریخچه دودمان",
+      "minEducatedChapters": 2
+    },
+    {
+      "id": "dyn_migrant_family",
+      "titleFa": "خانواده‌ی مهاجر",
+      "descriptionFa": "تجربه مهاجرت و زندگی در خارج از کشور در یکی از نسل‌های دودمان",
+      "requiresEmigration": true
     }
   ]
 }

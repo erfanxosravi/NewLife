@@ -268,5 +268,27 @@
     "soundEffectsDesc": "تیک ملایم تغییر سال و زنگ دستاوردها (پیش‌فرض خاموش)",
     "longPressAuto": "پیشروی سریع با نگه‌داشتن «سال بعد»",
     "longPressAutoDesc": "با نگه‌داشتن دکمه، سال‌ها تا رسیدن به رویداد یا نقطه عطف جلو می‌روند"
+  },
+  "legacy": {
+    "continueDynasty": "ادامه‌ی دودمان",
+    "viewDynasty": "مشاهده تاریخچه دودمان",
+    "heirSelectionTitle": "انتخاب وارث و ادامه دودمان",
+    "heirSelectionSubtitle": "انتخاب یکی از بازماندگان برای ادامه تاریخچه خانواده",
+    "whoGetsWhat": "چه کسی چه سهمی می‌برد؟",
+    "hideEstateBreakdown": "بستن جزئیات ماترک",
+    "startHeirLife": "آغاز فصل تازه با این وارث",
+    "noHeirTitle": "وارث مستقیمی در قید حیات نیست",
+    "noHeirSubtitle": "می‌توانی سرنوشت نهایی دودمان را به یکی از سه شکل زیر رقم بزنی",
+    "distantRelativeOption": "ادامه با خویشاوند دور",
+    "charityFoundationOption": "تأسیس بنیاد خیریه با ماترک",
+    "closeDynastyOption": "بستن بااحترام دفتر دودمان",
+    "willTitle": "وصیت‌نامه و قواعد ارث",
+    "willSubtitle": "تنظیم وصیت، وقف و قواعد ارث",
+    "saveWill": "ثبت وصیت‌نامه",
+    "dynastyScreenTitle": "دودمان و شجره‌نامه",
+    "tabTree": "شجره‌نامه",
+    "tabStats": "آمار و نمودار",
+    "tabHall": "تالار افتخار",
+    "shareDynastyCard": "اشتراک‌گذاری کارت دودمان"
   }
 }

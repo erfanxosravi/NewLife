@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const BASE_URL = process.env.E2E_URL || 'http://localhost:3000';
 const EXEC_PATH = '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell';
 const SHOT_DIR = path.resolve(
-  '.aistudio/artifacts/brain/48d87d70-3e76-40e2-9fac-8a1ec15bad5d/screenshots',
+  '.aistudio/artifacts/brain/9b815c2d-3ce6-4758-8f13-fad3be82c488/screenshots/smoke',
 );
 
 fs.mkdirSync(SHOT_DIR, { recursive: true });
@@ -147,23 +147,31 @@ async function run() {
           }
           if (!(await nextBtn.isEnabled())) continue;
 
-          // At step 6 and 8 (age >= 7), open Skills -> Talent Practice -> "تمرین فردی" so talent discovery surfaces
+          // At step 6 and 8 (age >= 7), open Skills -> Talent row -> "تمرین فردی" so talent discovery surfaces
           if (step === 6 || step === 8) {
             await page.click('button:has-text("شغل و تحصیل")');
             await page.waitForSelector('[role="dialog"]');
             await page.click('[role="dialog"] button[role="tab"]:has-text("مهارت‌ها")');
-            await page.waitForSelector('text=پرورش استعدادها و گرایش‌های فردی');
-            const practiceBtn = page
-              .locator('[role="dialog"] button:has-text("تمرین فردی")')
+            await page.waitForSelector('text=پرورش استعدادها و مهارت‌ها');
+            const firstTalentRow = page
+              .locator('[role="dialog"] button:has-text("آواز و خوانندگی")')
               .first();
-            if ((await practiceBtn.count()) > 0 && (await practiceBtn.isEnabled())) {
-              await practiceBtn.click();
-              practicedTalentSteps++;
-              if (practicedTalentSteps === 2) {
-                await page.screenshot({ path: path.join(SHOT_DIR, 'tab-skills-talents-390.png') });
+            if ((await firstTalentRow.count()) > 0) {
+              await firstTalentRow.click();
+              await page.waitForSelector('text=روش‌های پرورش و شکوفایی');
+              const practiceBtn = page
+                .locator('[role="dialog"] button:has-text("تمرین فردی")')
+                .last();
+              if ((await practiceBtn.count()) > 0 && (await practiceBtn.isEnabled())) {
+                await practiceBtn.click();
+                practicedTalentSteps++;
+                if (practicedTalentSteps === 2) {
+                  await page.screenshot({ path: path.join(SHOT_DIR, 'tab-skills-talents-390.png') });
+                }
               }
+              await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
             }
-            await page.click('[role="dialog"] button[aria-label="بازگشت"]');
+            await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
           }
 
           await nextBtn.click();
@@ -257,41 +265,51 @@ async function run() {
         await careerSubTab.click();
         await page.waitForTimeout(150);
         if (vp.name === '390') {
-          // Verify Ownership Flow + Risk Preview
-          const ownershipCard = page.locator('[data-testid="ownership-flow-card"]');
-          if ((await ownershipCard.count()) > 0) {
-            const startFlowBtn = ownershipCard.locator('button:has-text("شروع فرآیند")');
-            if ((await startFlowBtn.count()) > 0) {
-              await startFlowBtn.click();
-              await page.waitForSelector('[data-testid="ownership-risk-preview"]');
+          // Verify Ownership Flow + Risk Preview inside drill-down DetailSheet
+          const ownershipRow = page.locator('[data-testid="ownership-flow-card"]');
+          if ((await ownershipRow.count()) > 0) {
+            await ownershipRow.click();
+            await page.waitForSelector('[data-testid="ownership-risk-preview"]');
+            await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
+          }
+          // Verify Licenses drill-down DetailSheet
+          const licensesRow = page.locator('[data-testid="licenses-card"]');
+          if ((await licensesRow.count()) > 0) {
+            await licensesRow.click();
+            await page.waitForSelector('text=مجوزهای رسمی و حرفه‌ای');
+            await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
+          }
+          // Apply to barber job via Job Board -> Job Detail -> Apply
+          const jobBoardEntry = page.locator('[data-testid="job-board-entry"]');
+          if ((await jobBoardEntry.count()) > 0) {
+            await jobBoardEntry.click();
+            await page.waitForSelector('text=فهرست مشاغل');
+            const barberRow = page.locator('[role="dialog"] button:has-text("آرایشگر")').first();
+            if ((await barberRow.count()) > 0) {
+              await barberRow.click();
+              await page.waitForSelector('text=پیش‌نیازهای استخدام');
+              const applyBarberBtn = page
+                .locator('[role="dialog"] button:has-text("ارسال درخواست و مصاحبه")')
+                .last();
+              if ((await applyBarberBtn.count()) > 0 && (await applyBarberBtn.isEnabled())) {
+                await applyBarberBtn.click();
+                await page.waitForTimeout(200);
+              }
             }
           }
-          // Expand Licenses Card briefly to verify zero overflow
-          const licensesCard = page.locator('[data-testid="licenses-card"]');
-          if ((await licensesCard.count()) > 0) {
-            await licensesCard.locator('button:has-text("مشاهده و اخذ مجوز")').click();
-            await page.waitForTimeout(100);
-          }
-          // Apply to barber job to surface employee career ladder timeline
-          const applyBarberBtn = page
-            .locator('[role="dialog"] .space-y-2')
-            .filter({ hasText: 'آرایشگر' })
-            .locator('button:has-text("ارسال درخواست و مصاحبه")')
-            .first();
-          if ((await applyBarberBtn.count()) > 0 && (await applyBarberBtn.isEnabled())) {
-            await applyBarberBtn.click();
-            await page.waitForTimeout(200);
-          }
-          const dialogText = await page.locator('[role="dialog"]').innerText();
-          if (/[A-Za-z]/.test(dialogText)) {
-            const match = dialogText.match(/[A-Za-z]+/g);
+          const topDialogText = await page.locator('[role="dialog"]').last().innerText();
+          if (/[A-Za-z]/.test(topDialogText)) {
+            const match = topDialogText.match(/[A-Za-z]+/g);
             throw new Error(`English text found in Career UI: ${match?.join(', ')}`);
           }
         }
       }
       await assertNoHorizontalOverflow(page, `${vp.name}-tab-work`);
       await page.screenshot({ path: path.join(SHOT_DIR, `tab-work-${vp.name}.png`) });
-      await page.click('[role="dialog"] button[aria-label="بازگشت"]');
+      while ((await page.locator('[role="dialog"] button[aria-label="بازگشت"]').count()) > 0) {
+        await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
+        await page.waitForTimeout(80);
+      }
 
       await page.click('button:has-text("دارایی‌ها")');
       await page.waitForSelector('[role="dialog"]');

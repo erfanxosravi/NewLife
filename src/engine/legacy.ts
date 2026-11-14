@@ -12,6 +12,7 @@ import type {
   DynastyHallOfFameEntry,
   DynastyState,
   DynastyWealthPoint,
+  EducationLevel,
   EstateSettlementResult,
   EstateShareLine,
   GameState,
@@ -198,12 +199,16 @@ function reconcileIntegerShares(
 
   let leftover = safeTotal - allocated;
   remainders.sort((a, b) => b.rem - a.rem || b.weight - a.weight);
-  let idx = 0;
-  while (leftover > 0 && remainders.length > 0) {
-    const target = remainders[idx % remainders.length];
-    out[target.id] = (out[target.id] ?? 0) + 1;
-    leftover -= 1;
-    idx += 1;
+  if (safeTotal > Number.MAX_SAFE_INTEGER && leftover > 0 && remainders.length > 0) {
+    out[remainders[0].id] = (out[remainders[0].id] ?? 0) + leftover;
+  } else {
+    let idx = 0;
+    while (leftover > 0 && remainders.length > 0) {
+      const target = remainders[idx % remainders.length];
+      out[target.id] = (out[target.id] ?? 0) + 1;
+      leftover -= 1;
+      idx += 1;
+    }
   }
 
   return out;
@@ -796,17 +801,39 @@ export function createDistantRelativeCandidate(
   };
 }
 
+const EDU_RANK: Record<EducationLevel, number> = {
+  none: 0,
+  preschool: 1,
+  elementary: 2,
+  middle_school: 3,
+  high_school: 4,
+  diploma: 5,
+  associate: 6,
+  bachelor: 7,
+  master: 8,
+  phd: 9,
+  medical_doctor: 10,
+};
+
+function isUniversityChapter(level?: EducationLevel): boolean {
+  if (!level) return false;
+  return EDU_RANK[level] >= EDU_RANK.associate;
+}
+
 function evaluateDynastyRibbons(dynasty: DynastyState, dataset: GameDataset): string[] {
   const unlocked = new Set(dynasty.unlockedDynastyRibbons);
   const peakRealNetWorth = Math.max(
     0,
     ...dynasty.chapters.map((c) => c.real1405NetWorthToman),
   );
+  const educatedCount = dynasty.chapters.filter((c) => isUniversityChapter(c.educationLevel)).length;
+  const hasEmigrated = dynasty.chapters.some((c) => c.didEmigrate);
 
   for (const ribbon of dataset.inheritance.dynastyRibbons) {
     if (unlocked.has(ribbon.id)) continue;
     let met = true;
-    if (ribbon.minGenerations !== undefined && dynasty.totalGenerationsLived < ribbon.minGenerations) {
+    const generationCount = Math.max(dynasty.totalGenerationsLived, dynasty.currentGeneration);
+    if (ribbon.minGenerations !== undefined && generationCount < ribbon.minGenerations) {
       met = false;
     }
     if (
@@ -824,6 +851,12 @@ function evaluateDynastyRibbons(dynasty: DynastyState, dataset: GameDataset): st
     if (ribbon.minReputation !== undefined && dynasty.familyReputation < ribbon.minReputation) {
       met = false;
     }
+    if (ribbon.minEducatedChapters !== undefined && educatedCount < ribbon.minEducatedChapters) {
+      met = false;
+    }
+    if (ribbon.requiresEmigration && !hasEmigrated) {
+      met = false;
+    }
     if (ribbon.id === 'dyn_business_steward') {
       // Unlocked explicitly on business inheritance
       met = false;
@@ -834,6 +867,44 @@ function evaluateDynastyRibbons(dynasty: DynastyState, dataset: GameDataset): st
   }
 
   return Array.from(unlocked);
+}
+
+export interface DynastyHallOfFameLeaders {
+  wealthiest?: LifeChapterSummary;
+  mostFamous?: LifeChapterSummary;
+  longestLived?: LifeChapterSummary;
+  mostEducated?: LifeChapterSummary;
+  mostGenerous?: LifeChapterSummary;
+}
+
+export function getDynastyHallOfFameLeaders(dynasty: DynastyState): DynastyHallOfFameLeaders {
+  const chapters = dynasty.chapters;
+  if (chapters.length === 0) return {};
+
+  const wealthiest = [...chapters].sort(
+    (a, b) => b.real1405NetWorthToman - a.real1405NetWorthToman,
+  )[0];
+  const mostFamous = [...chapters].sort(
+    (a, b) => (b.fameAtDeath ?? 0) - (a.fameAtDeath ?? 0) || b.lifeScore - a.lifeScore,
+  )[0];
+  const longestLived = [...chapters].sort((a, b) => b.ageAtDeath - a.ageAtDeath)[0];
+  const mostEducated = [...chapters].sort(
+    (a, b) =>
+      EDU_RANK[b.educationLevel ?? 'none'] - EDU_RANK[a.educationLevel ?? 'none'] ||
+      b.lifeScore - a.lifeScore,
+  )[0];
+  const mostGenerous = [...chapters].sort(
+    (a, b) => (b.charityContributionToman ?? 0) - (a.charityContributionToman ?? 0),
+  )[0];
+
+  return {
+    wealthiest,
+    mostFamous,
+    longestLived,
+    mostEducated,
+    mostGenerous:
+      (mostGenerous?.charityContributionToman ?? 0) > 0 ? mostGenerous : undefined,
+  };
 }
 
 function appendCompletedChapterToDynasty(
@@ -850,7 +921,17 @@ function appendCompletedChapterToDynasty(
   const real1405NetWorth = Math.round(
     finalNetWorth / Math.max(0.000001, state.inflationMultiplier),
   );
+  const charityReal1405 = Math.round(
+    charityAddedToman / Math.max(0.000001, state.inflationMultiplier),
+  );
   const city = dataset.cities.find((c) => c.id === state.player.currentCityId);
+  const cityNameFa = city?.nameFa ?? 'ایران';
+  const highestJobTitleFa =
+    state.ownedBusiness?.nameFa ?? state.player.job?.title ?? 'زندگی آزاد';
+  const didEmigrate = state.player.countryId !== 'iran';
+
+  const summaryFa = `${state.player.firstName} ${state.player.lastName} از نسل ${toPersianDigits(dynasty.currentGeneration)}، سال‌ها در ${cityNameFa} به عنوان «${highestJobTitleFa}» زیست و در ${toPersianDigits(state.player.age)} سالگی با عنوان «${deathSummary?.legacyTitle ?? 'رهگذر آرام زندگی'}» دفتر عمرش را بست.`;
+
   const chapter: LifeChapterSummary = {
     generation: dynasty.currentGeneration,
     firstName: state.player.firstName,
@@ -859,16 +940,20 @@ function appendCompletedChapterToDynasty(
     birthYear: state.birthJalaliYear,
     deathYear: state.currentJalaliYear,
     ageAtDeath: state.player.age,
-    cityNameFa: city?.nameFa ?? 'ایران',
+    cityNameFa,
     causeOfDeath: deathSummary?.causeOfDeath ?? 'پایان زندگی',
-    highestJobTitleFa:
-      state.ownedBusiness?.nameFa ?? state.player.job?.title ?? 'زندگی آزاد',
+    highestJobTitleFa,
     finalNetWorthToman: finalNetWorth,
     real1405NetWorthToman: real1405NetWorth,
     lifeScore: deathSummary?.lifeScore ?? 100,
     legacyTitle: deathSummary?.legacyTitle ?? 'رهگذر آرام زندگی',
     inheritedFromNameFa,
     relationshipToPrevFa,
+    educationLevel: state.player.education.level,
+    didEmigrate,
+    charityContributionToman: Math.max(0, charityReal1405),
+    fameAtDeath: state.player.stats.fame,
+    summaryFa,
   };
 
   dynasty.chapters.push(chapter);
@@ -897,9 +982,6 @@ function appendCompletedChapterToDynasty(
     .sort((a, b) => b.lifeScore - a.lifeScore)
     .slice(0, 12);
 
-  const charityReal1405 = Math.round(
-    charityAddedToman / Math.max(0.000001, state.inflationMultiplier),
-  );
   dynasty.charityEndowmentTotalToman += Math.max(0, charityReal1405);
 
   const pp = getPurchasingPowerSummary(finalNetWorth, state, dataset);
@@ -915,8 +997,32 @@ function appendCompletedChapterToDynasty(
     (charityReal1405 > 0 ? 120 : 0);
   dynasty.dynastyScore += Math.max(50, scoreDelta);
 
-  const memoryLine = `${state.player.firstName} ${state.player.lastName} (نسل ${toPersianDigits(dynasty.currentGeneration)}) در ${toPersianDigits(state.player.age)} سالگی پس از عمری به عنوان «${chapter.highestJobTitleFa}» چشم از جهان فروبست.`;
-  dynasty.ancestorMemoriesFa = [...dynasty.ancestorMemoriesFa, memoryLine].slice(-12);
+  const memoriesToAdd: string[] = [];
+  if (state.ownedBusiness) {
+    memoriesToAdd.push(
+      `مغازه و کسب‌وکار خانوادگی «${state.ownedBusiness.nameFa}» از روزگار ${state.player.firstName} ${state.player.lastName} بر سر زبان‌ها ماند.`,
+    );
+  } else if (state.player.housing.type === 'owned' || state.player.housing.type === 'villa') {
+    memoriesToAdd.push(
+      `خانه قدیمی که ${state.player.firstName} در ${cityNameFa} ساخت، هنوز یادآور خاطرات جمع خانوادگی است.`,
+    );
+  }
+  if (state.player.stats.fame >= 65) {
+    memoriesToAdd.push(
+      `نام ${state.player.firstName} ${state.player.lastName} به عنوان چهره‌ای سرشناس در شهر شناخته می‌شد.`,
+    );
+  }
+  if (state.player.debtToman > 0) {
+    memoriesToAdd.push(
+      `داستان بدهی‌های سنگین سال‌های پایانی عمر ${state.player.firstName} برای نسل‌های بعدی عبرت‌آموز ماند.`,
+    );
+  }
+  if (memoriesToAdd.length === 0) {
+    memoriesToAdd.push(
+      `${state.player.firstName} ${state.player.lastName} (نسل ${toPersianDigits(dynasty.currentGeneration)}) در ${toPersianDigits(state.player.age)} سالگی پس از عمری به عنوان «${chapter.highestJobTitleFa}» چشم از جهان فروبست.`,
+    );
+  }
+  dynasty.ancestorMemoriesFa = [...dynasty.ancestorMemoriesFa, ...memoriesToAdd].slice(-12);
 
   dynasty.unlockedDynastyRibbons = evaluateDynastyRibbons(dynasty, dataset);
   return dynasty;

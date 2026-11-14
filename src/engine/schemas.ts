@@ -413,6 +413,11 @@ export const LifeChapterSummarySchema = z.object({
   legacyTitle: z.string().min(1),
   inheritedFromNameFa: z.string().min(1).optional(),
   relationshipToPrevFa: z.string().min(1).optional(),
+  educationLevel: EducationLevelSchema.optional(),
+  didEmigrate: z.boolean().optional(),
+  charityContributionToman: z.number().min(0).finite().optional(),
+  fameAtDeath: BoundedStatSchema.optional(),
+  summaryFa: z.string().min(1).optional(),
 });
 
 export const DynastyWealthPointSchema = z.object({
@@ -1211,6 +1216,8 @@ export const InheritanceFileSchema = z.object({
         minCharityReal1405Toman: z.number().min(0).optional(),
         minPeakReal1405Toman: z.number().min(0).optional(),
         minReputation: z.number().min(0).max(100).optional(),
+        minEducatedChapters: z.number().int().min(1).optional(),
+        requiresEmigration: z.boolean().optional(),
       }),
     )
     .min(4),

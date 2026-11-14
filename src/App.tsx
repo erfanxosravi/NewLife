@@ -73,8 +73,17 @@ const EndOfLifeScreen = lazy(() =>
 const StyleGuidePage = lazy(() =>
   import('./ui/StyleGuidePage').then((m) => ({ default: m.StyleGuidePage })),
 );
+const DynastyContinueSheet = lazy(() =>
+  import('./ui/DynastyContinueSheet').then((m) => ({ default: m.DynastyContinueSheet })),
+);
+const DynastyScreen = lazy(() =>
+  import('./ui/DynastyScreen').then((m) => ({ default: m.DynastyScreen })),
+);
+const WillEditorSheet = lazy(() =>
+  import('./ui/WillEditorSheet').then((m) => ({ default: m.WillEditorSheet })),
+);
 
-type ActiveSheet = null | BottomNavTab | 'stats' | 'menu';
+type ActiveSheet = null | BottomNavTab | 'stats' | 'menu' | 'dynasty' | 'dynasty_continue' | 'will';
 
 const STAT_KEYS: (keyof PlayerStats)[] = [
   'happiness',
@@ -741,6 +750,14 @@ export default function App() {
                 state={saveGame.state}
                 lifeCode={saveGame.seed}
                 onPlayAgain={() => openCreationForSlot(activeSlotId)}
+                onContinueDynasty={() => {
+                  triggerHaptic('light');
+                  setActiveSheet('dynasty_continue');
+                }}
+                onOpenDynasty={() => {
+                  triggerHaptic('light');
+                  setActiveSheet('dynasty');
+                }}
                 onShareDone={(msg) => showToast(msg, 'success')}
               />
             </Suspense>
@@ -837,6 +854,7 @@ export default function App() {
                   saveGame={saveGame}
                   onClose={() => setActiveSheet(null)}
                   onUpdateSave={handleActionOutcome}
+                  onOpenWill={() => setActiveSheet('will')}
                 />
               )}
 
@@ -857,34 +875,72 @@ export default function App() {
                   onUpdateSave={handleActionOutcome}
                 />
               )}
-
-              {activeSheet === 'menu' && (
-                <MenuSheet
-                  open
-                  saveGame={saveGame}
-                  activeSlotId={activeSlotId}
-                  summaries={slotSummaries}
-                  themePreference={themePreference}
-                  animationSpeed={animationSpeed}
-                  soundEnabled={soundEnabled}
-                  longPressAutoEnabled={longPressAutoEnabled}
-                  onChangeTheme={setThemePreference}
-                  onChangeAnimationSpeed={handleChangeAnimationSpeed}
-                  onToggleSound={handleToggleSound}
-                  onToggleLongPressAuto={handleToggleLongPressAuto}
-                  onUpdateContentSettings={handleUpdateContentSettings}
-                  onLoadSlot={handleLoadSlot}
-                  onImportSave={handleImportSave}
-                  onStartNewInSlot={openCreationForSlot}
-                  onStartDebugRun={handleCreateCharacter}
-                  onDeleteSlot={handleDeleteSlot}
-                  onOpenStyleGuide={() => navigateStyleGuide(true)}
-                  onNotify={showToast}
-                  onClose={() => setActiveSheet(null)}
-                />
-              )}
             </Suspense>
           </>
+        )}
+
+        {!isHydrating && !isCreating && saveGame && (
+          <Suspense fallback={null}>
+            {activeSheet === 'menu' && (
+              <MenuSheet
+                open
+                saveGame={saveGame}
+                activeSlotId={activeSlotId}
+                summaries={slotSummaries}
+                themePreference={themePreference}
+                animationSpeed={animationSpeed}
+                soundEnabled={soundEnabled}
+                longPressAutoEnabled={longPressAutoEnabled}
+                onChangeTheme={setThemePreference}
+                onChangeAnimationSpeed={handleChangeAnimationSpeed}
+                onToggleSound={handleToggleSound}
+                onToggleLongPressAuto={handleToggleLongPressAuto}
+                onUpdateContentSettings={handleUpdateContentSettings}
+                onLoadSlot={handleLoadSlot}
+                onImportSave={handleImportSave}
+                onStartNewInSlot={openCreationForSlot}
+                onStartDebugRun={handleCreateCharacter}
+                onDeleteSlot={handleDeleteSlot}
+                onOpenStyleGuide={() => navigateStyleGuide(true)}
+                onOpenDynasty={() => setActiveSheet('dynasty')}
+                onOpenWill={() => setActiveSheet('will')}
+                onNotify={showToast}
+                onClose={() => setActiveSheet(null)}
+              />
+            )}
+
+            {activeSheet === 'dynasty' && (
+              <DynastyScreen
+                open
+                saveGame={saveGame}
+                onClose={() => setActiveSheet(null)}
+                onShareDone={(msg) => showToast(msg, 'success')}
+              />
+            )}
+
+            {activeSheet === 'dynasty_continue' && (
+              <DynastyContinueSheet
+                open
+                saveGame={saveGame}
+                onClose={() => setActiveSheet(null)}
+                onUpdateSave={(outcome) => {
+                  sequenceControllerRef.current!.reset();
+                  preSequenceSnapshotRef.current = null;
+                  void handleActionOutcome(outcome);
+                }}
+                onOpenDynastyHall={() => setActiveSheet('dynasty')}
+              />
+            )}
+
+            {activeSheet === 'will' && (
+              <WillEditorSheet
+                open
+                saveGame={saveGame}
+                onClose={() => setActiveSheet(null)}
+                onUpdateSave={handleActionOutcome}
+              />
+            )}
+          </Suspense>
         )}
       </div>
     </div>
