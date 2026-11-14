@@ -71,8 +71,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
           />
         </div>
       )}
-      <div className="truncate text-xs font-bold text-[var(--text)]">{name}</div>
-      <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+      <div className="text-xs font-bold text-[var(--text)]">{name}</div>
+      <div className="mt-0.5 text-xs text-[var(--text-muted)]">
         {role}
         {spanFa
           ? ` · ${spanFa}`
@@ -81,7 +81,7 @@ export function FamilyTreeView({ state }: { state: GameState }) {
             : ''}
       </div>
       {jobFa && (
-        <div className="mt-0.5 truncate text-[10px] font-medium text-[var(--primary-strong)]">
+        <div className="mt-0.5 text-xs font-medium text-[var(--primary-strong)]">
           {jobFa}
         </div>
       )}
@@ -106,7 +106,7 @@ export function FamilyTreeView({ state }: { state: GameState }) {
           <button
             type="button"
             onClick={() => setZoom(1)}
-            className="min-h-[36px] rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2.5 text-[11px] font-bold text-[var(--text-muted)]"
+            className="min-h-[36px] rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2.5 text-xs font-bold text-[var(--text-muted)]"
           >
             ۱۰۰٪
           </button>
@@ -203,7 +203,7 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                   gender={spouse.person.gender}
                 />
               ) : (
-                <div className="flex items-center justify-center rounded-2xl border border-dashed border-[var(--border)] p-2 text-[11px] text-[var(--text-muted)]">
+                <div className="flex items-center justify-center rounded-2xl border border-dashed border-[var(--border)] p-2 text-xs text-[var(--text-muted)]">
                   <IconHeart className="ml-1 h-3.5 w-3.5" />
                   {t(`marital.${state.player.maritalStatus}`)}
                 </div>
@@ -212,7 +212,7 @@ export function FamilyTreeView({ state }: { state: GameState }) {
 
             {siblings.length > 0 && (
               <div className="space-y-1.5 pt-1">
-                <div className="text-[11px] font-bold text-[var(--text-muted)]">
+                <div className="text-xs font-bold text-[var(--text-muted)]">
                   خواهر و برادرها ({toPersianDigits(siblings.length)})
                 </div>
                 <div className="flex flex-wrap gap-1.5">

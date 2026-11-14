@@ -5,7 +5,7 @@ interface BottomSheetProps {
   open: boolean;
   onClose?: () => void;
   title?: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   snap?: 'half' | 'full';
   allowSnapToggle?: boolean;
   dismissible?: boolean;
@@ -135,10 +135,10 @@ export function BottomSheet({
           <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-4 pt-1 pb-3">
             <div className="min-w-0">
               {title && (
-                <h2 className="truncate text-base font-bold text-[var(--text)]">{title}</h2>
+                <h2 className="text-base font-bold leading-snug text-[var(--text)]">{title}</h2>
               )}
               {subtitle && (
-                <p className="mt-0.5 truncate text-xs text-[var(--text-muted)]">{subtitle}</p>
+                <p className="mt-0.5 text-xs leading-snug text-[var(--text-muted)]">{subtitle}</p>
               )}
             </div>
             <div className="flex shrink-0 items-center gap-1.5">

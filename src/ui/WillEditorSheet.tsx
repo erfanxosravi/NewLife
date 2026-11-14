@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../data/registry';
-import { formatToman, toPersianDigits } from '../engine/jalali';
+import { toPersianDigits } from '../engine/jalali';
 import {
   getWillUnlockReasonFa,
   isWillUnlocked,
@@ -10,6 +10,7 @@ import type { SaveGame, WillBeneficiary, WillConfig } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
 import { saveWillAction, type ActionOutcome } from '../state/actions';
 import { FullScreenSheet } from './components/FullScreenSheet';
+import { MoneyText } from './components/MoneyText';
 import {
   ActionButton,
   Badge,
@@ -159,18 +160,21 @@ export function WillEditorSheet({
               <p className="text-xs leading-relaxed text-[var(--text)]">
                 {gameDataset.inheritance.meta.summaryFa}
               </p>
-              <div className="text-[11px] text-[var(--text-muted)]">
+              <div className="text-xs text-[var(--text-muted)]">
                 منبع شبیه‌ساز: {gameDataset.inheritance.meta.source}
               </div>
-              <div className="text-[11px] text-[var(--text-muted)]">
+              <div className="text-xs text-[var(--text-muted)]">
                 ترتیب تسویه ماترک: ۱) هزینه کفن‌ودفن ({toPersianDigits(gameDataset.inheritance.rules.funeralCostMinWageMultiple.value)} برابر حداقل دستمزد ماهانه، برآورد فعلی:{' '}
-                {formatToman(
-                  Math.round(
+                <MoneyText
+                  amount={Math.round(
                     gameDataset.economy.baseline1405.verifiedBenchmarks.minWageMonthly.value *
                       state.inflationMultiplier *
                       gameDataset.inheritance.rules.funeralCostMinWageMultiple.value,
-                  ),
-                )}
+                  )}
+                  currency="IRT"
+                  mode="inline"
+                  stateOverride={state}
+                />
                 ) ← ۲) دیون و وام‌ها ← ۳) وصیت تا سقف ثلث ← ۴) تقسیم قانونی میان وراث.
               </div>
             </Card>
@@ -205,11 +209,11 @@ export function WillEditorSheet({
                   {toPersianDigits(validation.maxAllowedPercent)}٪
                 </Badge>
               </div>
-              <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+              <p className="text-xs leading-relaxed text-[var(--text-muted)]">
                 بر اساس ماده ۸۴۳ قانون مدنی، وصیت تا یک‌سوم ماترک خالص (پس از کسر دیون و کفن‌ودفن) به طور مستقیم نافذ است.
               </p>
               {validation.exceedsOneThird && (
-                <div className="flex items-start gap-2 rounded-xl bg-[var(--warning)]/12 p-2.5 text-[11px] text-[var(--warning)]">
+                <div className="flex items-start gap-2 rounded-xl bg-[var(--warning)]/12 p-2.5 text-xs text-[var(--warning)]">
                   <IconWarning className="mt-0.5 h-4 w-4 shrink-0" />
                   <span>
                     جمع درخواست‌ها از ۳۳/۳٪ بیشتر است؛ هنگام تقسیم، سهم وصیتی به سقف ثلث تعدیل می‌شود و احتمال اعتراض وراث افزایش می‌یابد.

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { gameDataset } from '../../../data/registry';
 import {
   getAbroadLanguageLevel,
@@ -17,9 +17,9 @@ import {
   getLanguageLevelLabelFa,
   getStudyLanguageCost,
 } from '../../../engine/emigration';
-import { formatCurrencyAmount, getFxRate, getRealExchangeRateAndPppGap } from '../../../engine/fx';
+import { getRealExchangeRateAndPppGap } from '../../../engine/fx';
 import { toPersianDigits } from '../../../engine/jalali';
-import type { MigrationPathType, SaveGame } from '../../../engine/types';
+import type { CurrencyCode, MigrationPathType, SaveGame } from '../../../engine/types';
 import { useI18n } from '../../../i18n/useI18n';
 import {
   advanceEmigrationPipelineStepAction,
@@ -29,6 +29,10 @@ import {
   toggleShortlistCountryAction,
   type ActionOutcome,
 } from '../../../state/actions';
+import { AffordabilityBadge } from '../AffordabilityBadge';
+import { ExchangeRateStrip } from '../ExchangeRateStrip';
+import { ForeignPaymentSheet } from '../ForeignPaymentSheet';
+import { MoneyText } from '../MoneyText';
 import { CountryFlag } from '../flags/CountryFlag';
 import {
   ActionButton,
@@ -54,9 +58,19 @@ import {
 
 type DetailTab = 'income' | 'paths' | 'life' | 'economy' | 'risks';
 
+interface PendingCountryPayment {
+  kind: 'step' | 'language';
+  title: string;
+  subtitle?: string;
+  amount: number;
+  currency: CurrencyCode;
+  confirmLabel: string;
+}
+
 interface CountryDetailViewProps {
   open: boolean;
   countryId: string | null;
+  initialFocusBreakdown?: boolean;
   saveGame: SaveGame;
   onClose: () => void;
   onUpdateSave: (outcome: ActionOutcome) => void;
@@ -67,6 +81,7 @@ interface CountryDetailViewProps {
 export function CountryDetailView({
   open,
   countryId,
+  initialFocusBreakdown = false,
   saveGame,
   onClose,
   onUpdateSave,
@@ -78,6 +93,19 @@ export function CountryDetailView({
   const [activeTab, setActiveTab] = useState<DetailTab>('income');
   const [selectedPathOverride, setSelectedPathOverride] = useState<MigrationPathType | null>(null);
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
+  const [calcJobId, setCalcJobId] = useState<string>('');
+  const [calcFamilySize, setCalcFamilySize] = useState<'1' | '2' | '3'>('1');
+  const [pendingPayment, setPendingPayment] = useState<PendingCountryPayment | null>(null);
+  const breakdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (open && initialFocusBreakdown) {
+      setActiveTab('income');
+      window.setTimeout(() => {
+        breakdownRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
+    }
+  }, [open, initialFocusBreakdown, countryId]);
 
   const countryDef = useMemo(
     () => (countryId ? getCountryMacroDef(countryId, gameDataset) ?? null : null),
@@ -114,6 +142,15 @@ export function CountryDetailView({
     [countryId, activePathId, state],
   );
 
+  const effectiveRegionId = selectedRegionId ?? countryDef?.regions[0]?.id;
+  const defaultJobId =
+    state.player.job?.jobId ??
+    gameDataset.jobs.find((j) => j.minEducation === state.player.education.level)?.id ??
+    gameDataset.jobs[0]?.id ??
+    '';
+  const effectiveJobId = calcJobId || defaultJobId;
+  const familyMembersCount = calcFamilySize === '1' ? 1 : calcFamilySize === '2' ? 2 : 3;
+
   const netRange = useMemo(
     () =>
       countryId
@@ -121,18 +158,25 @@ export function CountryDetailView({
             countryId,
             state,
             dataset: gameDataset,
+            jobIdOverride: effectiveJobId || undefined,
+            regionIdOverride: effectiveRegionId,
           })
         : null,
-    [countryId, state],
+    [countryId, state, effectiveJobId, effectiveRegionId],
   );
 
-  const effectiveRegionId = selectedRegionId ?? countryDef?.regions[0]?.id;
   const monthlyBudget = useMemo(
     () =>
       countryId
-        ? getAbroadMonthlyBudget(state, gameDataset, countryId, effectiveRegionId)
+        ? getAbroadMonthlyBudget(
+            state,
+            gameDataset,
+            countryId,
+            effectiveRegionId,
+            familyMembersCount,
+          )
         : null,
-    [countryId, state, effectiveRegionId],
+    [countryId, state, effectiveRegionId, familyMembersCount],
   );
 
   if (!open || !countryDef || !pathsDef || !difficulty || !netRange || !monthlyBudget || !activePathSpec) {
@@ -147,7 +191,6 @@ export function CountryDetailView({
   );
   const langLevel = getAbroadLanguageLevel(state, countryDef.id, gameDataset);
   const langCost = getStudyLanguageCost(countryDef.id, state, gameDataset);
-  const fxToIrt = getFxRate(state, countryDef.currencyCode, 'IRT', gameDataset);
   const realFx = getRealExchangeRateAndPppGap(state, countryDef.currencyCode, gameDataset);
   const stepIdx = app && app.selectedPathId === activePathSpec.id ? app.currentStepIndex : 0;
   const nextStepFee = getEmigrationStepFeeLocal(
@@ -158,11 +201,10 @@ export function CountryDetailView({
     gameDataset,
   );
 
-  const currentJobDef = state.player.job
-    ? gameDataset.jobs.find((j) => j.id === state.player.job!.jobId)
-    : undefined;
-  const credTrack = currentJobDef
-    ? getCredentialTrackForJob(currentJobDef, state.player.education.major)
+  const selectedJobDef =
+    gameDataset.jobs.find((j) => j.id === effectiveJobId) ?? gameDataset.jobs[0];
+  const credTrack = selectedJobDef
+    ? getCredentialTrackForJob(selectedJobDef, state.player.education.major)
     : state.player.education.major?.includes('پزشکی')
       ? 'medicine'
       : state.player.education.major?.includes('حقوق')
@@ -178,9 +220,13 @@ export function CountryDetailView({
     .slice(-14)
     .map((h) => h.usdRates.IRT / Math.max(0.0001, h.usdRates[countryDef.currencyCode] ?? 1));
 
-  const sortedFactors = [...difficulty.factors].sort((a, b) => b.points - a.points);
+  const sortedFactors = [...difficulty.factors].sort((a, b) => Math.abs(b.points) - Math.abs(a.points));
+  const maxFactorPoints = Math.max(25, ...sortedFactors.map((f) => Math.abs(f.points)));
   const surplusLocal = netRange.monthlyNetMedian - monthlyBudget.totalMonthlyLocal;
-  const surplusToman = Math.round(surplusLocal * fxToIrt);
+  const affordabilityPct = Math.max(
+    8,
+    Math.min(100, Math.round((netRange.monthlyNetMedian / Math.max(1, monthlyBudget.totalMonthlyLocal)) * 65)),
+  );
   const inflationPct = Number(
     ((state.countryMacros?.[countryDef.id]?.lastInflationRate ?? countryDef.macro.inflationRate.value) * 100).toFixed(1),
   );
@@ -241,134 +287,265 @@ export function CountryDetailView({
     >
       {activeTab === 'income' && (
         <div className="space-y-4">
-          <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3.5">
+          <ExchangeRateStrip state={state} highlightCurrency={countryDef.currencyCode} compact />
+
+          {/* Interactive Monthly Income & Living Cost Calculator */}
+          <section
+            data-testid="abroad-income-calculator"
+            className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3.5"
+          >
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-xs font-bold text-[var(--text)]">تراز ماهانه درآمد و هزینه</h3>
+              <h3 className="text-xs font-bold text-[var(--text)]">ماشین‌حساب درآمد و هزینه ماهانه</h3>
               <Badge tone={surplusLocal >= 0 ? 'success' : 'warning'}>
-                {surplusLocal >= 0 ? 'تراز مثبت' : 'نیاز به پس‌انداز'}
+                {surplusLocal >= 0 ? 'قابل پرداخت و پس‌انداز' : 'نیاز به پشتوانه'}
               </Badge>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 rounded-xl bg-[var(--surface-2)] p-2.5 text-center text-xs">
-              <div>
-                <div className="text-[10px] text-[var(--text-muted)]">میانه حقوق خالص</div>
-                <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(netRange.monthlyNetMedian, netRange.currencyCode, gameDataset)}
-                  </bdi>
-                </div>
-                <div className="text-[10px] tabular-nums text-[var(--text-muted)]">
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(Math.round(netRange.monthlyNetMedian * fxToIrt), 'IRT', gameDataset, { compact: true })}
-                  </bdi>
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[var(--text-muted)]">سبد هزینه ماهانه</div>
-                <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(monthlyBudget.totalMonthlyLocal, monthlyBudget.currencyCode, gameDataset)}
-                  </bdi>
-                </div>
-                <div className="text-[10px] tabular-nums text-[var(--text-muted)]">
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(monthlyBudget.totalMonthlyToman, 'IRT', gameDataset, { compact: true })}
-                  </bdi>
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-[var(--text-muted)]">مانده ماهانه</div>
-                <div
-                  className={`mt-0.5 font-bold tabular-nums ${
-                    surplusLocal >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
-                  }`}
+            {/* Profession, City Tier, Family Size Controls */}
+            <div className="space-y-2.5 rounded-2xl bg-[var(--surface-2)] p-3 text-xs">
+              <label className="block space-y-1">
+                <span className="font-bold text-[var(--text)]">شغل نمونه در مقصد</span>
+                <select
+                  aria-label="انتخاب شغل برای محاسبه درآمد مقصد"
+                  value={effectiveJobId}
+                  onChange={(e) => setCalcJobId(e.target.value)}
+                  className="min-h-[40px] w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-bold text-[var(--text)]"
                 >
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(surplusLocal, netRange.currencyCode, gameDataset)}
-                  </bdi>
+                  {gameDataset.jobs.map((job) => (
+                    <option key={job.id} value={job.id}>
+                      {job.shortTitle || job.titleFa}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="space-y-1">
+                <span className="font-bold text-[var(--text)]">شهر و سطح هزینه</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {countryDef.regions.map((reg) => {
+                    const active = effectiveRegionId === reg.id;
+                    return (
+                      <button
+                        key={reg.id}
+                        type="button"
+                        onClick={() => setSelectedRegionId(reg.id)}
+                        className={`min-h-[38px] rounded-xl border px-3 text-xs font-bold transition-colors ${
+                          active
+                            ? 'border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]'
+                            : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]'
+                        }`}
+                      >
+                        {reg.nameFa}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="text-[10px] tabular-nums text-[var(--text-muted)]">
-                  <bdi dir="rtl">
-                    {formatCurrencyAmount(surplusToman, 'IRT', gameDataset, { compact: true })}
-                  </bdi>
+              </div>
+
+              <div className="space-y-1">
+                <span className="font-bold text-[var(--text)]">اندازه خانوار</span>
+                <SegmentedControl<'1' | '2' | '3'>
+                  value={calcFamilySize}
+                  onChange={setCalcFamilySize}
+                  items={[
+                    { value: '1', label: '۱ نفر (مجرد)' },
+                    { value: '2', label: '۲ نفر (زوج)' },
+                    { value: '3', label: 'خانواده ۳+ نفر' },
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 rounded-xl bg-[var(--surface-2)] p-3 sm:grid-cols-3">
+              <div>
+                <div className="text-xs text-[var(--text-muted)]">میانه حقوق خالص</div>
+                <div className="mt-1">
+                  <MoneyText
+                    amount={netRange.monthlyNetMedian}
+                    currency={netRange.currencyCode}
+                    mode="stacked"
+                    stateOverride={state}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-[var(--text-muted)]">سبد هزینه ماهانه</div>
+                <div className="mt-1">
+                  <MoneyText
+                    amount={monthlyBudget.totalMonthlyLocal}
+                    currency={monthlyBudget.currencyCode}
+                    mode="stacked"
+                    stateOverride={state}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-[var(--text-muted)]">مانده ماهانه</div>
+                <div className="mt-1">
+                  <MoneyText
+                    amount={surplusLocal}
+                    currency={netRange.currencyCode}
+                    mode="stacked"
+                    showSign
+                    stateOverride={state}
+                    primaryClassName={surplusLocal >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'}
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] text-[var(--text-muted)]">
-              <div className="flex justify-between rounded-xl bg-[var(--surface-2)] px-2.5 py-1.5">
+            {/* Affordability Visual Bar */}
+            <div className="space-y-1.5 rounded-xl bg-[var(--surface-2)] p-2.5 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-[var(--text)]">توان پوشش هزینه با حقوق شغلی</span>
+                <span
+                  className={`font-bold tabular-nums ${
+                    surplusLocal >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
+                  }`}
+                >
+                  {surplusLocal >= 0
+                    ? `مازاد ${toPersianDigits(Math.round((surplusLocal / Math.max(1, monthlyBudget.totalMonthlyLocal)) * 100))}٪`
+                    : `کسری ${toPersianDigits(Math.round((Math.abs(surplusLocal) / Math.max(1, monthlyBudget.totalMonthlyLocal)) * 100))}٪`}
+                </span>
+              </div>
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--surface)]">
+                <div
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{
+                    width: `${affordabilityPct}%`,
+                    backgroundColor: surplusLocal >= 0 ? 'var(--success)' : 'var(--warning)',
+                  }}
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-1 text-xs text-[var(--text-muted)]">
+                <span>بازه حقوق:</span>
+                <MoneyText
+                  amount={netRange.monthlyNetLow}
+                  currency={netRange.currencyCode}
+                  mode="single"
+                  stateOverride={state}
+                />
+                <span>تا</span>
+                <MoneyText
+                  amount={netRange.monthlyNetHigh}
+                  currency={netRange.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 text-xs text-[var(--text-muted)] sm:grid-cols-2">
+              <div className="flex flex-col gap-0.5 rounded-xl bg-[var(--surface-2)] px-3 py-2">
                 <span>اجاره مسکن:</span>
-                <bdi dir="rtl" className="font-bold tabular-nums text-[var(--text)]">
-                  {formatCurrencyAmount(monthlyBudget.rentLocal, monthlyBudget.currencyCode, gameDataset)}
-                </bdi>
+                <MoneyText
+                  amount={monthlyBudget.rentLocal}
+                  currency={monthlyBudget.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                  primaryClassName="font-bold text-[var(--text)]"
+                />
               </div>
-              <div className="flex justify-between rounded-xl bg-[var(--surface-2)] px-2.5 py-1.5">
+              <div className="flex flex-col gap-0.5 rounded-xl bg-[var(--surface-2)] px-3 py-2">
                 <span>خوراک و خرید:</span>
-                <bdi dir="rtl" className="font-bold tabular-nums text-[var(--text)]">
-                  {formatCurrencyAmount(monthlyBudget.foodLocal, monthlyBudget.currencyCode, gameDataset)}
-                </bdi>
+                <MoneyText
+                  amount={monthlyBudget.foodLocal}
+                  currency={monthlyBudget.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                  primaryClassName="font-bold text-[var(--text)]"
+                />
               </div>
-              <div className="flex justify-between rounded-xl bg-[var(--surface-2)] px-2.5 py-1.5">
+              <div className="flex flex-col gap-0.5 rounded-xl bg-[var(--surface-2)] px-3 py-2">
                 <span>حمل‌ونقل و قبوض:</span>
-                <bdi dir="rtl" className="font-bold tabular-nums text-[var(--text)]">
-                  {formatCurrencyAmount(monthlyBudget.utilitiesTransportLocal, monthlyBudget.currencyCode, gameDataset)}
-                </bdi>
+                <MoneyText
+                  amount={monthlyBudget.utilitiesTransportLocal}
+                  currency={monthlyBudget.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                  primaryClassName="font-bold text-[var(--text)]"
+                />
               </div>
-              <div className="flex justify-between rounded-xl bg-[var(--surface-2)] px-2.5 py-1.5">
+              <div className="flex flex-col gap-0.5 rounded-xl bg-[var(--surface-2)] px-3 py-2">
                 <span>بیمه و درمان:</span>
-                <bdi dir="rtl" className="font-bold tabular-nums text-[var(--text)]">
-                  {formatCurrencyAmount(monthlyBudget.healthcareMiscLocal, monthlyBudget.currencyCode, gameDataset)}
-                </bdi>
+                <MoneyText
+                  amount={monthlyBudget.healthcareMiscLocal}
+                  currency={monthlyBudget.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                  primaryClassName="font-bold text-[var(--text)]"
+                />
               </div>
             </div>
           </section>
 
-          <SectionGroup
-            title={`تجزیه سختی پرونده (سختی کل ${toPersianDigits(difficulty.totalDifficulty)}٪)`}
-            subtitle={`شانس برآوردی تأیید در مسیر «${activePathSpec.titleFa}»: ${toPersianDigits(difficulty.approvalChancePct)}٪`}
-          >
-            {sortedFactors.slice(0, 7).map((factor) => {
-              const barColor =
-                factor.impact === 'helpful'
+          <div ref={breakdownRef}>
+            <SectionGroup
+              title={`تجزیه سختی پرونده (سختی کل ${toPersianDigits(difficulty.totalDifficulty)}٪)`}
+              subtitle={`شانس برآوردی تأیید در مسیر «${activePathSpec.titleFa}»: ${toPersianDigits(difficulty.approvalChancePct)}٪`}
+            >
+              {sortedFactors.slice(0, 7).map((factor) => {
+                const isHelpful = factor.impact === 'helpful';
+                const isBarrier = factor.impact === 'barrier';
+                const textTone = isHelpful
                   ? 'text-[var(--success)]'
-                  : factor.impact === 'barrier'
+                  : isBarrier
                     ? 'text-[var(--danger)]'
                     : 'text-[var(--text-muted)]';
-              return (
-                <div
-                  key={factor.id}
-                  className="flex items-center justify-between gap-2.5 px-3.5 py-2.5 text-right"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="truncate text-xs font-bold text-[var(--text)]">
-                        {factor.labelFa}
-                      </span>
-                      <span className={`text-[11px] font-bold tabular-nums ${barColor}`}>
-                        <bdi dir="rtl">
-                          {factor.points > 0
-                            ? `+${toPersianDigits(factor.points)}`
-                            : toPersianDigits(factor.points)}
-                        </bdi>
-                      </span>
+                const barFill = isHelpful
+                  ? 'var(--success)'
+                  : isBarrier
+                    ? 'var(--danger)'
+                    : 'var(--border-strong)';
+                const barPct = Math.max(
+                  10,
+                  Math.min(100, Math.round((Math.abs(factor.points) / maxFactorPoints) * 100)),
+                );
+
+                return (
+                  <div
+                    key={factor.id}
+                    className="space-y-1.5 px-3.5 py-2.5 text-right"
+                  >
+                    <div className="flex items-center justify-between gap-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-xs font-bold text-[var(--text)]">
+                            {factor.labelFa}
+                          </span>
+                          <span className={`text-xs font-bold tabular-nums ${textTone}`}>
+                            <bdi dir="rtl">
+                              {factor.points > 0
+                                ? `+${toPersianDigits(factor.points)} سختی`
+                                : `${toPersianDigits(factor.points)} تسهیل`}
+                            </bdi>
+                          </span>
+                        </div>
+                        <div className="mt-0.5 text-xs text-[var(--text-muted)]">
+                          {factor.detailFa}
+                        </div>
+                      </div>
+                      {factor.fixAction && (
+                        <button
+                          type="button"
+                          onClick={() => handleSolveAction(factor.fixAction!.tab, factor.fixAction!.subTarget)}
+                          className="min-h-[38px] shrink-0 rounded-xl border border-[var(--primary)]/45 bg-[var(--primary-soft)] px-3 text-xs font-bold text-[var(--primary-strong)]"
+                        >
+                          {t('emigrationHub.solveAction')}
+                        </button>
+                      )}
                     </div>
-                    <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
-                      {factor.detailFa}
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-2)]">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{ width: `${barPct}%`, backgroundColor: barFill }}
+                      />
                     </div>
                   </div>
-                  {factor.fixAction && (
-                    <button
-                      type="button"
-                      onClick={() => handleSolveAction(factor.fixAction!.tab, factor.fixAction!.subTarget)}
-                      className="min-h-[36px] shrink-0 rounded-xl border border-[var(--primary)]/45 bg-[var(--primary-soft)] px-2.5 text-[11px] font-bold text-[var(--primary-strong)]"
-                    >
-                      {t('emigrationHub.solveAction')}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </SectionGroup>
+                );
+              })}
+            </SectionGroup>
+          </div>
         </div>
       )}
 
@@ -378,8 +555,10 @@ export function CountryDetailView({
             <LockedNotice message="شروع پرونده مستقل مهاجرت از ۱۸ سالگی فعال می‌شود." />
           ) : (
             <>
+              <ExchangeRateStrip state={state} highlightCurrency={countryDef.currencyCode} compact />
+
               <section className="space-y-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3.5">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <h3 className="text-xs font-bold text-[var(--text)]">انتخاب مسیر مهاجرت</h3>
                   {app?.selectedPathId !== activePathSpec.id && (
                     <button
@@ -394,7 +573,7 @@ export function CountryDetailView({
                           ),
                         )
                       }
-                      className="min-h-[32px] rounded-xl bg-[var(--primary-soft)] px-2.5 text-[11px] font-bold text-[var(--primary-strong)]"
+                      className="min-h-[36px] rounded-xl bg-[var(--primary-soft)] px-3 text-xs font-bold text-[var(--primary-strong)]"
                     >
                       تثبیت این مسیر
                     </button>
@@ -408,16 +587,16 @@ export function CountryDetailView({
                     label: p.titleFa,
                   }))}
                 />
-                <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
-                  {activePathSpec.summaryFa} · تمکن مالی لازم:{' '}
-                  <bdi dir="rtl" className="font-bold text-[var(--text)]">
-                    {formatCurrencyAmount(
-                      activePathSpec.proofOfFundsLocal,
-                      countryDef.currencyCode,
-                      gameDataset,
-                    )}
-                  </bdi>
-                </p>
+                <div className="flex flex-wrap items-center gap-1.5 text-xs leading-relaxed text-[var(--text-muted)]">
+                  <span>{activePathSpec.summaryFa} · تمکن مالی لازم:</span>
+                  <MoneyText
+                    amount={activePathSpec.proofOfFundsLocal}
+                    currency={countryDef.currencyCode}
+                    mode="inline"
+                    stateOverride={state}
+                    primaryClassName="font-bold text-[var(--text)]"
+                  />
+                </div>
               </section>
 
               <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3.5">
@@ -473,24 +652,51 @@ export function CountryDetailView({
                     />
                   </div>
                 ) : (
-                  <ActionButton
-                    icon={<IconCheck className="h-4 w-4" />}
-                    label={`اجرای گام ${toPersianDigits(stepIdx + 1)}: ${EMIGRATION_STEP_LABELS_FA[Math.min(5, stepIdx)]}`}
-                    costText={formatCurrencyAmount(nextStepFee.feeLocal, nextStepFee.currencyCode, gameDataset)}
-                    effectHint={`معادل ${formatCurrencyAmount(nextStepFee.feeToman, 'IRT', gameDataset, { compact: true })}`}
-                    disabled={isCurrentResidency}
-                    disabledReason={isCurrentResidency ? 'هم‌اکنون در این کشور اقامت داری' : undefined}
-                    onClick={() =>
-                      onUpdateSave(
-                        advanceEmigrationPipelineStepAction(
-                          saveGame,
-                          countryDef.id,
-                          activePathSpec.id,
-                          gameDataset,
-                        ),
-                      )
-                    }
-                  />
+                  <div className="space-y-2.5">
+                    {!isCurrentResidency && nextStepFee.feeLocal > 0 && (
+                      <AffordabilityBadge
+                        amount={nextStepFee.feeLocal}
+                        currency={nextStepFee.currencyCode}
+                        state={state}
+                      />
+                    )}
+                    <ActionButton
+                      icon={<IconCheck className="h-4 w-4" />}
+                      label={`اجرای گام ${toPersianDigits(stepIdx + 1)}: ${EMIGRATION_STEP_LABELS_FA[Math.min(5, stepIdx)]}`}
+                      costText={
+                        <MoneyText
+                          amount={nextStepFee.feeLocal}
+                          currency={nextStepFee.currencyCode}
+                          mode="inline"
+                          stateOverride={state}
+                          interactive={false}
+                        />
+                      }
+                      disabled={isCurrentResidency}
+                      disabledReason={isCurrentResidency ? 'هم‌اکنون در این کشور اقامت داری' : undefined}
+                      onClick={() => {
+                        if (nextStepFee.feeLocal <= 0) {
+                          onUpdateSave(
+                            advanceEmigrationPipelineStepAction(
+                              saveGame,
+                              countryDef.id,
+                              activePathSpec.id,
+                              gameDataset,
+                            ),
+                          );
+                          return;
+                        }
+                        setPendingPayment({
+                          kind: 'step',
+                          title: `پرداخت گام ${toPersianDigits(stepIdx + 1)}: ${EMIGRATION_STEP_LABELS_FA[Math.min(5, stepIdx)]}`,
+                          subtitle: `پرونده ${countryDef.nameFa} · مسیر «${activePathSpec.titleFa}»`,
+                          amount: nextStepFee.feeLocal,
+                          currency: nextStepFee.currencyCode,
+                          confirmLabel: 'تأیید و اجرای گام',
+                        });
+                      }}
+                    />
+                  </div>
                 )}
               </section>
 
@@ -500,9 +706,17 @@ export function CountryDetailView({
                   title={`سطح زبان فعلی: ${getLanguageLevelLabelFa(langLevel)}`}
                   subtitle={`حداقل سطح مورد نیاز مسیر «${activePathSpec.titleFa}»: ${getLanguageLevelLabelFa(activePathSpec.requiredLanguageLevel)}`}
                   value={
-                    langLevel >= 6
-                      ? 'تکمیل'
-                      : formatCurrencyAmount(langCost.costLocal, langCost.currencyCode, gameDataset)
+                    langLevel >= 6 ? (
+                      'تکمیل'
+                    ) : (
+                      <MoneyText
+                        amount={langCost.costLocal}
+                        currency={langCost.currencyCode}
+                        mode="inline"
+                        stateOverride={state}
+                        interactive={false}
+                      />
+                    )
                   }
                   state={
                     langLevel >= 6
@@ -512,9 +726,20 @@ export function CountryDetailView({
                         : 'enabled'
                   }
                   ctaLabel={langLevel >= 6 ? undefined : 'دوره فشرده'}
-                  onClick={() =>
-                    onUpdateSave(studyForeignLanguageAction(saveGame, countryDef.id, gameDataset))
-                  }
+                  onClick={() => {
+                    if (langCost.costLocal <= 0) {
+                      onUpdateSave(studyForeignLanguageAction(saveGame, countryDef.id, gameDataset));
+                      return;
+                    }
+                    setPendingPayment({
+                      kind: 'language',
+                      title: `ثبت‌نام دوره فشرده زبان ${countryDef.nameFa}`,
+                      subtitle: `ارتقای سطح زبان از ${getLanguageLevelLabelFa(langLevel)}`,
+                      amount: langCost.costLocal,
+                      currency: langCost.currencyCode,
+                      confirmLabel: 'پرداخت و شروع دوره',
+                    });
+                  }}
                 />
               </SectionGroup>
             </>
@@ -532,7 +757,7 @@ export function CountryDetailView({
               >
                 <div className="min-w-0 text-right">
                   <div className="font-bold text-[var(--text)]">{reg.nameFa}</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">
+                  <div className="text-xs text-[var(--text-muted)]">
                     شاخص فرصت شغلی: {toPersianDigits(Math.round(reg.jobOpportunityIndex * 100))}٪
                   </div>
                 </div>
@@ -540,7 +765,7 @@ export function CountryDetailView({
                   <div className="font-bold text-[var(--text)]">
                     هزینه {toPersianDigits(Math.round(reg.colMultiplier * 100))}٪
                   </div>
-                  <div className="text-[11px] text-[var(--text-muted)]">
+                  <div className="text-xs text-[var(--text-muted)]">
                     اجاره {toPersianDigits(Math.round(reg.rentMultiplier * 100))}٪
                   </div>
                 </div>
@@ -590,7 +815,7 @@ export function CountryDetailView({
               }
               height={46}
             />
-            <div className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+            <div className="text-xs leading-relaxed text-[var(--text-muted)]">
               {countryDef.macro.verifiedAnchorNoteFa} · وضعیت نرخ برابری قدرت خرید: {realFx.assessmentFa}
             </div>
           </section>
@@ -606,7 +831,14 @@ export function CountryDetailView({
                     ? 'برآوردی بر پایه داده‌های مرجع'
                     : 'مصوب قانونی کشور مقصد'
               }
-              value={formatCurrencyAmount(minWageLocal, countryDef.currencyCode, gameDataset)}
+              value={
+                <MoneyText
+                  amount={minWageLocal}
+                  currency={countryDef.currencyCode}
+                  mode="inline"
+                  stateOverride={state}
+                />
+              }
             />
             <ActionRow
               icon={<IconCoins className="h-4 w-4" />}
@@ -673,6 +905,41 @@ export function CountryDetailView({
               ))}
           </SectionGroup>
         </div>
+      )}
+
+      {pendingPayment && (
+        <ForeignPaymentSheet
+          open={true}
+          onClose={() => setPendingPayment(null)}
+          title={pendingPayment.title}
+          subtitle={pendingPayment.subtitle}
+          amount={pendingPayment.amount}
+          currency={pendingPayment.currency}
+          state={state}
+          confirmLabel={pendingPayment.confirmLabel}
+          lockedRateToIrt={app?.lockedRates?.ratesToIrt?.[countryDef.currencyCode]}
+          lockedYear={app?.lockedRates?.year}
+          onConfirm={({ payFromCurrency }) => {
+            if (pendingPayment.kind === 'step') {
+              onUpdateSave(
+                advanceEmigrationPipelineStepAction(
+                  saveGame,
+                  countryDef.id,
+                  activePathSpec.id,
+                  gameDataset,
+                  { payFromCurrency },
+                ),
+              );
+            } else {
+              onUpdateSave(
+                studyForeignLanguageAction(saveGame, countryDef.id, gameDataset, {
+                  payFromCurrency,
+                }),
+              );
+            }
+            setPendingPayment(null);
+          }}
+        />
       )}
     </DetailSheet>
   );

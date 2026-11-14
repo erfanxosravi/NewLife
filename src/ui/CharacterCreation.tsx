@@ -166,7 +166,7 @@ export function CharacterCreation({
               ]}
             />
             {startingScenarioId === 'welfare_center' && (
-              <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--primary-strong)]">
+              <p className="mt-1.5 text-xs leading-relaxed text-[var(--primary-strong)]">
                 {gameDataset.adoption.challengePack.subtitleFa}
               </p>
             )}

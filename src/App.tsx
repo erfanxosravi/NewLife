@@ -3,6 +3,7 @@ import { gameDataset } from './data/registry';
 import type {
   ActivityDefinition,
   ContentSettings,
+  CurrencyCode,
   EventChoice,
   EventDefinition,
   PlayerStats,
@@ -10,6 +11,7 @@ import type {
 } from './engine/types';
 import { useI18n } from './i18n/useI18n';
 import {
+  convertCurrencyAction,
   performActivityAction,
   runAdvanceYearWithTick,
   runApplyEventChoice,
@@ -41,6 +43,13 @@ import {
 } from './storage/saveStore';
 import { BottomNav, type BottomNavTab } from './ui/BottomNav';
 import { CharacterCreation } from './ui/CharacterCreation';
+import { CurrencyCalculatorSheet } from './ui/components/CurrencyCalculatorSheet';
+import { ForeignAmountPopoverSheet } from './ui/components/ForeignAmountPopoverSheet';
+import {
+  MoneyProvider,
+  type CalculatorRequest,
+  type ForeignPopoverRequest,
+} from './ui/components/MoneyContext';
 import { Toast } from './ui/components/Primitives';
 import { EventPopupSheet } from './ui/EventPopupSheet';
 import { HeaderBar } from './ui/HeaderBar';
@@ -159,6 +168,14 @@ export default function App() {
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>(null);
   const [eventQueue, setEventQueue] = useState<EventDefinition[]>([]);
   const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
+  const [calculatorSheet, setCalculatorSheet] = useState<{
+    open: boolean;
+    req: CalculatorRequest;
+  }>({ open: false, req: {} });
+  const [foreignPopover, setForeignPopover] = useState<{
+    open: boolean;
+    req: ForeignPopoverRequest | null;
+  }>({ open: false, req: null });
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
@@ -755,9 +772,44 @@ export default function App() {
     !isSequenceActive;
 
   return (
-    <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
-      {/* Centered Phone-Width Column (360-480px) */}
-      <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)] sm:border-x sm:border-[var(--border)] sm:shadow-2xl">
+    <MoneyProvider
+      value={{
+        state: saveGame?.state ?? ({
+          currentJalaliYear: 1405,
+          player: { countryId: 'iran', moneyToman: 0, debtToman: 0, housing: { monthlyRentToman: 0, depositRahnToman: 0, propertyValueToman: 0 } },
+          assets: [],
+          loans: [],
+          flags: {},
+          displayCurrencyMode: 'local',
+        } as unknown as SaveGame['state']),
+        onOpenCalculator: (req) => {
+          triggerHaptic('light');
+          setCalculatorSheet({ open: true, req: req ?? {} });
+        },
+        onOpenForeignPopover: (req) => {
+          triggerHaptic('light');
+          setForeignPopover({ open: true, req });
+        },
+        onAffordabilityFix: (fix, contextCurrency) => {
+          triggerHaptic('light');
+          if (fix === 'convert') {
+            setCalculatorSheet({
+              open: true,
+              req: {
+                fromCurrency: 'IRT',
+                toCurrency: contextCurrency && contextCurrency !== 'IRT' ? contextCurrency : 'EUR',
+                amount: 50_000_000,
+              },
+            });
+          } else if (fix === 'sell_asset' || fix === 'loan') {
+            setActiveSheet('assets');
+          }
+        },
+      }}
+    >
+      <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
+        {/* Centered Phone-Width Column (360-480px) */}
+        <div className="relative flex h-[100dvh] w-full max-w-[480px] flex-col overflow-hidden bg-[var(--bg)] text-[var(--text)] sm:border-x sm:border-[var(--border)] sm:shadow-2xl">
         <Toast
           visible={toast.visible}
           message={toast.message}
@@ -1044,7 +1096,46 @@ export default function App() {
             )}
           </Suspense>
         )}
+
+        {saveGame && (
+          <>
+            <CurrencyCalculatorSheet
+              open={calculatorSheet.open}
+              onClose={() => setCalculatorSheet((prev) => ({ ...prev, open: false }))}
+              state={saveGame.state}
+              initialFrom={calculatorSheet.req.fromCurrency}
+              initialTo={calculatorSheet.req.toCurrency}
+              initialAmount={calculatorSheet.req.amount}
+              onConvertWallet={(fromCurrency, toCurrency, fromAmount) => {
+                void handleActionOutcome(
+                  convertCurrencyAction(saveGame, { fromCurrency, toCurrency, fromAmount }),
+                );
+              }}
+            />
+
+            {foreignPopover.req && (
+              <ForeignAmountPopoverSheet
+                open={foreignPopover.open}
+                onClose={() => setForeignPopover((prev) => ({ ...prev, open: false }))}
+                amount={foreignPopover.req.amount}
+                currency={foreignPopover.req.currency}
+                state={saveGame.state}
+                onOpenCalculator={() =>
+                  setCalculatorSheet({
+                    open: true,
+                    req: {
+                      fromCurrency: foreignPopover.req?.currency ?? 'EUR',
+                      toCurrency: 'IRT',
+                      amount: foreignPopover.req?.amount ?? 100,
+                    },
+                  })
+                }
+              />
+            )}
+          </>
+        )}
+        </div>
       </div>
-    </div>
+    </MoneyProvider>
   );
 }

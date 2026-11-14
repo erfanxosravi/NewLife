@@ -239,7 +239,7 @@ export function YearTransitionOverlay({
                       }`}
                     >
                       <Icon className="h-4 w-4" strokeWidth={1.75} />
-                      <span className="text-[10px] font-bold">{label}</span>
+                      <span className="text-xs font-bold">{label}</span>
                     </div>
                   );
                 })}
@@ -262,7 +262,7 @@ export function YearTransitionOverlay({
           )}
 
           {/* Subtle tap-to-skip hint */}
-          <span className="mt-8 text-[11px] font-medium text-[var(--text-muted)]/80">
+          <span className="mt-8 text-xs font-medium text-[var(--text-muted)]/80">
             {t('yearTransition.tapToSkip')}
           </span>
         </motion.div>

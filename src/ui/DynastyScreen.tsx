@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { gameDataset } from '../data/registry';
 import { calculateNetWorthToman } from '../engine/economy';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import { ensureDynastyState, getDynastyHallOfFameLeaders } from '../engine/legacy';
-import type { DynastyWealthPoint, SaveGame } from '../engine/types';
+import type { DynastyWealthPoint, GameState, SaveGame } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
 import { FullScreenSheet } from './components/FullScreenSheet';
+import { MoneyText } from './components/MoneyText';
 import {
   ActionButton,
   Badge,
   Card,
-  CurrencyText,
   EmptyState,
   SectionHeader,
   SegmentedControl,
@@ -28,7 +28,7 @@ interface DynastyScreenProps {
 
 type DynastyTab = 'tree' | 'stats' | 'hall';
 
-function DynastyWealthChart({ points }: { points: DynastyWealthPoint[] }) {
+function DynastyWealthChart({ points, state }: { points: DynastyWealthPoint[]; state: GameState }) {
   if (points.length < 2) {
     return (
       <div className="rounded-xl bg-[var(--surface-2)] p-4 text-center text-xs text-[var(--text-muted)]">
@@ -73,7 +73,7 @@ function DynastyWealthChart({ points }: { points: DynastyWealthPoint[] }) {
               x={c.x}
               y={height - 5}
               textAnchor="middle"
-              fontSize="9"
+              fontSize="12"
               fill="var(--text-muted)"
             >
               ن{toPersianDigits(c.point.generation)}
@@ -81,9 +81,11 @@ function DynastyWealthChart({ points }: { points: DynastyWealthPoint[] }) {
           </g>
         ))}
       </svg>
-      <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+      <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
         <span>مبنا: ارزش واقعی ۱۴۰۵</span>
-        <span>بیشینه: {formatToman(maxVal)}</span>
+        <span>
+          بیشینه: <MoneyText amount={maxVal} currency="IRT" mode="inline" stateOverride={state} />
+        </span>
       </div>
     </div>
   );
@@ -248,7 +250,7 @@ export function DynastyScreen({
                   <IconBrandMark className="h-6 w-6" />
                   <div>
                     <div className="text-sm font-bold">{dynasty.dynastyNameFa}</div>
-                    <div className="text-[11px] text-[var(--text-muted)]">
+                    <div className="text-xs text-[var(--text-muted)]">
                       بنیان‌گذار: {dynasty.founderNameFa}
                     </div>
                   </div>
@@ -260,19 +262,19 @@ export function DynastyScreen({
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="rounded-xl bg-[var(--surface)] p-2.5">
-                  <div className="text-[10px] text-[var(--text-muted)]">نسل‌ها</div>
+                  <div className="text-xs text-[var(--text-muted)]">نسل‌ها</div>
                   <div className="mt-0.5 text-sm font-bold tabular-nums">
                     {toPersianDigits(dynasty.currentGeneration)}
                   </div>
                 </div>
                 <div className="rounded-xl bg-[var(--surface)] p-2.5">
-                  <div className="text-[10px] text-[var(--text-muted)]">سال‌های زیسته</div>
+                  <div className="text-xs text-[var(--text-muted)]">سال‌های زیسته</div>
                   <div className="mt-0.5 text-sm font-bold tabular-nums">
                     {toPersianDigits(totalYearsLived)}
                   </div>
                 </div>
                 <div className="rounded-xl bg-[var(--surface)] p-2.5">
-                  <div className="text-[10px] text-[var(--text-muted)]">نشان دودمان</div>
+                  <div className="text-xs text-[var(--text-muted)]">نشان دودمان</div>
                   <div className="mt-0.5 text-sm font-bold tabular-nums">
                     {toPersianDigits(dynasty.unlockedDynastyRibbons.length)} /{' '}
                     {toPersianDigits(gameDataset.inheritance.dynastyRibbons.length)}
@@ -298,7 +300,7 @@ export function DynastyScreen({
                 title="ثروت تجمعی در گذر زمان (تعدیل‌شده با تورم)"
                 subtitle="مقایسه قدرت خرید واقعی خاندان در پایان هر نسل"
               />
-              <DynastyWealthChart points={chartPoints} />
+              <DynastyWealthChart points={chartPoints} state={state} />
             </Card>
 
             <Card className="space-y-2.5">
@@ -324,7 +326,7 @@ export function DynastyScreen({
                           {unlocked ? 'باز شده' : 'قفل'}
                         </Badge>
                       </div>
-                      <p className="mt-1 text-[11px] text-[var(--text-muted)]">
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">
                         {ribbon.descriptionFa}
                       </p>
                     </div>
@@ -360,13 +362,16 @@ export function DynastyScreen({
                   {leaders.wealthiest && (
                     <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-2.5">
                       <div>
-                        <div className="text-[10px] text-[var(--text-muted)]">ثروتمندترین (ارزش واقعی)</div>
+                        <div className="text-xs text-[var(--text-muted)]">ثروتمندترین (ارزش واقعی)</div>
                         <div className="font-bold">
                           {leaders.wealthiest.firstName} {leaders.wealthiest.lastName}
                         </div>
                       </div>
-                      <CurrencyText
-                        amountToman={leaders.wealthiest.real1405NetWorthToman}
+                      <MoneyText
+                        amount={leaders.wealthiest.real1405NetWorthToman}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
                         className="font-bold text-[var(--primary-strong)]"
                       />
                     </div>
@@ -374,7 +379,7 @@ export function DynastyScreen({
                   {leaders.mostFamous && (
                     <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-2.5">
                       <div>
-                        <div className="text-[10px] text-[var(--text-muted)]">سرشناس‌ترین</div>
+                        <div className="text-xs text-[var(--text-muted)]">سرشناس‌ترین</div>
                         <div className="font-bold">
                           {leaders.mostFamous.firstName} {leaders.mostFamous.lastName}
                         </div>
@@ -387,7 +392,7 @@ export function DynastyScreen({
                   {leaders.longestLived && (
                     <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-2.5">
                       <div>
-                        <div className="text-[10px] text-[var(--text-muted)]">طولانی‌ترین عمر</div>
+                        <div className="text-xs text-[var(--text-muted)]">طولانی‌ترین عمر</div>
                         <div className="font-bold">
                           {leaders.longestLived.firstName} {leaders.longestLived.lastName}
                         </div>
@@ -398,7 +403,7 @@ export function DynastyScreen({
                   {leaders.mostEducated && (
                     <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-2.5">
                       <div>
-                        <div className="text-[10px] text-[var(--text-muted)]">تحصیل‌کرده‌ترین</div>
+                        <div className="text-xs text-[var(--text-muted)]">تحصیل‌کرده‌ترین</div>
                         <div className="font-bold">
                           {leaders.mostEducated.firstName} {leaders.mostEducated.lastName}
                         </div>
@@ -411,13 +416,16 @@ export function DynastyScreen({
                   {leaders.mostGenerous && (
                     <div className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-2.5">
                       <div>
-                        <div className="text-[10px] text-[var(--text-muted)]">بخشنده‌ترین (وقف و خیریه)</div>
+                        <div className="text-xs text-[var(--text-muted)]">بخشنده‌ترین (وقف و خیریه)</div>
                         <div className="font-bold">
                           {leaders.mostGenerous.firstName} {leaders.mostGenerous.lastName}
                         </div>
                       </div>
-                      <CurrencyText
-                        amountToman={leaders.mostGenerous.charityContributionToman ?? 0}
+                      <MoneyText
+                        amount={leaders.mostGenerous.charityContributionToman ?? 0}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
                         className="font-bold text-[var(--success)]"
                       />
                     </div>
@@ -441,11 +449,11 @@ export function DynastyScreen({
                         </span>
                         <Badge tone="primary">{toPersianDigits(ch.lifeScore)} امتیاز</Badge>
                       </div>
-                      <div className="text-[11px] text-[var(--text-muted)]">
+                      <div className="text-xs text-[var(--text-muted)]">
                         {toPersianDigits(ch.birthYear)} تا {toPersianDigits(ch.deathYear)} ·{' '}
                         {formatAgeLabel(ch.ageAtDeath)} · {ch.cityNameFa}
                       </div>
-                      <p className="text-[11px] leading-relaxed text-[var(--text)]">
+                      <p className="text-xs leading-relaxed text-[var(--text)]">
                         {ch.summaryFa ??
                           `${ch.firstName} ${ch.lastName} با پیشه «${ch.highestJobTitleFa}» و عنوان «${ch.legacyTitle}» زندگی کرد.`}
                       </p>

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../data/registry';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import {
   createDistantRelativeCandidate,
   getEligibleHeirs,
@@ -15,12 +15,12 @@ import {
   type ActionOutcome,
 } from '../state/actions';
 import { FullScreenSheet } from './components/FullScreenSheet';
+import { MoneyText } from './components/MoneyText';
 import { PersonAvatar } from './components/PersonAvatar';
 import {
   ActionButton,
   Badge,
   Card,
-  CurrencyText,
   SectionHeader,
   SegmentedControl,
   StatBar,
@@ -177,7 +177,7 @@ export function DynastyContinueSheet({
               نسل {toPersianDigits((state.dynasty?.currentGeneration ?? 1) + 1)}
             </Badge>
           </div>
-          <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+          <p className="text-xs leading-relaxed text-[var(--text-muted)]">
             جهان شبیه‌ساز، وضعیت اقتصاد و روابط خویشاوندی با همان تاریخ ادامه پیدا می‌کند و وارث انتخابی از سن کنونی خود مسیر را پیش می‌برد.
           </p>
         </Card>
@@ -213,22 +213,26 @@ export function DynastyContinueSheet({
                         />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="truncate text-sm font-bold text-[var(--text)]">
+                            <span className="text-sm font-bold text-[var(--text)]">
                               {heir.fullName}
                             </span>
                             <Badge tone={isSelected ? 'primary' : 'neutral'}>
                               {heir.relationLabelFa}
                             </Badge>
                           </div>
-                          <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                          <div className="mt-0.5 text-xs text-[var(--text-muted)]">
                             {formatAgeLabel(heir.age)} · {getSituationFa(heir)}
                           </div>
                         </div>
                       </div>
                       <div className="shrink-0 text-left">
-                        <div className="text-[10px] text-[var(--text-muted)]">سهم برآوردی</div>
-                        <CurrencyText
-                          amountToman={heir.estimatedInheritanceToman}
+                        <div className="text-xs text-[var(--text-muted)]">سهم برآوردی</div>
+                        <MoneyText
+                          amount={heir.estimatedInheritanceToman}
+                          currency="IRT"
+                          mode="inline"
+                          stateOverride={state}
+                          interactive={false}
                           className="text-xs font-bold text-[var(--primary-strong)]"
                         />
                       </div>
@@ -278,7 +282,14 @@ export function DynastyContinueSheet({
                     </span>
                   </span>
                   <span>
-                    ماترک خالص: {formatToman(estatePreview.netDistributableToman)}
+                    ماترک خالص:{' '}
+                    <MoneyText
+                      amount={estatePreview.netDistributableToman}
+                      currency="IRT"
+                      mode="inline"
+                      stateOverride={state}
+                      interactive={false}
+                    />
                   </span>
                 </button>
 
@@ -286,27 +297,55 @@ export function DynastyContinueSheet({
                   <div className="space-y-2 border-t border-[var(--border)] pt-3 text-xs">
                     <div className="flex justify-between">
                       <span className="text-[var(--text-muted)]">کل دارایی قبل از کسر</span>
-                      <CurrencyText amountToman={estatePreview.grossAssetsToman} className="font-bold" />
+                      <MoneyText
+                        amount={estatePreview.grossAssetsToman}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
+                        className="font-bold"
+                      />
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--text-muted)]">هزینه کفن‌ودفن و مراسم</span>
-                      <CurrencyText amountToman={estatePreview.funeralCostToman} />
+                      <MoneyText
+                        amount={estatePreview.funeralCostToman}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
+                      />
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--text-muted)]">بدهی‌های پرداخت‌شده</span>
-                      <CurrencyText amountToman={estatePreview.debtsPaidToman} />
+                      <MoneyText
+                        amount={estatePreview.debtsPaidToman}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
+                      />
                     </div>
                     {estatePreview.forgivenDebtToman > 0 && (
-                      <div className="rounded-xl bg-[var(--surface-2)] p-2 text-[11px] text-[var(--text-muted)]">
-                        مازاد بدهی ({formatToman(estatePreview.forgivenDebtToman)}) طبق ماده ۸۶۹ به وراث منتقل نمی‌شود.
+                      <div className="rounded-xl bg-[var(--surface-2)] p-2 text-xs text-[var(--text-muted)]">
+                        مازاد بدهی (
+                        <MoneyText
+                          amount={estatePreview.forgivenDebtToman}
+                          currency="IRT"
+                          mode="inline"
+                          stateOverride={state}
+                        />
+                        ) طبق ماده ۸۶۹ به وراث منتقل نمی‌شود.
                       </div>
                     )}
                     <div className="flex justify-between">
                       <span className="text-[var(--text-muted)]">هزینه حصر وراثت و کارشناسی</span>
-                      <CurrencyText amountToman={estatePreview.settlementFeeToman} />
+                      <MoneyText
+                        amount={estatePreview.settlementFeeToman}
+                        currency="IRT"
+                        mode="inline"
+                        stateOverride={state}
+                      />
                     </div>
                     {estatePreview.contestOutcomeFa && (
-                      <div className="rounded-xl bg-[var(--warning)]/12 p-2 text-[11px] text-[var(--warning)]">
+                      <div className="rounded-xl bg-[var(--warning)]/12 p-2 text-xs text-[var(--warning)]">
                         {estatePreview.contestOutcomeFa}
                       </div>
                     )}
@@ -319,13 +358,16 @@ export function DynastyContinueSheet({
                           className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] px-3 py-2"
                         >
                           <div className="min-w-0">
-                            <div className="truncate font-bold">{line.recipientNameFa}</div>
-                            <div className="text-[10px] text-[var(--text-muted)]">
+                            <div className="font-bold">{line.recipientNameFa}</div>
+                            <div className="text-xs text-[var(--text-muted)]">
                               {line.roleLabelFa} · {toPersianDigits(Math.round(line.shareRatio * 100))}٪
                             </div>
                           </div>
-                          <CurrencyText
-                            amountToman={line.totalToman}
+                          <MoneyText
+                            amount={line.totalToman}
+                            currency="IRT"
+                            mode="inline"
+                            stateOverride={state}
                             className="font-bold text-[var(--primary-strong)]"
                           />
                         </div>
@@ -372,7 +414,7 @@ export function DynastyContinueSheet({
                   <IconUser className="h-5 w-5 text-[var(--primary-strong)]" />
                   <div>
                     <div className="text-sm font-bold">{t('legacy.distantRelativeOption')}</div>
-                    <div className="text-[11px] text-[var(--text-muted)]">
+                    <div className="text-xs text-[var(--text-muted)]">
                       {distantCandidate.fullName} · {distantCandidate.relationLabelFa} ·{' '}
                       {formatAgeLabel(distantCandidate.age)}
                     </div>
@@ -380,7 +422,12 @@ export function DynastyContinueSheet({
                 </div>
                 <p className="text-xs text-[var(--text-muted)]">
                   شغل فعلی: {distantCandidate.jobTitle} · سهم‌الارث محدود:{' '}
-                  {formatToman(distantCandidate.estimatedInheritanceToman)}
+                  <MoneyText
+                    amount={distantCandidate.estimatedInheritanceToman}
+                    currency="IRT"
+                    mode="inline"
+                    stateOverride={state}
+                  />
                 </p>
                 <ActionButton
                   label={`ادامه به عنوان ${distantCandidate.fullName}`}
@@ -395,8 +442,15 @@ export function DynastyContinueSheet({
                 <IconCharity className="h-5 w-5 text-[var(--success)]" />
                 <div>
                   <div className="text-sm font-bold">{t('legacy.charityFoundationOption')}</div>
-                  <div className="text-[11px] text-[var(--text-muted)]">
-                    ماترک خالص پس از تسویه دیون ({formatToman(charityPreview?.netDistributableToman ?? 0)}) صرف تأسیس بنیاد خانوادگی می‌شود.
+                  <div className="text-xs text-[var(--text-muted)]">
+                    ماترک خالص پس از تسویه دیون (
+                    <MoneyText
+                      amount={charityPreview?.netDistributableToman ?? 0}
+                      currency="IRT"
+                      mode="inline"
+                      stateOverride={state}
+                    />
+                    ) صرف تأسیس بنیاد خانوادگی می‌شود.
                   </div>
                 </div>
               </div>

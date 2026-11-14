@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { gameDataset } from '../../data/registry';
-import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { toPersianDigits } from '../../engine/jalali';
 import { STANDARD_ACTIVITY_CATEGORIES } from '../../engine/recommendation';
 import type {
   ActivityCategory,
@@ -25,8 +25,10 @@ import {
 import { ActivityResultSheet } from '../components/ActivityResultSheet';
 import { CountryFlag } from '../components/flags/CountryFlag';
 import { FullScreenSheet } from '../components/FullScreenSheet';
+import { MoneyText } from '../components/MoneyText';
 import {
   ActionRow,
+  Badge,
   ConfirmDialog,
   DangerZoneGroup,
   DetailSheet,
@@ -73,6 +75,7 @@ type DiscoveryMode = 'seasonal' | 'favorites' | 'recent';
 interface CategoryTileMeta {
   id: ActivityCategory;
   descFa: string;
+  emoji: string;
   icon: ReactNode;
   accentBg: string;
   accentText: string;
@@ -82,6 +85,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'health',
     descFa: 'چکاپ، دندان و آرامش',
+    emoji: '🩺',
     icon: <IconDoctor className="h-5 w-5" />,
     accentBg: 'bg-emerald-500/12',
     accentText: 'text-emerald-600 dark:text-emerald-400',
@@ -89,6 +93,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'leisure',
     descFa: 'سینما، کافه و فرهنگ',
+    emoji: '🎭',
     icon: <IconSparkles className="h-5 w-5" />,
     accentBg: 'bg-amber-500/12',
     accentText: 'text-amber-600 dark:text-amber-400',
@@ -96,6 +101,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'travel',
     descFa: 'ایران‌گردی و طبیعت',
+    emoji: '🏕️',
     icon: <IconMapPin className="h-5 w-5" />,
     accentBg: 'bg-sky-500/12',
     accentText: 'text-sky-600 dark:text-sky-400',
@@ -103,6 +109,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'sport',
     descFa: 'باشگاه، دو و کوه',
+    emoji: '🏃',
     icon: <IconSport className="h-5 w-5" />,
     accentBg: 'bg-orange-500/12',
     accentText: 'text-orange-600 dark:text-orange-400',
@@ -110,6 +117,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'learning',
     descFa: 'مطالعه، زبان و پژوهش',
+    emoji: '📚',
     icon: <IconBook className="h-5 w-5" />,
     accentBg: 'bg-indigo-500/12',
     accentText: 'text-indigo-600 dark:text-indigo-400',
@@ -117,6 +125,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'charity',
     descFa: 'نیکوکاری و داوطلبی',
+    emoji: '🤝',
     icon: <IconCharity className="h-5 w-5" />,
     accentBg: 'bg-rose-500/12',
     accentText: 'text-rose-600 dark:text-rose-400',
@@ -124,6 +133,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'arts_talent',
     descFa: 'موسیقی، قلم و هنر',
+    emoji: '🎨',
     icon: <IconPalette className="h-5 w-5" />,
     accentBg: 'bg-fuchsia-500/12',
     accentText: 'text-fuchsia-600 dark:text-fuchsia-400',
@@ -131,6 +141,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'pets',
     descFa: 'حیوانات خانگی و باغچه',
+    emoji: '🌿',
     icon: <IconFlame className="h-5 w-5" />,
     accentBg: 'bg-lime-500/12',
     accentText: 'text-lime-600 dark:text-lime-400',
@@ -138,6 +149,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'social_digital',
     descFa: 'جمع، گفتگو و رسانه',
+    emoji: '💬',
     icon: <IconRelations className="h-5 w-5" />,
     accentBg: 'bg-cyan-500/12',
     accentText: 'text-cyan-600 dark:text-cyan-400',
@@ -145,6 +157,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'business_trade',
     descFa: 'معامله، پروژه و شبکه',
+    emoji: '💼',
     icon: <IconTrendUp className="h-5 w-5" />,
     accentBg: 'bg-teal-500/12',
     accentText: 'text-teal-600 dark:text-teal-400',
@@ -152,6 +165,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'legal_civic',
     descFa: 'امور مدنی، بیمه و حقوق',
+    emoji: '⚖️',
     icon: <IconShield className="h-5 w-5" />,
     accentBg: 'bg-slate-500/12',
     accentText: 'text-slate-600 dark:text-slate-300',
@@ -159,6 +173,7 @@ const CATEGORY_TILES: CategoryTileMeta[] = [
   {
     id: 'lifestyle_shop',
     descFa: 'نظم، خانه و سبک زندگی',
+    emoji: '🛍️',
     icon: <IconShop className="h-5 w-5" />,
     accentBg: 'bg-orange-500/12',
     accentText: 'text-[var(--primary-strong)]',
@@ -275,10 +290,32 @@ export function ActivitiesTabSheet({
         ? favorites.slice(0, 6)
         : recents.slice(0, 6);
 
-  const countForCategory = (catId: ActivityCategory): number =>
-    gameDataset.activities.filter(
+  const categoryProgress = (catId: ActivityCategory) => {
+    const list = gameDataset.activities.filter(
       (a) => a.category === catId && isActivityVisibleByContentSettings(a, saveGame),
-    ).length;
+    );
+    const seen = list.filter((a) => (runtime.seenOutcomeMap[a.id]?.length ?? 0) > 0).length;
+    const hasNewAgeEligible =
+      seen === 0 &&
+      list.some(
+        (a) =>
+          player.age >= a.minAge &&
+          (a.maxAge === undefined || player.age <= a.maxAge),
+      );
+    return { total: list.length, seen, isNew: hasNewAgeEligible && player.age >= 10 };
+  };
+
+  const friendlyStatusText =
+    player.stats.health < 20
+      ? 'وضعیت سلامت فوری: استراحت یا درمان در اولویت است'
+      : quotaRemaining > 0
+        ? `${toPersianDigits(quotaRemaining)} سهمیه از ${toPersianDigits(runtime.maxQuotaPerTurn)} باقی مانده · ${seasonal.seasonLabelFa}`
+        : t('activitiesHub.quotaFull');
+
+  const fourthGauge =
+    player.age >= 10
+      ? { label: 'جایگاه', val: player.stats.fame, colorVar: '--stat-standing' }
+      : { label: 'هوش', val: player.stats.intelligence, colorVar: '--stat-smarts' };
 
   const firstChunk = categoryActivities.slice(0, 6);
   const secondChunk = categoryActivities.slice(6, 12);
@@ -308,15 +345,13 @@ export function ActivitiesTabSheet({
                   <IconSparkles className="h-3.5 w-3.5" />
                 </button>
               </div>
-              <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                {quotaRemaining > 0
-                  ? `${toPersianDigits(quotaRemaining)} سهمیه از ${toPersianDigits(runtime.maxQuotaPerTurn)} باقی مانده · ${seasonal.seasonLabelFa}`
-                  : t('activitiesHub.quotaFull')}
+              <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">
+                {friendlyStatusText}
               </p>
             </div>
 
             <div className="shrink-0 text-left">
-              <div className="text-[10px] text-[var(--text-muted)]">{t('cashLabel')}</div>
+              <div className="text-xs text-[var(--text-muted)]">{t('cashLabel')}</div>
               <div className="text-xs font-bold tabular-nums text-[var(--primary-strong)]">
                 <bdi dir="rtl">{moneySummary.cashDisplayText}</bdi>
               </div>
@@ -325,7 +360,7 @@ export function ActivitiesTabSheet({
 
           {/* 5 Circular Quota Dots */}
           <div className="flex items-center justify-between gap-2 rounded-2xl bg-[var(--surface-2)] px-3 py-2">
-            <span className="text-[11px] font-bold text-[var(--text-muted)]">ظرفیت امسال</span>
+            <span className="text-xs font-bold text-[var(--text-muted)]">ظرفیت امسال</span>
             <div className="flex items-center gap-1.5" aria-label="سهمیه فعالیت امسال">
               {Array.from({ length: runtime.maxQuotaPerTurn }).map((_, idx) => {
                 const used = idx < runtime.quotaUsedThisTurn;
@@ -349,36 +384,48 @@ export function ActivitiesTabSheet({
               { label: 'سلامت', val: player.stats.health, colorVar: '--stat-health' },
               { label: 'شادی', val: player.stats.happiness, colorVar: '--stat-happiness' },
               { label: 'روان', val: player.stats.mentalHealth, colorVar: '--stat-mental' },
-              { label: 'هوش', val: player.stats.intelligence, colorVar: '--stat-smarts' },
+              fourthGauge,
             ].map((g) => (
               <div key={g.label} className="flex flex-col items-center gap-1 rounded-xl bg-[var(--surface-2)] py-2">
                 <ProgressRing value={g.val} size={40} strokeWidth={4} colorVar={g.colorVar} />
-                <span className="text-[10px] font-bold text-[var(--text-muted)]">{g.label}</span>
+                <span className="text-xs font-bold text-[var(--text-muted)]">{g.label}</span>
               </div>
             ))}
           </div>
 
-          {/* Pinned Urgent Alert when Health < 20 */}
+          {/* Pinned Urgent Alert when critical stat triggers */}
           {urgentAlert && (
-            <div className="flex items-center justify-between gap-2 rounded-2xl border border-[var(--danger)]/40 bg-[var(--danger)]/10 px-3 py-2.5">
-              <div className="flex min-w-0 items-start gap-2">
+            <div
+              data-testid="activities-urgent-alert"
+              className="space-y-2.5 rounded-2xl border border-[var(--danger)]/40 bg-[var(--danger)]/10 p-3"
+            >
+              <div className="flex items-start gap-2 text-right">
                 <IconWarning className="mt-0.5 h-4 w-4 shrink-0 text-[var(--danger)]" />
-                <div className="min-w-0 text-right">
+                <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold text-[var(--danger)]">
                     {t('activitiesHub.urgentPriorityTitle')}: {urgentAlert.titleFa}
                   </div>
-                  <div className="mt-0.5 line-clamp-2 text-[11px] text-[var(--text)]">
+                  <div className="mt-0.5 text-xs leading-relaxed text-[var(--text)]">
                     {urgentAlert.bodyFa}
                   </div>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => triggerActivity(urgentAlert.activity, false)}
-                className="min-h-[38px] shrink-0 rounded-xl bg-[var(--danger)] px-3 text-xs font-bold text-[var(--on-primary)]"
-              >
-                {urgentAlert.activity.titleFa}
-              </button>
+              <div className="flex flex-wrap gap-1.5">
+                {urgentAlert.actions.slice(0, 3).map((act, idx) => (
+                  <button
+                    key={act.id}
+                    type="button"
+                    onClick={() => triggerActivity(act, false)}
+                    className={`min-h-[38px] rounded-xl px-3 text-xs font-bold transition-colors ${
+                      idx === 0
+                        ? 'bg-[var(--danger)] text-[var(--on-primary)]'
+                        : 'border border-[var(--danger)]/35 bg-[var(--surface)] text-[var(--danger)]'
+                    }`}
+                  >
+                    {act.titleFa}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </section>
@@ -386,40 +433,65 @@ export function ActivitiesTabSheet({
         {/* Section 2: Smart 1-Tap Horizontal Carousel */}
         {smartRecommendations.length > 0 && (
           <section className="space-y-2">
-            <div className="flex items-center justify-between px-1">
+            <div className="flex items-center justify-between gap-2 px-1">
               <h3 className="text-xs font-bold text-[var(--text-muted)]">
                 {t('activitiesHub.smartCarouselTitle')}
               </h3>
-              <span className="text-[11px] text-[var(--text-muted)]">اجرای فوری با امکان بازگردانی</span>
+              <span className="text-xs text-[var(--text-muted)]">اجرای فوری با بازگردانی</span>
             </div>
             <div className="flex gap-2.5 overflow-x-auto pb-1 no-scrollbar">
               {smartRecommendations.map((rec) => {
                 const tileMeta = CATEGORY_TILES.find((c) => c.id === rec.activity.category);
                 const check = canPerformActivity(rec.activity, saveGame);
+                const quotaCost = rec.activity.quotaCost ?? 1;
                 return (
                   <button
                     key={rec.activity.id}
                     type="button"
                     onClick={() => triggerActivity(rec.activity, false)}
-                    className="flex min-h-[112px] w-[164px] shrink-0 flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
+                    className="flex min-h-[146px] w-[228px] shrink-0 flex-col justify-between gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <span
-                        className={`flex h-8 w-8 items-center justify-center rounded-xl ${tileMeta?.accentBg ?? 'bg-[var(--primary-soft)]'} ${tileMeta?.accentText ?? 'text-[var(--primary-strong)]'}`}
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${tileMeta?.accentBg ?? 'bg-[var(--primary-soft)]'} ${tileMeta?.accentText ?? 'text-[var(--primary-strong)]'}`}
                       >
-                        {tileMeta?.icon ?? <IconSparkles className="h-4 w-4" />}
+                        <span aria-hidden="true" className="text-base leading-none">
+                          {tileMeta?.emoji ?? '✨'}
+                        </span>
                       </span>
-                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 text-[10px] font-bold tabular-nums text-[var(--text)]">
-                        {check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                      <span className="rounded-lg bg-[var(--primary-soft)] px-2.5 py-1 text-xs font-bold text-[var(--primary-strong)]">
+                        انجام
                       </span>
                     </div>
-                    <div className="mt-2 min-w-0">
-                      <div className="truncate text-xs font-bold text-[var(--text)]">
+
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold leading-snug text-[var(--text)]">
                         {rec.activity.titleFa}
                       </div>
-                      <div className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-[var(--text-muted)]">
+                      <div className="mt-1 line-clamp-2 text-xs leading-snug text-[var(--text-muted)]">
                         {rec.reasonFa}
                       </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
+                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 font-bold tabular-nums text-[var(--text)]">
+                        {check.adjustedCost > 0 ? (
+                          <MoneyText
+                            amount={check.adjustedCost}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        ) : (
+                          'رایگان'
+                        )}
+                      </span>
+                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 text-[var(--text-muted)]">
+                        {toPersianDigits(quotaCost)} سهمیه
+                      </span>
+                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 text-[var(--text-muted)]">
+                        ریسک {rec.activity.riskLabelFa}
+                      </span>
                     </div>
                   </button>
                 );
@@ -463,7 +535,18 @@ export function ActivitiesTabSheet({
                       icon={<IconSparkles className="h-4 w-4" />}
                       title={act.titleFa}
                       subtitle={act.effectHintFa}
-                      value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                      value={
+                        check.adjustedCost > 0 ? (
+                          <MoneyText
+                            amount={check.adjustedCost}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        ) : (
+                          'رایگان'
+                        )
+                      }
                       state={check.allowed ? 'enabled' : isCooldown ? 'cooldown' : 'disabled'}
                       reason={check.reason}
                       ctaLabel="انجام"
@@ -497,25 +580,38 @@ export function ActivitiesTabSheet({
           <div className="grid grid-cols-2 gap-2">
             {STANDARD_ACTIVITY_CATEGORIES.map((catId) => {
               const meta = CATEGORY_TILES.find((m) => m.id === catId)!;
-              const cnt = countForCategory(catId);
+              const prog = categoryProgress(catId);
               return (
                 <button
                   key={catId}
                   type="button"
                   onClick={() => setSelectedCategory(catId)}
-                  className="flex min-h-[74px] items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
+                  className="flex min-h-[82px] flex-col justify-between gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]"
                 >
-                  <span
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.accentBg} ${meta.accentText}`}
-                  >
-                    {meta.icon}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs font-bold text-[var(--text)]">
+                  <div className="flex items-start justify-between gap-1.5">
+                    <span
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${meta.accentBg} ${meta.accentText}`}
+                    >
+                      {meta.icon}
+                    </span>
+                    {prog.seen > 0 ? (
+                      <span className="rounded-lg bg-[var(--surface-2)] px-2 py-0.5 text-xs font-bold tabular-nums text-[var(--text-muted)]">
+                        {toPersianDigits(prog.seen)} از {toPersianDigits(prog.total)}
+                      </span>
+                    ) : prog.isNew ? (
+                      <Badge tone="primary">جدید</Badge>
+                    ) : (
+                      <span className="text-xs tabular-nums text-[var(--text-muted)]">
+                        {toPersianDigits(prog.total)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold leading-snug text-[var(--text)]">
                       {t(`activities.categories.${catId}`)}
                     </div>
-                    <div className="mt-0.5 truncate text-[10px] text-[var(--text-muted)]">
-                      {meta.descFa} · {toPersianDigits(cnt)}
+                    <div className="mt-0.5 text-xs leading-snug text-[var(--text-muted)]">
+                      {meta.descFa}
                     </div>
                   </div>
                 </button>
@@ -527,17 +623,17 @@ export function ActivitiesTabSheet({
             <button
               type="button"
               onClick={onOpenEmigration}
-              className="flex min-h-[68px] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--primary)]/40 bg-[var(--primary-soft)]/60 px-3.5 py-3 text-right transition-colors hover:border-[var(--primary)]"
+              className="flex min-h-[72px] w-full items-center justify-between gap-3 rounded-2xl border border-[var(--primary)]/40 bg-[var(--primary-soft)]/60 px-3.5 py-3 text-right transition-colors hover:border-[var(--primary)]"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)] text-[var(--on-primary)]">
                   <IconPlane className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-bold text-[var(--primary-strong)]">
+                  <div className="text-sm font-bold leading-snug text-[var(--primary-strong)]">
                     {t('activitiesHub.travelMigrationTile')}
                   </div>
-                  <div className="mt-0.5 truncate text-[11px] text-[var(--text)]">
+                  <div className="mt-0.5 text-xs leading-snug text-[var(--text)]">
                     {t('activitiesHub.travelMigrationSubtitle')}
                   </div>
                 </div>
@@ -561,7 +657,7 @@ export function ActivitiesTabSheet({
                 icon={cat.icon}
                 title={t(`activities.categories.${cat.id}`)}
                 subtitle={cat.descFa}
-                value={`${toPersianDigits(countForCategory(cat.id))} مورد`}
+                value={`${toPersianDigits(categoryProgress(cat.id).total)} مورد`}
                 showChevron
                 onClick={() => setSelectedCategory(cat.id)}
               />
@@ -653,7 +749,18 @@ export function ActivitiesTabSheet({
                         icon={<IconCoins className="h-4 w-4" />}
                         title={act.titleFa}
                         subtitle={`${act.effectHintFa} · ریسک ${act.riskLabelFa}`}
-                        value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                        value={
+                          check.adjustedCost > 0 ? (
+                            <MoneyText
+                              amount={check.adjustedCost}
+                              currency="IRT"
+                              mode="inline"
+                              interactive={false}
+                            />
+                          ) : (
+                            'رایگان'
+                          )
+                        }
                         state={rowState}
                         reason={check.reason}
                         ctaLabel="انجام"
@@ -699,7 +806,18 @@ export function ActivitiesTabSheet({
                           icon={<IconBank className="h-4 w-4" />}
                           title={act.titleFa}
                           subtitle={`${act.effectHintFa} · ریسک ${act.riskLabelFa}`}
-                          value={check.adjustedCost > 0 ? formatToman(check.adjustedCost) : 'رایگان'}
+                          value={
+                            check.adjustedCost > 0 ? (
+                              <MoneyText
+                                amount={check.adjustedCost}
+                                currency="IRT"
+                                mode="inline"
+                                interactive={false}
+                              />
+                            ) : (
+                              'رایگان'
+                            )
+                          }
                           state={rowState}
                           reason={check.reason}
                           ctaLabel="انجام"

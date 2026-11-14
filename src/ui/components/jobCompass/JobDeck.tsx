@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
-import { formatToman, toPersianDigits } from '../../../engine/jalali';
+import { toPersianDigits } from '../../../engine/jalali';
 import type { JobMarketItem } from '../../../engine/jobCompass';
 import { useI18n } from '../../../i18n/useI18n';
 import { triggerHaptic } from '../../../utils/haptics';
 import { IconReset, IconStar } from '../../icons';
+import { MoneyText } from '../MoneyText';
 import { Card } from '../Primitives';
 import { EmojiSprite, JobIconTile } from './JobIcons';
 import { MatchRing, ReadinessRing } from './JobRings';
@@ -174,14 +175,15 @@ export function JobDeck({
         <div className="rounded-2xl bg-[var(--surface-2)] p-3 flex items-center justify-between gap-2">
           <div>
             <div className="text-xs text-[var(--text-muted)]">خالص دریافتی</div>
-            <div className="text-base font-bold tabular-nums text-[var(--text)]">
-              {formatToman(netAmt).replace(' تومان', '')} {unitLabel}
+            <div className="inline-flex items-baseline gap-1 text-base font-bold tabular-nums text-[var(--text)]">
+              <MoneyText amount={netAmt} currency="IRT" mode="single" compact />
+              <span>{unitLabel}</span>
             </div>
           </div>
           <div className="text-left">
             <div className="text-xs text-[var(--text-muted)]">معادل ارزی</div>
             <div className="text-xs font-bold tabular-nums text-[var(--text-muted)]">
-              {toPersianDigits(usdAmt.toLocaleString('en-US'))} دلار
+              <MoneyText amount={usdAmt} currency="USD" mode="single" compact />
             </div>
           </div>
         </div>

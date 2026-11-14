@@ -1,6 +1,8 @@
-import { formatToman, toPersianDigits } from '../../../engine/jalali';
+import type { ReactNode } from 'react';
+import { toPersianDigits } from '../../../engine/jalali';
 import type { JobMarketItem } from '../../../engine/jobCompass';
 import { useI18n } from '../../../i18n/useI18n';
+import { MoneyText } from '../MoneyText';
 import { Card, DetailSheet } from '../Primitives';
 import { JobIconTile } from './JobIcons';
 import { COMPARE_SERIES_COLORS, FingerprintRadar } from './FingerprintRadar';
@@ -24,7 +26,7 @@ export function CompareSheet({
   const metrics: {
     id: string;
     labelFa: string;
-    getValue: (item: JobMarketItem) => string;
+    getValue: (item: JobMarketItem) => ReactNode;
   }[] = [
     {
       id: 'pay',
@@ -32,7 +34,12 @@ export function CompareSheet({
       getValue: (item) => {
         const amt =
           salaryUnit === 'annual' ? item.salary.expectedAnnualNet : item.salary.expectedMonthlyNet;
-        return `${formatToman(amt).replace(' تومان', '')} ${unitText}`;
+        return (
+          <span className="inline-flex flex-wrap items-baseline gap-1">
+            <MoneyText amount={amt} currency="IRT" mode="single" compact />
+            <span>{unitText}</span>
+          </span>
+        );
       },
     },
     {

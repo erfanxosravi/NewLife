@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../../data/registry';
-import { formatToman, toPersianDigits } from '../../../engine/jalali';
+import { toPersianDigits } from '../../../engine/jalali';
 import {
   pickInterviewQuestionsForJob,
   type JobMarketItem,
@@ -9,6 +9,7 @@ import type { JobInterviewOutcome } from '../../../state/actions';
 import type { InterviewAnswer, SaveGame } from '../../../engine/types';
 import { useI18n } from '../../../i18n/useI18n';
 import { triggerHaptic } from '../../../utils/haptics';
+import { MoneyText } from '../MoneyText';
 import { Card, DetailSheet } from '../Primitives';
 import { JobIconTile } from './JobIcons';
 
@@ -121,8 +122,15 @@ export function JobInterviewSheet({
           </div>
 
           {result.outcome === 'hired' && result.startingMonthlyNet && (
-            <div className="rounded-xl border border-[var(--success)]/35 bg-[var(--success)]/10 p-3 text-xs font-bold text-[var(--text)]">
-              حقوق خالص آغازین: {formatToman(result.startingMonthlyNet)} / ماه
+            <div className="flex flex-wrap items-center gap-1 rounded-xl border border-[var(--success)]/35 bg-[var(--success)]/10 p-3 text-xs font-bold text-[var(--text)]">
+              <span>حقوق خالص آغازین:</span>
+              <MoneyText
+                amount={result.startingMonthlyNet}
+                currency="IRT"
+                mode="inline"
+                stateOverride={saveGame.state}
+              />
+              <span>/ ماه</span>
             </div>
           )}
 

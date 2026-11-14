@@ -24,8 +24,9 @@ import {
   ensureEmigrationState,
   rankCountriesForPlayer,
 } from '../engine/emigration';
-import { formatCurrencyAmount, getDisplayCurrencyCode } from '../engine/fx';
+import { getDisplayCurrencyCode } from '../engine/fx';
 import { toPersianDigits } from '../engine/jalali';
+import { formatSingleCurrency } from '../engine/money';
 import {
   getAnnualRealPerformanceAndBenchmarks,
   getCurrencyExposureBreakdown,
@@ -1020,7 +1021,7 @@ export function getHeaderMoneySummary(
   const exposure = getCurrencyExposureBreakdown(state, dataset);
   const warnings = getSavingsErosionWarnings(state, dataset);
   const perf = getAnnualRealPerformanceAndBenchmarks(state, dataset);
-  const cashDisplayText = formatCurrencyAmount(
+  const cashDisplayAmount =
     netWorth.displayCurrency === 'IRT'
       ? state.player.moneyToman
       : state.ledger
@@ -1033,16 +1034,14 @@ export function getHeaderMoneySummary(
               (netWorth.tomanAmount > 0 ? netWorth.displayAmount / netWorth.tomanAmount : 0)
             ).toFixed(2),
           )
-        : state.player.moneyToman,
-    displayCurrency,
-    dataset,
-  );
-  const primaryFormatted = formatCurrencyAmount(
+        : state.player.moneyToman;
+  const cashDisplayText = formatSingleCurrency(cashDisplayAmount, displayCurrency, dataset);
+  const primaryFormatted = formatSingleCurrency(
     netWorth.displayAmount,
     netWorth.displayCurrency,
     dataset,
   );
-  const secondaryTomanFormatted = formatCurrencyAmount(netWorth.tomanAmount, 'IRT', dataset);
+  const secondaryTomanFormatted = formatSingleCurrency(netWorth.tomanAmount, 'IRT', dataset);
   return {
     displayCurrency,
     netWorth: {
@@ -1050,6 +1049,7 @@ export function getHeaderMoneySummary(
       primaryFormatted,
       secondaryTomanFormatted,
     },
+    cashDisplayAmount,
     cashDisplayText,
     exposure,
     warnings,

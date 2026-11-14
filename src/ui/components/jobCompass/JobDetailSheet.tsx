@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { gameDataset } from '../../../data/registry';
-import { formatToman, toPersianDigits } from '../../../engine/jalali';
+import { toPersianDigits } from '../../../engine/jalali';
 import {
   JOB_COMPASS_AXES,
   type JobMarketItem,
@@ -8,13 +8,13 @@ import {
 } from '../../../engine/jobCompass';
 import type { JobCompassPriorities, SaveGame } from '../../../engine/types';
 import { useI18n } from '../../../i18n/useI18n';
-import { formatUsdEquivalentHint } from '../../../state/selectors';
 import { triggerHaptic } from '../../../utils/haptics';
 import {
   IconCheck,
   IconClose,
   IconStar,
 } from '../../icons';
+import { MoneyText } from '../MoneyText';
 import { Card, DetailSheet, ProgressStepper, SectionGroup } from '../Primitives';
 import { EmojiSprite, JobIconTile } from './JobIcons';
 import { MatchRing, ReadinessRing } from './JobRings';
@@ -240,8 +240,15 @@ export function JobDetailSheet({
             <div className="text-xs text-[var(--text-muted)]">
               {t('careerMarket.expectedPayLabel')}
             </div>
-            <div className="mt-0.5 text-xs font-bold tabular-nums text-[var(--success)]">
-              {formatToman(expectedNet).replace(' تومان', '')} {unitText}
+            <div className="mt-0.5 flex flex-wrap items-baseline gap-1 text-xs font-bold tabular-nums text-[var(--success)]">
+              <MoneyText
+                amount={expectedNet}
+                currency="IRT"
+                mode="single"
+                compact
+                stateOverride={state}
+              />
+              <span>{unitText}</span>
             </div>
           </div>
           <div className="min-w-0 text-right">
@@ -269,31 +276,49 @@ export function JobDetailSheet({
           <span className="text-sm font-bold text-[var(--text)]">
             {t('careerMarket.payRangeLabel')}
           </span>
-          <span className="text-xs tabular-nums text-[var(--text-muted)]">
-            {formatUsdEquivalentHint(expectedNet, state, gameDataset)}
+          <span className="inline-flex items-center gap-1 text-xs tabular-nums text-[var(--text-muted)]">
+            <span>معادل</span>
+            <MoneyText
+              amount={expectedNet}
+              currency="IRT"
+              mode="single"
+              stateOverride={state}
+              primaryOverride="USD"
+            />
           </span>
         </div>
         <div className="rounded-xl bg-[var(--surface-2)] p-3 text-xs space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[var(--text-muted)]">بازه خالص بازار ({unitText}):</span>
-            <span className="font-bold tabular-nums text-[var(--text)]">
-              از {formatToman(p10Net).replace(' تومان', '')} تا {formatToman(p90Net)}
+            <span className="inline-flex flex-wrap items-center gap-1 font-bold tabular-nums text-[var(--text)]">
+              <span>از</span>
+              <MoneyText amount={p10Net} currency="IRT" mode="single" compact stateOverride={state} />
+              <span>تا</span>
+              <MoneyText amount={p90Net} currency="IRT" mode="single" compact stateOverride={state} />
             </span>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[var(--text-muted)]">درآمد ناخالص پایه:</span>
             <span className="font-bold tabular-nums text-[var(--text)]">
-              {formatToman(
-                salaryUnit === 'annual' ? salary.expectedAnnualGross : salary.expectedMonthlyGross,
-              )}
+              <MoneyText
+                amount={
+                  salaryUnit === 'annual' ? salary.expectedAnnualGross : salary.expectedMonthlyGross
+                }
+                currency="IRT"
+                mode="inline"
+                stateOverride={state}
+              />
             </span>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[var(--text-muted)]">کسورات سالانه (بیمه/مالیات/هزینه):</span>
             <span className="font-bold tabular-nums text-[var(--text)]">
-              {formatToman(
-                salaryUnit === 'annual' ? deductionsTotal : Math.round(deductionsTotal / 12),
-              )}
+              <MoneyText
+                amount={salaryUnit === 'annual' ? deductionsTotal : Math.round(deductionsTotal / 12)}
+                currency="IRT"
+                mode="inline"
+                stateOverride={state}
+              />
             </span>
           </div>
         </div>

@@ -1,14 +1,12 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../../data/registry';
-import {
-  formatCurrencyAmount,
-  getCurrencyDef,
-  quoteConversion,
-} from '../../../engine/fx';
+import { getCurrencyDef, quoteConversion } from '../../../engine/fx';
 import { toPersianDigits } from '../../../engine/jalali';
 import type { CurrencyCode, SaveGame, TransferChannelDef } from '../../../engine/types';
 import { sellIranPropertyAndTransferAction, type ActionOutcome } from '../../../state/actions';
 import { BottomSheet } from '../BottomSheet';
+import { ExchangeRateStrip } from '../ExchangeRateStrip';
+import { MoneyText } from '../MoneyText';
 import { ActionRow, HubHeroCard, SectionGroup } from '../Primitives';
 import { IconBank, IconHome, IconPlane, IconSparkles } from '../../icons';
 
@@ -76,16 +74,41 @@ export function SellIranPropertyWizard({
       <div className="space-y-4">
         <HubHeroCard
           icon={<IconHome className="h-5 w-5" />}
-          title={formatCurrencyAmount(propertyToman, 'IRT', gameDataset, { compact: true })}
+          title={
+            <MoneyText
+              amount={propertyToman}
+              currency="IRT"
+              mode="stacked"
+              stateOverride={state}
+              interactive={false}
+            />
+          }
           subtitle="ارزش روز ملک ثبت‌شده در ایران (با ۲٪ هزینه معاملاتی فروش)"
           metrics={[
             {
               label: 'خالص فروش تومانی',
-              value: formatCurrencyAmount(netSaleToman, 'IRT', gameDataset, { compact: true }),
+              value: (
+                <MoneyText
+                  amount={netSaleToman}
+                  currency="IRT"
+                  mode="single"
+                  compact
+                  stateOverride={state}
+                  interactive={false}
+                />
+              ),
             },
             {
               label: 'برآورد دریافتی مقصد',
-              value: formatCurrencyAmount(quote.netToAmount, targetCurrency, gameDataset),
+              value: (
+                <MoneyText
+                  amount={quote.netToAmount}
+                  currency={targetCurrency}
+                  mode="inline"
+                  stateOverride={state}
+                  interactive={false}
+                />
+              ),
               tone: 'success',
             },
             {
@@ -94,6 +117,8 @@ export function SellIranPropertyWizard({
             },
           ]}
         />
+
+        <ExchangeRateStrip state={state} highlightCurrency={targetCurrency} compact />
 
         {step === 1 && (
           <SectionGroup
@@ -104,7 +129,14 @@ export function SellIranPropertyWizard({
               icon={<IconHome className="h-4 w-4" />}
               title="ملک ثبت‌شده در ایران"
               subtitle="پس از کسر ۲٪ کمیسیون معامله به حساب تومانی واریز می‌شود"
-              value={formatCurrencyAmount(netSaleToman, 'IRT', gameDataset, { compact: true })}
+              value={
+                <MoneyText
+                  amount={netSaleToman}
+                  currency="IRT"
+                  mode="inline"
+                  stateOverride={state}
+                />
+              }
             />
           </SectionGroup>
         )}
@@ -126,7 +158,18 @@ export function SellIranPropertyWizard({
                   key={code}
                   icon={<IconSparkles className="h-4 w-4" />}
                   title={def.nameFa}
-                  subtitle={`معادل خالص پس از تبدیل: ${formatCurrencyAmount(q.netToAmount, code, gameDataset)}`}
+                  subtitle={
+                    <span className="inline-flex flex-wrap items-center gap-1">
+                      <span>معادل خالص پس از تبدیل:</span>
+                      <MoneyText
+                        amount={q.netToAmount}
+                        currency={code}
+                        mode="inline"
+                        stateOverride={state}
+                        interactive={false}
+                      />
+                    </span>
+                  }
                   state={targetCurrency === code ? 'done' : 'enabled'}
                   ctaLabel={targetCurrency === code ? undefined : 'انتخاب'}
                   onClick={() => setTargetCurrency(code)}

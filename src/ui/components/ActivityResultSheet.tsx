@@ -1,9 +1,8 @@
-import { gameDataset } from '../../data/registry';
-import { formatCurrencyAmount, getFxRate } from '../../engine/fx';
 import { toPersianDigits } from '../../engine/jalali';
 import type { ActivityDefinition, ActivityOutcome, PlayerStats, SaveGame } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
 import { BottomSheet } from './BottomSheet';
+import { MoneyText } from './MoneyText';
 import { IconBook, IconCheck, IconReset, IconSparkles, IconStar } from '../icons';
 
 interface ActivityResultSheetProps {
@@ -49,15 +48,6 @@ export function ActivityResultSheet({
   const netMoneyToman = Math.round(
     ((outcome.moneyToman ?? 0) - activity.costToman) * saveGame.state.inflationMultiplier,
   );
-  const localCountry = saveGame.state.player.countryId;
-  const localCurrency =
-    localCountry !== 'iran'
-      ? gameDataset.countriesMacro.find((c) => c.id === localCountry)?.currencyCode ?? 'IRT'
-      : 'IRT';
-  const moneyLocal =
-    localCurrency === 'IRT'
-      ? netMoneyToman
-      : Number((netMoneyToman * getFxRate(saveGame.state, 'IRT', localCurrency, gameDataset)).toFixed(2));
 
   return (
     <BottomSheet
@@ -110,10 +100,13 @@ export function ActivityResultSheet({
                     : 'bg-[var(--surface-2)] text-[var(--text)]'
                 }`}
               >
-                <bdi dir="rtl">
-                  {netMoneyToman > 0 ? '+' : ''}
-                  {formatCurrencyAmount(moneyLocal, localCurrency, gameDataset, { compact: true })}
-                </bdi>
+                <MoneyText
+                  amount={netMoneyToman}
+                  currency="IRT"
+                  mode="inline"
+                  showSign
+                  stateOverride={saveGame.state}
+                />
               </span>
             )}
           </div>
@@ -121,7 +114,7 @@ export function ActivityResultSheet({
 
         {/* Journal Entry Preview Card */}
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-[var(--text-muted)]">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-muted)]">
             <IconBook className="h-3.5 w-3.5 text-[var(--primary-strong)]" />
             <span>{t('activitiesHub.journalPreview')}</span>
           </div>

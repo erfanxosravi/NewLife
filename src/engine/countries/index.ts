@@ -443,29 +443,53 @@ export function getExpectedAbroadMonthlyNetRange(params: {
   countryId: string;
   state: GameState;
   dataset: GameDataset;
+  jobIdOverride?: string;
+  regionIdOverride?: string;
+  languageLevelOverride?: number;
 }): {
   currencyCode: CurrencyCode;
   monthlyNetLow: number;
   monthlyNetMedian: number;
   monthlyNetHigh: number;
   needsRelicensing: boolean;
+  jobTitleFa: string;
 } {
-  const { countryId, state, dataset } = params;
+  const {
+    countryId,
+    state,
+    dataset,
+    jobIdOverride,
+    regionIdOverride,
+    languageLevelOverride,
+  } = params;
+  const overrideJob = jobIdOverride ? dataset.jobs.find((j) => j.id === jobIdOverride) : undefined;
   const currentJob = state.player.job
     ? dataset.jobs.find((j) => j.id === state.player.job!.jobId)
     : undefined;
   const fallbackJob =
+    overrideJob ??
     currentJob ??
     dataset.jobs.find((j) => j.minEducation === state.player.education.level) ??
     dataset.jobs[0];
 
-  const langLevel = getAbroadLanguageLevel(state, countryId, dataset);
+  const langLevel = languageLevelOverride ?? getAbroadLanguageLevel(state, countryId, dataset);
   const yearsEst = state.player.countryId === countryId ? state.emigration?.residency?.yearsAbroad ?? 0 : 1;
+  const activeState =
+    regionIdOverride && state.emigration
+      ? {
+          ...state,
+          emigration: {
+            ...state.emigration,
+            residency: { ...state.emigration.residency, regionId: regionIdOverride },
+          },
+        }
+      : state;
+  const targetLevel = overrideJob ? 1 : state.player.job?.level ?? 1;
 
   const low = calculateAbroadJobIncome({
     job: fallbackJob,
-    level: state.player.job?.level ?? 1,
-    state,
+    level: targetLevel,
+    state: activeState,
     dataset,
     countryIdOverride: countryId,
     yearsAbroadOverride: 0,
@@ -474,8 +498,8 @@ export function getExpectedAbroadMonthlyNetRange(params: {
   });
   const med = calculateAbroadJobIncome({
     job: fallbackJob,
-    level: state.player.job?.level ?? 1,
-    state,
+    level: targetLevel,
+    state: activeState,
     dataset,
     countryIdOverride: countryId,
     yearsAbroadOverride: yearsEst,
@@ -484,8 +508,8 @@ export function getExpectedAbroadMonthlyNetRange(params: {
   });
   const high = calculateAbroadJobIncome({
     job: fallbackJob,
-    level: Math.min(fallbackJob.ladder.length, (state.player.job?.level ?? 1) + 1),
-    state,
+    level: Math.min(fallbackJob.ladder.length, targetLevel + 1),
+    state: activeState,
     dataset,
     countryIdOverride: countryId,
     yearsAbroadOverride: 4,
@@ -500,6 +524,7 @@ export function getExpectedAbroadMonthlyNetRange(params: {
     monthlyNetMedian: Math.round(med.netAnnualLocal / 12),
     monthlyNetHigh: Math.round(high.netAnnualLocal / 12),
     needsRelicensing: med.needsRelicensing,
+    jobTitleFa: fallbackJob.shortTitle || fallbackJob.titleFa,
   };
 }
 
@@ -508,6 +533,7 @@ export function getAbroadMonthlyBudget(
   dataset: GameDataset,
   countryIdOverride?: string,
   regionIdOverride?: string,
+  householdMembersOverride?: number,
 ): AbroadMonthlyBudget {
   const countryId = countryIdOverride ?? state.player.countryId;
   const countryDef = getCountryMacroDef(countryId, dataset) ?? dataset.countriesMacro[0];
@@ -523,12 +549,14 @@ export function getAbroadMonthlyBudget(
   const colMult = region?.colMultiplier ?? 1;
   const rentMult = region?.rentMultiplier ?? 1;
 
-  const hasSpouse = state.relationships.some(
-    (r) => r.role === 'spouse' && state.npcs[r.personId]?.isAlive,
-  );
-  const childrenCount = state.relationships.filter(
-    (r) => r.role === 'child' && state.npcs[r.personId]?.isAlive,
-  ).length;
+  const hasSpouse =
+    householdMembersOverride !== undefined
+      ? householdMembersOverride >= 2
+      : state.relationships.some((r) => r.role === 'spouse' && state.npcs[r.personId]?.isAlive);
+  const childrenCount =
+    householdMembersOverride !== undefined
+      ? Math.max(0, householdMembersOverride - 2)
+      : state.relationships.filter((r) => r.role === 'child' && state.npcs[r.personId]?.isAlive).length;
   const nonRentHouseholdMult = 1 + (hasSpouse ? 0.42 : 0) + Math.min(3, childrenCount) * 0.24;
   const rentHouseholdMult = 1 + (hasSpouse ? 0.18 : 0) + Math.min(3, childrenCount) * 0.14;
 

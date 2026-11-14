@@ -48,8 +48,9 @@ import {
   INTEGRATION_CHECKLIST_ITEMS,
   triggerReturnToIran,
 } from '../engine/emigration';
-import { formatCurrencyAmount, getFxRate } from '../engine/fx';
+import { getFxRate } from '../engine/fx';
 import { formatToman, toPersianDigits } from '../engine/jalali';
+import { formatDualMoneyText } from '../engine/money';
 import {
   clampChancePct,
   deriveDefaultPriorities,
@@ -3897,7 +3898,7 @@ export function convertCurrencyAction(
     });
     ok = res.ok;
     if (res.ok) {
-      resultMsg = `${formatCurrencyAmount(params.fromAmount, params.fromCurrency, dataset)} به ${formatCurrencyAmount(res.toAmount, params.toCurrency, dataset)} تبدیل شد.`;
+      resultMsg = `${formatDualMoneyText(params.fromAmount, params.fromCurrency, draft, dataset)} به ${formatDualMoneyText(res.toAmount, params.toCurrency, draft, dataset)} تبدیل شد.`;
       pushTimeline(draft, 'تبدیل ارزی', resultMsg, 'life');
     } else {
       resultMsg = res.errorFa ?? 'تبدیل ارز انجام نشد.';
@@ -3941,7 +3942,7 @@ export function submitCrossBorderTransferAction(
       msg = `حواله «${params.purposeFa}» ثبت شد و سال آینده به حساب مقصد می‌نشیند.`;
       pushTimeline(draft, 'ثبت حواله ارزی', msg, 'life');
     } else {
-      msg = `انتقال ${formatCurrencyAmount(res.receivedAmount, params.toCurrency, dataset)} انجام شد.`;
+      msg = `انتقال ${formatDualMoneyText(res.receivedAmount, params.toCurrency, draft, dataset)} انجام شد.`;
       pushTimeline(draft, 'انتقال ارزی موفق', msg, 'life');
     }
   });
@@ -3952,6 +3953,7 @@ export function studyForeignLanguageAction(
   save: SaveGame,
   countryId: string,
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   const countryDef = getCountryMacroDef(countryId, dataset);
   if (!countryDef) {
@@ -3976,6 +3978,8 @@ export function studyForeignLanguageAction(
       currencyCode,
       amount: costLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
@@ -3991,7 +3995,7 @@ export function studyForeignLanguageAction(
     pushTimeline(
       draft,
       `ارتقای زبان (${countryDef.nameFa})`,
-      `با گذراندن دوره فشرده، سطح زبانت به «${getLanguageLevelLabelFa(nextLevel)}» رسید.`,
+      `با گذراندن دوره فشرده (${formatDualMoneyText(costLocal, currencyCode, draft, dataset)})، سطح زبانت به «${getLanguageLevelLabelFa(nextLevel)}» رسید.`,
       'life',
       { intelligence: 2, happiness: 2 },
     );
@@ -4001,7 +4005,7 @@ export function studyForeignLanguageAction(
     return {
       save,
       success: false,
-      message: `موجودی برای هزینه دوره (${formatCurrencyAmount(costLocal, currencyCode, dataset)}) کافی نیست`,
+      message: `موجودی برای هزینه دوره (${formatDualMoneyText(costLocal, currencyCode, save.state, dataset)}) کافی نیست`,
     };
   }
   return {
@@ -4015,6 +4019,7 @@ export function relicenseCredentialAbroadAction(
   save: SaveGame,
   track: CredentialCategory,
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   if (save.state.player.countryId === 'iran') {
     return { save, success: false, message: 'این اقدام پس از ورود به کشور مقصد فعال می‌شود' };
@@ -4048,6 +4053,8 @@ export function relicenseCredentialAbroadAction(
       currencyCode: countryDef.currencyCode,
       amount: spec.costLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
@@ -4058,7 +4065,7 @@ export function relicenseCredentialAbroadAction(
     pushTimeline(
       draft,
       `معادل‌سازی و آزمون تخصصی مدرک در ${countryDef.nameFa}`,
-      'آزمون تطبیق و دریافت مجوز حرفه‌ای با موفقیت ثبت شد و سقف درآمدی شغلت باز شد.',
+      `آزمون تطبیق (${formatDualMoneyText(spec.costLocal, countryDef.currencyCode, draft, dataset)}) با موفقیت ثبت شد و سقف درآمدی شغلت باز شد.`,
       'milestone',
       { happiness: 6 },
     );
@@ -4068,7 +4075,7 @@ export function relicenseCredentialAbroadAction(
     return {
       save,
       success: false,
-      message: `موجودی برای هزینه معادل‌سازی (${formatCurrencyAmount(spec.costLocal, countryDef.currencyCode, dataset)}) کافی نیست`,
+      message: `موجودی برای هزینه معادل‌سازی (${formatDualMoneyText(spec.costLocal, countryDef.currencyCode, save.state, dataset)}) کافی نیست`,
     };
   }
   return {
@@ -4108,6 +4115,14 @@ export function startOrSelectEmigrationPathAction(
   const nextSave = updateState(save, (draft) => {
     const emig = ensureEmigrationState(draft);
     const prev = emig.activeApplications[countryId];
+    const lockedRates =
+      prev?.lockedRates ?? {
+        year: draft.currentJalaliYear,
+        ratesToIrt: {
+          [countryDef.currencyCode]: getFxRate(draft, countryDef.currencyCode, 'IRT', dataset),
+          USD: getFxRate(draft, 'USD', 'IRT', dataset),
+        },
+      };
     emig.activeApplications[countryId] = {
       countryId,
       status: prev?.status === 'approved' ? 'approved' : 'in_progress',
@@ -4119,6 +4134,7 @@ export function startOrSelectEmigrationPathAction(
           : [false, false, false, false, false, false],
       proofOfFundsVerified: prev?.proofOfFundsVerified ?? false,
       lastAttemptYear: draft.currentJalaliYear,
+      lockedRates,
     };
     draft.emigration = emig;
   });
@@ -4135,6 +4151,7 @@ export function advanceEmigrationPipelineStepAction(
   countryId: string,
   pathId?: MigrationPathType,
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   if (save.state.player.age < 18) {
     return { save, success: false, message: 'مهاجرت مستقل از ۱۸ سالگی فعال می‌شود' };
@@ -4183,7 +4200,7 @@ export function advanceEmigrationPipelineStepAction(
     return {
       save,
       success: false,
-      message: `تمکن مالی حداقل ${formatCurrencyAmount(report.proofOfFundsRequiredLocal, report.currencyCode, dataset)} لازم است`,
+      message: `تمکن مالی حداقل ${formatDualMoneyText(report.proofOfFundsRequiredLocal, report.currencyCode, save.state, dataset)} لازم است`,
     };
   }
 
@@ -4211,19 +4228,38 @@ export function advanceEmigrationPipelineStepAction(
       currencyCode,
       amount: feeLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
 
     const emig = ensureEmigrationState(draft);
-    const app = emig.activeApplications[countryId] ?? {
+    const prevApp = emig.activeApplications[countryId];
+    const app = prevApp ?? {
       countryId,
       status: 'in_progress',
       selectedPathId: pathSpec.id,
       currentStepIndex: 0,
       stepsCompleted: [false, false, false, false, false, false],
       proofOfFundsVerified: report.hasProofOfFunds,
+      lockedRates: {
+        year: draft.currentJalaliYear,
+        ratesToIrt: {
+          [countryDef.currencyCode]: getFxRate(draft, countryDef.currencyCode, 'IRT', dataset),
+          USD: getFxRate(draft, 'USD', 'IRT', dataset),
+        },
+      },
     };
+    if (!app.lockedRates) {
+      app.lockedRates = {
+        year: draft.currentJalaliYear,
+        ratesToIrt: {
+          [countryDef.currencyCode]: getFxRate(draft, countryDef.currencyCode, 'IRT', dataset),
+          USD: getFxRate(draft, 'USD', 'IRT', dataset),
+        },
+      };
+    }
     app.selectedPathId = pathSpec.id;
     app.lastAttemptYear = draft.currentJalaliYear;
     app.proofOfFundsVerified = report.hasProofOfFunds;
@@ -4237,7 +4273,7 @@ export function advanceEmigrationPipelineStepAction(
         `تکمیل مرحله «${stepName}» (${countryDef.nameFa})`,
         app.status === 'approved'
           ? `ویزای ${countryDef.nameFa} صادر شد و آماده سفر و استقرار هستی.`
-          : `مرحله «${stepName}» با موفقیت انجام شد.`,
+          : `مرحله «${stepName}» با پرداخت ${formatDualMoneyText(feeLocal, currencyCode, draft, dataset)} انجام شد.`,
         app.status === 'approved' ? 'milestone' : 'life',
       );
       if (app.status === 'approved') {
@@ -4263,7 +4299,7 @@ export function advanceEmigrationPipelineStepAction(
     return {
       save,
       success: false,
-      message: `موجودی برای هزینه مرحله (${formatCurrencyAmount(feeLocal, currencyCode, dataset)}) کافی نیست`,
+      message: `موجودی برای هزینه مرحله (${formatDualMoneyText(feeLocal, currencyCode, save.state, dataset)}) کافی نیست`,
     };
   }
 
@@ -4414,7 +4450,7 @@ export function sellIranPropertyAndTransferAction(
 
     if (targetCurrency === 'IRT') {
       ok = true;
-      msg = `ملک ایران به مبلغ ${formatCurrencyAmount(netSaleToman, 'IRT', dataset)} فروخته شد و به کیف تومانی واریز گردید.`;
+      msg = `ملک ایران به مبلغ ${formatDualMoneyText(netSaleToman, 'IRT', draft, dataset)} فروخته شد و به کیف تومانی واریز گردید.`;
       pushTimeline(draft, 'فروش ملک ایران', msg, 'milestone');
       return;
     }
@@ -4432,8 +4468,8 @@ export function sellIranPropertyAndTransferAction(
     ok = res.ok;
     if (res.ok) {
       msg = res.delayed
-        ? `ملک فروخته شد و حواله معادل ${formatCurrencyAmount(res.receivedAmount, targetCurrency, dataset)} برای انتقال به سال بعد ثبت شد.`
-        : `ملک فروخته شد و ${formatCurrencyAmount(res.receivedAmount, targetCurrency, dataset)} به حساب ارزی نشست.`;
+        ? `ملک فروخته شد و حواله معادل ${formatDualMoneyText(res.receivedAmount, targetCurrency, draft, dataset)} برای انتقال به سال بعد ثبت شد.`
+        : `ملک فروخته شد و ${formatDualMoneyText(res.receivedAmount, targetCurrency, draft, dataset)} به حساب ارزی نشست.`;
       pushTimeline(draft, 'فروش ملک و تبدیل ارزی سرمایه', msg, 'milestone');
     } else {
       msg = `ملک به تومانی نقد شد اما حواله ارزی محدودیت داشت: ${res.errorFa ?? ''}`;
@@ -4488,7 +4524,7 @@ export function sendRemittanceToIranAction(
     emig.residency.annualRemittanceCount += amountLocal;
     draft.emigration = emig;
     draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 5, mentalHealth: 4 });
-    msg = `مبلغ ${formatCurrencyAmount(amountLocal, countryDef.currencyCode, dataset)} (معادل حدود ${formatCurrencyAmount(toIrt, 'IRT', dataset)}) برای حمایت از خانواده ارسال شد.`;
+    msg = `مبلغ ${formatDualMoneyText(amountLocal, countryDef.currencyCode, draft, dataset)} (خالص ارسالی حدود ${formatToman(toIrt)}) برای حمایت از خانواده ارسال شد.`;
     pushTimeline(draft, 'ارسال حواله حمایتی به خانواده', msg, 'life', { happiness: 5 });
   });
 
@@ -4500,6 +4536,7 @@ export function takeShortForeignTripAction(
   countryId: string,
   tier: 'budget' | 'standard' | 'comfort',
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   if (!save.state.isAlive) {
     return { save, success: false, message: 'زندگی به پایان رسیده است' };
@@ -4531,12 +4568,14 @@ export function takeShortForeignTripAction(
         currencyCode: quote.currencyCode,
         amount: feeCharge,
         dataset,
+        preferredSourceCurrency: payOptions?.payFromCurrency,
+        channelId: payOptions?.channelId,
       });
       if (!p.ok) return;
       paidOk = true;
       draft.flags['cd_foreign_trip'] = draft.turn;
       draft.player.stats = applyStatDelta(draft.player.stats, { happiness: -3, mentalHealth: -2 });
-      outcomeMsg = `متأسفانه ویزای توریستی ${quote.countryNameFa} در این نوبت صادر نشد؛ سال بعد می‌توانی دوباره درخواست بدهی.`;
+      outcomeMsg = `متأسفانه ویزای توریستی ${quote.countryNameFa} در این نوبت صادر نشد (کارمزد ${formatDualMoneyText(feeCharge, quote.currencyCode, draft, dataset)})؛ سال بعد می‌توانی دوباره درخواست بدهی.`;
       pushTimeline(draft, `نتیجه ویزای سفر (${quote.countryNameFa})`, outcomeMsg, 'life', {
         happiness: -3,
       });
@@ -4548,6 +4587,8 @@ export function takeShortForeignTripAction(
       currencyCode: quote.currencyCode,
       amount: quote.totalLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
@@ -4576,7 +4617,7 @@ export function takeShortForeignTripAction(
         countryNameFa: quote.countryNameFa,
         jalaliYear: draft.currentJalaliYear,
         tier,
-        totalCostDisplayFa: formatCurrencyAmount(quote.totalLocal, quote.currencyCode, dataset),
+        totalCostDisplayFa: formatDualMoneyText(quote.totalLocal, quote.currencyCode, draft, dataset),
         memoryFa: memory,
       },
     ];
@@ -4585,7 +4626,7 @@ export function takeShortForeignTripAction(
       happiness: quote.happinessBoost,
       mentalHealth: quote.mentalBoost,
     });
-    outcomeMsg = `سفر ${toPersianDigits(quote.durationDays)} روزه به ${quote.countryNameFa} (${quote.tierLabelFa}) انجام شد: ${memory}`;
+    outcomeMsg = `سفر ${toPersianDigits(quote.durationDays)} روزه به ${quote.countryNameFa} (${quote.tierLabelFa} · ${formatDualMoneyText(quote.totalLocal, quote.currencyCode, draft, dataset)}) انجام شد: ${memory}`;
     pushTimeline(draft, `سفر به ${quote.countryNameFa}`, outcomeMsg, 'life', {
       happiness: quote.happinessBoost,
       mentalHealth: quote.mentalBoost,
@@ -4596,7 +4637,7 @@ export function takeShortForeignTripAction(
     return {
       save,
       success: false,
-      message: `موجودی برای هزینه سفر (${formatCurrencyAmount(quote.totalLocal, quote.currencyCode, dataset)}) کافی نیست`,
+      message: `موجودی برای هزینه سفر (${formatDualMoneyText(quote.totalLocal, quote.currencyCode, save.state, dataset)}) کافی نیست`,
     };
   }
   return { save: nextSave, success: visaApproved, message: outcomeMsg };
@@ -4606,6 +4647,7 @@ export function completeIntegrationChecklistAction(
   save: SaveGame,
   itemId: string,
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   if (save.state.player.countryId === 'iran') {
     return { save, success: false, message: 'فقط هنگام اقامت در خارج فعال است' };
@@ -4635,6 +4677,8 @@ export function completeIntegrationChecklistAction(
       currencyCode: countryDef.currencyCode,
       amount: costLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
@@ -4648,14 +4692,18 @@ export function completeIntegrationChecklistAction(
     pushTimeline(
       draft,
       `استقرار در ${countryDef.nameFa}: ${item.titleFa}`,
-      item.subtitleFa,
+      `${item.subtitleFa} (${formatDualMoneyText(costLocal, countryDef.currencyCode, draft, dataset)})`,
       'life',
       { mentalHealth: item.mentalBoost },
     );
   });
 
   if (!paidOk) {
-    return { save, success: false, message: 'موجودی برای هزینه ثبت اداری کافی نیست' };
+    return {
+      save,
+      success: false,
+      message: `موجودی برای هزینه ثبت اداری (${formatDualMoneyText(costLocal, countryDef.currencyCode, save.state, dataset)}) کافی نیست`,
+    };
   }
   return { save: nextSave, success: true, message: `«${item.titleFa}» تکمیل شد` };
 }
@@ -4665,6 +4713,7 @@ export function rentOrBuyAbroadHousingAction(
   optionId: string,
   regionId?: string,
   dataset: GameDataset = gameDataset,
+  payOptions?: { payFromCurrency?: CurrencyCode; channelId?: TransferChannelDef['id'] },
 ): ActionOutcome {
   if (save.state.player.countryId === 'iran') {
     return { save, success: false, message: 'برای مسکن داخل ایران از بخش دارایی اقدام کن' };
@@ -4694,6 +4743,8 @@ export function rentOrBuyAbroadHousingAction(
       currencyCode: countryDef.currencyCode,
       amount: upfrontLocal,
       dataset,
+      preferredSourceCurrency: payOptions?.payFromCurrency,
+      channelId: payOptions?.channelId,
     });
     if (!paid.ok) return;
     paidOk = true;
@@ -4707,7 +4758,7 @@ export function rentOrBuyAbroadHousingAction(
         depositRahnToman: Math.round(chosen.depositLocal * fxToIrt),
         propertyValueToman: 0,
       };
-      msg = `قرارداد اجاره «${chosen.titleFa}» ثبت شد.`;
+      msg = `قرارداد اجاره «${chosen.titleFa}» با اجاره ماهانه ${formatDualMoneyText(chosen.monthlyRentLocal, countryDef.currencyCode, draft, dataset)} ثبت شد.`;
     } else {
       draft.player.housing = {
         type: 'owned',
@@ -4727,7 +4778,7 @@ export function rentOrBuyAbroadHousingAction(
           annualPaymentToman: Math.round(chosen.annualMortgageLocal * fxToIrt),
         });
       }
-      msg = `خرید «${chosen.titleFa}» ثبت شد و سند مالکیت به نام تو درآمد.`;
+      msg = `خرید «${chosen.titleFa}» به ارزش ${formatDualMoneyText(chosen.buyPriceLocal, countryDef.currencyCode, draft, dataset)} ثبت شد و سند مالکیت به نام تو درآمد.`;
     }
     pushTimeline(draft, chosen.titleFa, msg, 'milestone', { happiness: 6 });
     draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6 });
@@ -4737,7 +4788,7 @@ export function rentOrBuyAbroadHousingAction(
     return {
       save,
       success: false,
-      message: `نقدینگی برای پیش‌پرداخت (${formatCurrencyAmount(upfrontLocal, countryDef.currencyCode, dataset)}) کافی نیست`,
+      message: `نقدینگی برای پیش‌پرداخت (${formatDualMoneyText(upfrontLocal, countryDef.currencyCode, save.state, dataset)}) کافی نیست`,
     };
   }
   return { save: nextSave, success: true, message: msg };

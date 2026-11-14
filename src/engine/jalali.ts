@@ -66,8 +66,16 @@ export function formatToman(amountToman: number): string {
   if (!Number.isFinite(amountToman)) {
     return '۰ تومان';
   }
-  const sign = amountToman < 0 ? '−' : '';
-  const abs = Math.round(Math.abs(amountToman));
+  const safe = Object.is(amountToman, -0) ? 0 : amountToman;
+  const sign = safe < 0 ? '−' : '';
+  const abs = Math.round(Math.abs(safe));
+
+  if (abs >= 1_000_000_000_000) {
+    const hemt = abs / 1_000_000_000_000;
+    const formatted =
+      hemt >= 100 ? Math.round(hemt).toString() : hemt.toFixed(hemt >= 10 ? 1 : 2).replace(/\.0+$/, '').replace(/(\.\d)0$/, '$1');
+    return `${sign}${toPersianDigits(formatted)} همت`;
+  }
 
   if (abs >= 1_000_000_000) {
     const billions = abs / 1_000_000_000;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { BellRing } from 'lucide-react';
 import { motion } from 'motion/react';
-import { formatToman, toPersianDigits } from '../engine/jalali';
+import { toPersianDigits } from '../engine/jalali';
 import type { EventChoice, EventDefinition, PlayerStats } from '../engine/types';
 import type { AnimationSpeed } from '../storage/saveStore';
 import { triggerHaptic } from '../utils/haptics';
 import { BottomSheet } from './components/BottomSheet';
+import { MoneyText } from './components/MoneyText';
 import { ActionButton, Badge } from './components/Primitives';
 import {
   IconCalendar,
@@ -124,7 +125,7 @@ export function EventPopupSheet({
               <IconCalendar className="h-4 w-4" />
               <span>{calAccent.label}</span>
             </div>
-            <span className="text-[11px] font-medium text-[var(--primary-strong)]">
+            <span className="text-xs font-medium text-[var(--primary-strong)]">
               {calAccent.badge}
             </span>
           </div>
@@ -154,7 +155,11 @@ export function EventPopupSheet({
                   >
                     <ActionButton
                       label={choice.labelFa}
-                      costText={cost > 0 ? formatToman(cost) : undefined}
+                      costText={
+                        cost > 0 ? (
+                          <MoneyText amount={cost} currency="IRT" mode="inline" interactive={false} />
+                        ) : undefined
+                      }
                       disabled={cantAfford}
                       disabledReason={cantAfford ? 'موجودی کافی نیست' : undefined}
                       variant="secondary"
@@ -210,8 +215,13 @@ export function EventPopupSheet({
                     }
                   >
                     <Badge tone={resolvedChoice.effects.moneyToman > 0 ? 'success' : 'danger'}>
-                      {resolvedChoice.effects.moneyToman > 0 ? '+' : ''}
-                      {formatToman(resolvedChoice.effects.moneyToman)}
+                      <MoneyText
+                        amount={resolvedChoice.effects.moneyToman}
+                        currency="IRT"
+                        mode="inline"
+                        showSign
+                        interactive={false}
+                      />
                     </Badge>
                   </motion.div>
                 ) : null}

@@ -1798,6 +1798,10 @@ export interface CountryApplicationProgress {
   lastAttemptYear?: number;
   cooldownUntilYear?: number;
   notesFa?: string;
+  lockedRates?: {
+    year: number;
+    ratesToIrt: Partial<Record<CurrencyCode, number>>;
+  };
 }
 
 export interface TravelHistoryEntry {

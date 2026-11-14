@@ -15,7 +15,6 @@ import {
   Badge,
   Card,
   ConfirmDialog,
-  CurrencyText,
   DangerZoneGroup,
   DetailSheet,
   EmptyState,
@@ -39,7 +38,11 @@ import {
 import { PersonAvatar } from './components/PersonAvatar';
 import { CountryFlag } from './components/flags/CountryFlag';
 import { ChecklistCard, InspectorVisitCard } from './components/AdoptionCards';
+import { AffordabilityBadge } from './components/AffordabilityBadge';
 import { BottomSheet } from './components/BottomSheet';
+import { ExchangeRateStrip } from './components/ExchangeRateStrip';
+import { MoneyProvider } from './components/MoneyContext';
+import { MoneyText } from './components/MoneyText';
 import {
   COMPARE_SERIES_COLORS,
   CompareSheet,
@@ -142,7 +145,8 @@ export function StyleGuidePage({
   const sampleCompareItems = [sampleReady, sampleNearLocked].filter(Boolean);
 
   return (
-    <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
+    <MoneyProvider value={{ state: sampleSave.state }}>
+      <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
       <div className="flex min-h-[100dvh] w-full max-w-[480px] flex-col bg-[var(--bg)] text-[var(--text)] sm:border-x sm:border-[var(--border)]">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--surface)] px-4 py-3">
           <div className="flex items-center gap-2.5">
@@ -157,7 +161,7 @@ export function StyleGuidePage({
             <IconBrandMark className="h-7 w-7" />
             <div>
               <h1 className="text-base font-bold">راهنمای اجزا و رنگ‌ها</h1>
-              <p className="text-[11px] text-[var(--text-muted)]">الگوی هاب + فهرست گروهی + صفحه جزئیات</p>
+              <p className="text-xs text-[var(--text-muted)]">الگوی هاب + فهرست گروهی + صفحه جزئیات</p>
             </div>
           </div>
 
@@ -333,13 +337,23 @@ export function StyleGuidePage({
               <Badge tone="danger">ریسک بالا</Badge>
             </div>
             <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-[var(--surface-2)] p-3">
-              <div>
+              <div className="space-y-1">
                 <div className="text-xs text-[var(--text-muted)]">موجودی نمونه</div>
-                <div className="text-base font-bold text-[var(--primary-strong)]">
-                  <CurrencyText amountToman={1_450_000_000} />
+                <MoneyText
+                  amount={1_450_000_000}
+                  currency="IRT"
+                  mode="stacked"
+                  primaryClassName="text-base font-bold text-[var(--primary-strong)]"
+                />
+                <div className="pt-1">
+                  <MoneyText amount={450} currency="EUR" mode="stacked" />
                 </div>
               </div>
               <ProgressRing value={17.5} max={20} label="۱۷.۵" />
+            </div>
+            <div className="mt-3 space-y-2">
+              <ExchangeRateStrip state={sampleSave.state} compact />
+              <AffordabilityBadge amount={450} currency="EUR" state={sampleSave.state} compact />
             </div>
             <div className="mt-3">
               <Sparkline values={[42, 48, 45, 55, 62, 60, 74]} />
@@ -436,27 +450,27 @@ export function StyleGuidePage({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_infant" gender="female" age={1} size={46} />
-                <span className="text-[10px] text-[var(--text-muted)]">نوزاد</span>
+                <span className="text-xs text-[var(--text-muted)]">نوزاد</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_child" gender="male" age={8} size={46} />
-                <span className="text-[10px] text-[var(--text-muted)]">کودک</span>
+                <span className="text-xs text-[var(--text-muted)]">کودک</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_woman" gender="female" age={29} size={46} />
-                <span className="text-[10px] text-[var(--text-muted)]">جوان</span>
+                <span className="text-xs text-[var(--text-muted)]">جوان</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_man" gender="male" age={38} size={46} />
-                <span className="text-[10px] text-[var(--text-muted)]">میان‌سال</span>
+                <span className="text-xs text-[var(--text-muted)]">میان‌سال</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_inspector" gender="female" age={42} size={46} originKind="inspector" />
-                <span className="text-[10px] text-[var(--text-muted)]">ناظر</span>
+                <span className="text-xs text-[var(--text-muted)]">ناظر</span>
               </div>
               <div className="flex flex-col items-center gap-1">
                 <PersonAvatar seed="sg_elder" gender="male" age={68} size={46} />
-                <span className="text-[10px] text-[var(--text-muted)]">سالمند</span>
+                <span className="text-xs text-[var(--text-muted)]">سالمند</span>
               </div>
             </div>
           </Card>
@@ -639,7 +653,7 @@ export function StyleGuidePage({
                   className="flex flex-col items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] py-2"
                 >
                   <CountryFlag countryId={c.id} size="md" />
-                  <span className="text-[11px] font-bold text-[var(--text)]">{c.name}</span>
+                  <span className="text-xs font-bold text-[var(--text)]">{c.name}</span>
                 </div>
               ))}
             </div>
@@ -647,7 +661,7 @@ export function StyleGuidePage({
             <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5">
               <div>
                 <div className="text-xs font-bold text-[var(--text)]">سهمیه برنامه امسال</div>
-                <div className="text-[11px] text-[var(--text-muted)]">۳ از ۵ اقدام باقی‌مانده</div>
+                <div className="text-xs text-[var(--text-muted)]">۳ از ۵ اقدام باقی‌مانده</div>
               </div>
               <div className="flex items-center gap-1.5">
                 {[0, 1, 2, 3, 4].map((idx) => (
@@ -669,8 +683,8 @@ export function StyleGuidePage({
                   <IconHealth className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-xs font-bold text-[var(--text)]">ورزش و تندرستی</div>
-                  <div className="text-[10px] text-[var(--text-muted)]">۸ فعالیت</div>
+                  <div className="text-xs font-bold text-[var(--text)]">ورزش و تندرستی</div>
+                  <div className="text-xs text-[var(--text-muted)]">۸ فعالیت</div>
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-2xl border border-[var(--primary)]/35 bg-[var(--primary-soft)] p-3">
@@ -678,8 +692,53 @@ export function StyleGuidePage({
                   <IconPlane className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-xs font-bold text-[var(--primary-strong)]">سفر و مهاجرت</div>
-                  <div className="text-[10px] text-[var(--text-muted)]">۶ مقصد</div>
+                  <div className="text-xs font-bold text-[var(--primary-strong)]">سفر و مهاجرت</div>
+                  <div className="text-xs text-[var(--text-muted)]">۶ مقصد</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Rich Country Card + Difficulty Factor Bar Pattern */}
+            <div className="space-y-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)]/70 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CountryFlag countryId="germany" size="md" />
+                  <div>
+                    <div className="text-sm font-bold text-[var(--text)]">آلمان</div>
+                    <div className="text-xs text-[var(--text-muted)]">ارز: یورو (€)</div>
+                  </div>
+                </div>
+                <Badge tone="primary">کارت مقصد غنی</Badge>
+              </div>
+              <div className="grid grid-cols-3 gap-2 rounded-xl bg-[var(--surface)] p-2 text-center text-xs">
+                <div>
+                  <div className="text-[var(--text-muted)]">درآمد ماهانه</div>
+                  <div className="flex justify-center">
+                    <MoneyText
+                      amount={2850}
+                      currency="EUR"
+                      mode="stacked"
+                      interactive={false}
+                      className="items-center"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[var(--text-muted)]">سطح هزینه</div>
+                  <div className="font-bold text-[var(--text)]">متعادل</div>
+                </div>
+                <div>
+                  <div className="text-[var(--text-muted)]">گشودگی</div>
+                  <div className="font-bold tabular-nums text-[var(--primary-strong)]">۷۸٪</div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[var(--text)]">نمودار سهم عامل سختی</span>
+                  <span className="font-bold tabular-nums text-[var(--success)]">+۱۴ امتیاز</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-[var(--surface)]">
+                  <div className="h-full w-3/4 rounded-full bg-[var(--success)]" />
                 </div>
               </div>
             </div>
@@ -809,5 +868,6 @@ export function StyleGuidePage({
         />
       </div>
     </div>
+    </MoneyProvider>
   );
 }

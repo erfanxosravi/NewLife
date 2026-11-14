@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { gameDataset } from '../data/registry';
 import { ADOPTION_STEP_ORDER, getAdoptionStepIndex } from '../engine/adoption';
 import { getBaselineScaleFromMinWage } from '../engine/economy';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import type { AdoptionCareType, AdoptionStepId, SaveGame } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
 import {
@@ -22,6 +22,7 @@ import {
 } from '../state/actions';
 import { getAdoptionHubSummary } from '../state/selectors';
 import { ChecklistCard, InspectorVisitCard } from './components/AdoptionCards';
+import { MoneyText } from './components/MoneyText';
 import { PersonAvatar } from './components/PersonAvatar';
 import {
   ActionButton,
@@ -106,7 +107,12 @@ export function AdoptionSheet({
         title: doc.titleFa,
         subtitle: doc.subtitleFa,
         done,
-        valueText: fee > 0 ? formatToman(fee) : 'رایگان',
+        valueText:
+          fee > 0 ? (
+            <MoneyText amount={fee} currency="IRT" mode="inline" interactive={false} />
+          ) : (
+            'رایگان'
+          ),
         ctaLabel: 'ثبت مدرک',
         disabled: !canAfford,
         reason: !canAfford ? 'موجودی کافی نیست' : undefined,
@@ -228,15 +234,29 @@ export function AdoptionSheet({
               <span className="font-bold text-[var(--primary-strong)]">{careDef.titleFa}</span>
               <Badge tone="neutral">{careDef.commitmentYearsLabelFa}</Badge>
             </div>
-            <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+            <p className="text-xs leading-relaxed text-[var(--text-muted)]">
               {careDef.legalBasisFa}
             </p>
-            <div className="flex flex-wrap gap-3 pt-1 text-[11px] text-[var(--text-muted)]">
+            <div className="flex flex-wrap gap-3 pt-1 text-xs text-[var(--text-muted)]">
               <span>
-                حداقل پس‌انداز: <strong className="text-[var(--text)]">{formatToman(summary.activeEligibility.requiredSavingsToman)}</strong>
+                حداقل پس‌انداز:{' '}
+                <strong className="text-[var(--text)]">
+                  <MoneyText
+                    amount={summary.activeEligibility.requiredSavingsToman}
+                    currency="IRT"
+                    mode="inline"
+                  />
+                </strong>
               </span>
               <span>
-                هزینه ثبت حکم: <strong className="text-[var(--text)]">{formatToman(summary.activeEligibility.placementFeeToman)}</strong>
+                هزینه ثبت حکم:{' '}
+                <strong className="text-[var(--text)]">
+                  <MoneyText
+                    amount={summary.activeEligibility.placementFeeToman}
+                    currency="IRT"
+                    mode="inline"
+                  />
+                </strong>
               </span>
             </div>
           </Card>
@@ -260,7 +280,7 @@ export function AdoptionSheet({
             return (
               <div key={stepId} className="space-y-1 text-center">
                 <div
-                  className={`flex h-6 items-center justify-center rounded-lg border text-[11px] font-bold tabular-nums transition-colors ${
+                  className={`flex h-7 items-center justify-center rounded-lg border text-xs font-bold tabular-nums transition-colors ${
                     isDone
                       ? 'border-[var(--success)]/45 bg-[var(--success)]/15 text-[var(--success)]'
                       : isCurrent
@@ -303,7 +323,14 @@ export function AdoptionSheet({
                 icon={<IconHeart className="h-4 w-4" />}
                 title="دریافت گواهی پزشکی ناباروری"
                 subtitle="معافیت از شرط انتظار ۵ ساله زندگی مشترک (تبصره ماده ۵)"
-                value={formatToman(summary.activeEligibility.infertilityTestCostToman)}
+                value={
+                  <MoneyText
+                    amount={summary.activeEligibility.infertilityTestCostToman}
+                    currency="IRT"
+                    mode="inline"
+                    interactive={false}
+                  />
+                }
                 state={
                   player.moneyToman < summary.activeEligibility.infertilityTestCostToman
                     ? 'disabled'
@@ -382,7 +409,14 @@ export function AdoptionSheet({
           />
           <ActionButton
             label="ثبت نهایی پرونده در درگاه بهزیستی"
-            costText={formatToman(summary.costEstimates.applicationBaseCostToman)}
+            costText={
+              <MoneyText
+                amount={summary.costEstimates.applicationBaseCostToman}
+                currency="IRT"
+                mode="inline"
+                interactive={false}
+              />
+            }
             variant="primary"
             disabled={
               !allDocsDone ||
@@ -462,14 +496,14 @@ export function AdoptionSheet({
                     />
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="truncate text-sm font-bold text-[var(--text)]">
+                        <h4 className="text-sm font-bold text-[var(--text)]">
                           {cand.firstName}
                         </h4>
                         <Badge tone="neutral">
                           {cand.gender === 'female' ? 'دختر' : 'پسر'} · {formatAgeLabel(cand.age)}
                         </Badge>
                       </div>
-                      <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                         ویژگی‌ها: {cand.traits.join(' · ')}
                       </p>
                     </div>
@@ -482,7 +516,7 @@ export function AdoptionSheet({
                 <p className="text-xs leading-relaxed text-[var(--text)]">{cand.backgroundFa}</p>
 
                 {cand.healthNeedsFa && (
-                  <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[11px] text-[var(--text-muted)]">
+                  <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs text-[var(--text-muted)]">
                     نکته مراقبتی: {cand.healthNeedsFa}
                   </div>
                 )}
@@ -490,7 +524,14 @@ export function AdoptionSheet({
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <ActionButton
                     label="برگزاری نشست آشنایی"
-                    costText={formatToman(summary.costEstimates.bondingMeetingCostToman)}
+                    costText={
+                      <MoneyText
+                        amount={summary.costEstimates.bondingMeetingCostToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    }
                     variant={meetingsReady ? 'secondary' : 'primary'}
                     disabled={!canAffordMeeting}
                     disabledReason={!canAffordMeeting ? 'موجودی کافی نیست' : undefined}
@@ -574,7 +615,14 @@ export function AdoptionSheet({
 
           <ActionButton
             label="صدور حکم دادگاه و تحویل کودک"
-            costText={formatToman(summary.activeEligibility.placementFeeToman)}
+            costText={
+              <MoneyText
+                amount={summary.activeEligibility.placementFeeToman}
+                currency="IRT"
+                mode="inline"
+                interactive={false}
+              />
+            }
             variant="primary"
             disabled={player.moneyToman < summary.activeEligibility.placementFeeToman}
             disabledReason={

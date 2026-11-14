@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   ArrowDownLeft,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
@@ -150,3 +151,4 @@ export const IconSparkles = withDefaultStroke(Sparkles);
 export const IconBook = withDefaultStroke(BookOpen);
 export const IconHeart = withDefaultStroke(Heart);
 export const IconMapPin = withDefaultStroke(MapPin);
+export const IconSwap = withDefaultStroke(ArrowLeftRight);

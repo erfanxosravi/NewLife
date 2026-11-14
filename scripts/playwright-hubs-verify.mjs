@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 const BASE_URL = process.env.E2E_URL || 'http://localhost:3000';
 const EXEC_PATH = '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell';
 const SHOT_DIR = path.resolve(
-  '.aistudio/artifacts/brain/135c4a68-3b99-499b-9682-e9a286caf1fc/screenshots/hubs',
+  '.aistudio/artifacts/brain/b45dabeb-e0eb-47eb-a65d-10c17ddda0b1/screenshots/after',
 );
 
 fs.mkdirSync(SHOT_DIR, { recursive: true });
@@ -39,10 +39,39 @@ async function assertCleanScreen(page, label) {
       }
     }
 
+    // Check computed font size >= 12px and no clipped headings
+    const tinyTexts = [];
+    const clippedHeadings = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      if (!node.nodeValue || !node.nodeValue.trim()) continue;
+      const el = node.parentElement;
+      if (!el) continue;
+      if (el.closest('[aria-hidden="true"]') || el.closest('svg')) continue;
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) continue;
+      const fs = parseFloat(cs.fontSize);
+      if (!Number.isNaN(fs) && fs < 11.9) {
+        tinyTexts.push(`${el.tagName} (${fs.toFixed(1)}px): "${node.nodeValue.trim().slice(0, 24)}"`);
+      }
+    }
+
+    for (const h of root.querySelectorAll('h1, h2, h3, h4, [role="heading"]')) {
+      const cs = getComputedStyle(h);
+      if (cs.textOverflow === 'ellipsis' && cs.overflow === 'hidden' && h.scrollWidth > h.clientWidth + 1) {
+        clippedHeadings.push(h.textContent?.trim().slice(0, 32) || h.tagName);
+      }
+    }
+
     return {
       overflow: sw > cw ? `${sw}>${cw}` : null,
       english: englishMatch,
       nestedScrolls,
+      tinyTexts: tinyTexts.slice(0, 5),
+      clippedHeadings,
     };
   });
 
@@ -54,6 +83,12 @@ async function assertCleanScreen(page, label) {
   }
   if (result.nestedScrolls.length > 0) {
     throw new Error(`Nested scrollbars found at ${label}: ${result.nestedScrolls.join('; ')}`);
+  }
+  if (result.tinyTexts.length > 0) {
+    throw new Error(`Sub-12px text found at ${label}: ${result.tinyTexts.join('; ')}`);
+  }
+  if (result.clippedHeadings.length > 0) {
+    throw new Error(`Clipped heading found at ${label}: ${result.clippedHeadings.join('; ')}`);
   }
 }
 
@@ -262,7 +297,9 @@ async function runForMode(browser, vp, theme) {
     // Switch back to Migration sub-tab & open Turkey detail
     await page.locator('[role="dialog"] button[role="tab"]:has-text("مهاجرت")').last().click();
     await page.waitForSelector('text=کشورهای مقصد مهاجرت');
-    await page.locator('[role="dialog"] button:has-text("ترکیه")').first().click();
+    await page.locator('[data-testid="country-card-turkey"] button:has-text("بررسی پرونده")').click();
+    await page.waitForSelector('[data-testid="abroad-income-calculator"]');
+    await page.locator('[data-testid="abroad-income-calculator"] button:has-text("۲ نفر")').click();
     await page.waitForSelector('text=تجزیه سختی پرونده');
     await assertCleanScreen(page, `${vp.name}-${theme}-country-detail-income`);
     await page.screenshot({ path: path.join(SHOT_DIR, `drill-country-detail-${theme}-${vp.name}.png`) });

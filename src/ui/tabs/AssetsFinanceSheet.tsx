@@ -1,14 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { gameDataset } from '../../data/registry';
 import { getAbroadHousingOptions, getCountryMacroDef } from '../../engine/countries';
 import { calculateNetWorthToman } from '../../engine/economy';
-import {
-  ALL_CURRENCY_CODES,
-  formatCurrencyAmount,
-  getCurrencyDef,
-  quoteConversion,
-} from '../../engine/fx';
-import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { ALL_CURRENCY_CODES, getCurrencyDef, quoteConversion } from '../../engine/fx';
+import { toPersianDigits } from '../../engine/jalali';
 import { getWalletBalance } from '../../engine/ledger';
 import type {
   Asset,
@@ -38,7 +33,6 @@ import {
   type ActionOutcome,
 } from '../../state/actions';
 import {
-  formatUsdEquivalentHint,
   getAdjustedPriceToman,
   getAmountPurchasingPower,
   getAnnualExpenseEstimate,
@@ -64,12 +58,14 @@ import {
 } from '../../state/selectors';
 import { CurrencyExposureCard } from '../components/CurrencyExposureCard';
 import { SellIranPropertyWizard } from '../components/emigration/SellIranPropertyWizard';
+import { ExchangeRateStrip } from '../components/ExchangeRateStrip';
+import { ForeignPaymentSheet } from '../components/ForeignPaymentSheet';
 import { FullScreenSheet } from '../components/FullScreenSheet';
+import { MoneyText } from '../components/MoneyText';
 import {
   ActionRow,
   Card,
   ConfirmDialog,
-  CurrencyText,
   DangerZoneGroup,
   DetailSheet,
   FilterChips,
@@ -150,6 +146,9 @@ export function AssetsFinanceSheet({
   const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const [infoTopic, setInfoTopic] = useState<InfoTopic>(null);
   const [pendingConfirm, setPendingConfirm] = useState<PendingAssetConfirm | null>(null);
+  const [pendingAbroadHousing, setPendingAbroadHousing] = useState<
+    ReturnType<typeof getAbroadHousingOptions>[number] | null
+  >(null);
 
   const bankRatePct = Math.round(
     gameDataset.economy.baseline1405.policyAndModel.bankDepositAnnualRate.value * 100,
@@ -334,7 +333,7 @@ export function AssetsFinanceSheet({
         icon={<IconShop className="h-4 w-4" />}
         title={item.titleFa}
         subtitle={`${t(`shop.categories.${item.category}`)} · ${item.effectHintFa}`}
-        value={formatToman(price)}
+        value={<MoneyText amount={price} currency="IRT" mode="inline" interactive={false} />}
         state={alreadyOwned ? 'done' : ageLocked ? 'locked' : cantAfford ? 'disabled' : 'enabled'}
         reason={reason}
         ctaLabel={alreadyOwned ? undefined : t('buy')}
@@ -354,7 +353,13 @@ export function AssetsFinanceSheet({
     if (pendingConfirm.kind === 'sell_investment') {
       return {
         title: `فروش کل ${pendingConfirm.titleFa}`,
-        message: `با فروش تمام موجودی این دارایی، مبلغ ${formatToman(pendingConfirm.amountToman)} به نقدینگی تو اضافه می‌شود.`,
+        message: (
+          <span>
+            با فروش تمام موجودی این دارایی، مبلغ{' '}
+            <MoneyText amount={pendingConfirm.amountToman} currency="IRT" mode="inline" /> به
+            نقدینگی تو اضافه می‌شود.
+          </span>
+        ),
         destructive: false,
         confirmLabel: 'فروش کل',
       };
@@ -363,9 +368,19 @@ export function AssetsFinanceSheet({
       return {
         title: `تأیید معامله: ${pendingConfirm.listing.titleFa}`,
         message:
-          pendingConfirm.listing.mode === 'rent'
-            ? `مبلغ پیش‌پرداخت (ودیعه + اجاره ماه اول) برابر با ${formatToman(pendingConfirm.upfrontToman)} است و جایگزین مسکن فعلی می‌شود.`
-            : `قیمت قطعی معامله ${formatToman(pendingConfirm.upfrontToman)} است. با تسویه ملک قبلی انجام می‌شود.`,
+          pendingConfirm.listing.mode === 'rent' ? (
+            <span>
+              مبلغ پیش‌پرداخت (ودیعه + اجاره ماه اول) برابر با{' '}
+              <MoneyText amount={pendingConfirm.upfrontToman} currency="IRT" mode="inline" /> است و
+              جایگزین مسکن فعلی می‌شود.
+            </span>
+          ) : (
+            <span>
+              قیمت قطعی معامله{' '}
+              <MoneyText amount={pendingConfirm.upfrontToman} currency="IRT" mode="inline" /> است.
+              با تسویه ملک قبلی انجام می‌شود.
+            </span>
+          ),
         destructive: false,
         confirmLabel: 'امضای قرارداد',
       };
@@ -373,7 +388,12 @@ export function AssetsFinanceSheet({
     if (pendingConfirm.kind === 'buy_vehicle') {
       return {
         title: `خرید ${pendingConfirm.vehicle.titleFa}`,
-        message: `مبلغ ${formatToman(pendingConfirm.priceToman)} از نقدینگی کسر می‌شود و هزینه نگهداری سالانه دارد.`,
+        message: (
+          <span>
+            مبلغ <MoneyText amount={pendingConfirm.priceToman} currency="IRT" mode="inline" /> از
+            نقدینگی کسر می‌شود و هزینه نگهداری سالانه دارد.
+          </span>
+        ),
         destructive: false,
         confirmLabel: 'خرید خودرو',
       };
@@ -381,7 +401,13 @@ export function AssetsFinanceSheet({
     if (pendingConfirm.kind === 'sell_vehicle') {
       return {
         title: `فروش ${pendingConfirm.titleFa}`,
-        message: `خودرو به قیمت روز ${formatToman(pendingConfirm.priceToman)} فروخته می‌شود و قابل بازگشت نیست.`,
+        message: (
+          <span>
+            خودرو به قیمت روز{' '}
+            <MoneyText amount={pendingConfirm.priceToman} currency="IRT" mode="inline" /> فروخته
+            می‌شود و قابل بازگشت نیست.
+          </span>
+        ),
         destructive: true,
         confirmLabel: 'فروش خودرو',
       };
@@ -389,14 +415,25 @@ export function AssetsFinanceSheet({
     if (pendingConfirm.kind === 'loan') {
       return {
         title: `دریافت ${pendingConfirm.labelFa}`,
-        message: `مبلغ ${formatToman(pendingConfirm.principalToman)} واریز می‌شود و اقساط آن به‌صورت خودکار سالانه کسر خواهد شد.`,
+        message: (
+          <span>
+            مبلغ{' '}
+            <MoneyText amount={pendingConfirm.principalToman} currency="IRT" mode="inline" /> واریز
+            می‌شود و اقساط آن به‌صورت خودکار سالانه کسر خواهد شد.
+          </span>
+        ),
         destructive: false,
         confirmLabel: 'دریافت وام',
       };
     }
     return {
       title: `تأیید خرید: ${pendingConfirm.item.titleFa}`,
-      message: `مبلغ ${formatToman(pendingConfirm.priceToman)} بابت این کالا پرداخت می‌شود. ${pendingConfirm.item.effectHintFa}.`,
+      message: (
+        <span>
+          مبلغ <MoneyText amount={pendingConfirm.priceToman} currency="IRT" mode="inline" /> بابت
+          این کالا پرداخت می‌شود. {pendingConfirm.item.effectHintFa}.
+        </span>
+      ),
       destructive: false,
       confirmLabel: 'تأیید خرید',
     };
@@ -439,7 +476,7 @@ export function AssetsFinanceSheet({
     setPendingConfirm(null);
   };
 
-  const infoContent: Record<Exclude<InfoTopic, null>, { title: string; bullets: string[] }> = {
+  const infoContent: Record<Exclude<InfoTopic, null>, { title: string; bullets: ReactNode[] }> = {
     netWorth: {
       title: 'دارایی خالص و قدرت خرید',
       bullets: [
@@ -451,7 +488,10 @@ export function AssetsFinanceSheet({
       title: 'شاخص‌های بازار و تورم',
       bullets: [
         'شاخص‌ها از سال ۱۳۴۰ تا ۱۴۰۵ بر پایه داده‌های واقعی اقتصاد ایران و پس از آن بر اساس سناریوی تورمی شبیه‌سازی تنظیم شده‌اند.',
-        `حداقل مزد ماهانه فعلی در مدل اقتصاد: ${formatToman(minWageMonthly)}.`,
+        <span key="min-wage">
+          حداقل مزد ماهانه فعلی در مدل اقتصاد:{' '}
+          <MoneyText amount={minWageMonthly} currency="IRT" mode="inline" />.
+        </span>,
       ],
     },
     investments: {
@@ -482,7 +522,12 @@ export function AssetsFinanceSheet({
       open={open}
       onClose={onClose}
       title={t('nav.assets')}
-      subtitle={`نقدینگی: ${moneySummary.cashDisplayText}`}
+      subtitle={
+        <span className="inline-flex items-center gap-1">
+          <span>نقدینگی:</span>
+          <MoneyText amount={player.moneyToman} currency="IRT" mode="inline" interactive={false} />
+        </span>
+      }
       scrollKey={subTab}
       stickySubHeader={
         <SegmentedControl
@@ -505,22 +550,45 @@ export function AssetsFinanceSheet({
             <HubHeroCard
               tone="primary"
               icon={<IconAssets className="h-5 w-5" />}
-              title={moneySummary.netWorth.primaryFormatted}
-              subtitle={
-                moneySummary.netWorth.displayCurrency !== 'IRT'
-                  ? `معادل ${moneySummary.netWorth.secondaryTomanFormatted} · ${moneySummary.netWorth.purchasingPowerHintFa}`
-                  : `${netWorthPP.labelFa} · ${moneySummary.netWorth.purchasingPowerHintFa}`
-              }
+              title={<MoneyText amount={netWorth} currency="IRT" mode="stacked" />}
+              subtitle={`${netWorthPP.labelFa} · ${moneySummary.netWorth.purchasingPowerHintFa}`}
               onInfo={() => setInfoTopic('netWorth')}
               detailsLabel="تحلیل بازار"
               onDetails={() => setShowMarketDetail(true)}
               metrics={[
-                { label: t('cashLabel'), value: moneySummary.cashDisplayText },
+                {
+                  label: t('cashLabel'),
+                  value: (
+                    <MoneyText
+                      amount={player.moneyToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
+                },
                 {
                   label: 'خالص درآمد سالانه',
-                  value: <CurrencyText amountToman={annualIncome} />,
+                  value: (
+                    <MoneyText
+                      amount={annualIncome}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
                 },
-                { label: 'کل بدهی و وام', value: <CurrencyText amountToman={totalDebtAll} /> },
+                {
+                  label: 'کل بدهی و وام',
+                  value: (
+                    <MoneyText
+                      amount={totalDebtAll}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
+                },
               ]}
             />
 
@@ -543,8 +611,9 @@ export function AssetsFinanceSheet({
               title="روند دارایی و شاخص بازار"
               subtitle={`تورم سال ${toPersianDigits(state.currentJalaliYear)}: ${toPersianDigits(inflationPct)}٪`}
             >
-              <div className="p-3">
+              <div className="p-3 space-y-2.5">
                 <Sparkline values={netWorthSeries} colorVar="--primary" height={40} />
+                <ExchangeRateStrip state={state} compact />
               </div>
               <ActionRow
                 icon={<IconCoins className="h-4 w-4" />}
@@ -556,7 +625,26 @@ export function AssetsFinanceSheet({
               <ActionRow
                 icon={<IconTrendUp className="h-4 w-4" />}
                 title={`نرخ‌های بازار (${toPersianDigits(state.currentJalaliYear)})`}
-                subtitle={`دلار: ${formatToman(usdRate)} · طلای ۱۸: ${formatToman(goldRate)}`}
+                subtitle={
+                  <span className="inline-flex flex-wrap items-center gap-1">
+                    <span>دلار:</span>
+                    <MoneyText
+                      amount={usdRate}
+                      currency="IRT"
+                      mode="single"
+                      compact
+                      interactive={false}
+                    />
+                    <span>· طلای ۱۸:</span>
+                    <MoneyText
+                      amount={goldRate}
+                      currency="IRT"
+                      mode="single"
+                      compact
+                      interactive={false}
+                    />
+                  </span>
+                }
                 value={`${toPersianDigits(inflationPct)}٪ تورم`}
                 showChevron
                 onClick={() => setShowMarketDetail(true)}
@@ -568,9 +656,19 @@ export function AssetsFinanceSheet({
                 icon={<IconCoins className="h-4 w-4" />}
                 title={t('tabs.investments')}
                 subtitle={
-                  totalPortfolioVal > 0
-                    ? `ارزش سبد: ${formatToman(totalPortfolioVal)}`
-                    : 'ارز، طلا، بورس و سپرده بانکی'
+                  totalPortfolioVal > 0 ? (
+                    <span className="inline-flex items-center gap-1">
+                      <span>ارزش سبد:</span>
+                      <MoneyText
+                        amount={totalPortfolioVal}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    </span>
+                  ) : (
+                    'ارز، طلا، بورس و سپرده بانکی'
+                  )
                 }
                 showChevron
                 onClick={() => setSubTab('investments')}
@@ -620,13 +718,41 @@ export function AssetsFinanceSheet({
                   subtitle="برای خرید سریع یا فروش، هر بازار را باز کن"
                   onInfo={() => setInfoTopic('investments')}
                   metrics={[
-                    { label: 'ارزش کل سبد', value: formatToman(totalPortfolioVal) },
+                    {
+                      label: 'ارزش کل سبد',
+                      value: (
+                        <MoneyText
+                          amount={totalPortfolioVal}
+                          currency="IRT"
+                          mode="inline"
+                          interactive={false}
+                        />
+                      ),
+                    },
                     {
                       label: 'سود یا زیان',
-                      value: <CurrencyText amountToman={totalPortfolioPnl} showSign />,
+                      value: (
+                        <MoneyText
+                          amount={totalPortfolioPnl}
+                          currency="IRT"
+                          mode="inline"
+                          showSign
+                          interactive={false}
+                        />
+                      ),
                       tone: totalPortfolioPnl >= 0 ? 'success' : 'danger',
                     },
-                    { label: 'نقدینگی آزاد', value: formatToman(player.moneyToman) },
+                    {
+                      label: 'نقدینگی آزاد',
+                      value: (
+                        <MoneyText
+                          amount={player.moneyToman}
+                          currency="IRT"
+                          mode="inline"
+                          interactive={false}
+                        />
+                      ),
+                    },
                   ]}
                 />
 
@@ -640,7 +766,18 @@ export function AssetsFinanceSheet({
                         icon={<IconCoins className="h-4 w-4" />}
                         title={opt.titleFa}
                         subtitle={`ریسک: ${opt.riskLabel} · ${opt.hint}`}
-                        value={heldVal > 0 ? formatToman(heldVal) : 'بدون موجودی'}
+                        value={
+                          heldVal > 0 ? (
+                            <MoneyText
+                              amount={heldVal}
+                              currency="IRT"
+                              mode="inline"
+                              interactive={false}
+                            />
+                          ) : (
+                            'بدون موجودی'
+                          )
+                        }
                         state={heldVal > 0 ? 'recommended' : 'enabled'}
                         showChevron
                         onClick={() => setSelectedInvId(opt.id)}
@@ -660,22 +797,61 @@ export function AssetsFinanceSheet({
               icon={<IconHome className="h-5 w-5" />}
               title={`مسکن: ${t(`housingLabels.${player.housing.type}`)}`}
               subtitle={
-                player.housing.propertyValueToman > 0
-                  ? `ارزش روز ملک: ${formatToman(player.housing.propertyValueToman)}`
-                  : player.housing.monthlyRentToman > 0
-                    ? `ودیعه: ${formatToman(player.housing.depositRahnToman)} · اجاره: ${formatToman(player.housing.monthlyRentToman)}`
-                    : 'اقامت خانوادگی بدون هزینه اجاره'
+                player.housing.propertyValueToman > 0 ? (
+                  <span className="inline-flex items-center gap-1">
+                    <span>ارزش روز ملک:</span>
+                    <MoneyText
+                      amount={player.housing.propertyValueToman}
+                      currency="IRT"
+                      mode="inline"
+                    />
+                  </span>
+                ) : player.housing.monthlyRentToman > 0 ? (
+                  <span className="inline-flex flex-wrap items-center gap-1">
+                    <span>ودیعه:</span>
+                    <MoneyText
+                      amount={player.housing.depositRahnToman}
+                      currency="IRT"
+                      mode="single"
+                      compact
+                    />
+                    <span>· اجاره:</span>
+                    <MoneyText
+                      amount={player.housing.monthlyRentToman}
+                      currency="IRT"
+                      mode="single"
+                      compact
+                    />
+                  </span>
+                ) : (
+                  'اقامت خانوادگی بدون هزینه اجاره'
+                )
               }
               onInfo={() => setInfoTopic('housing')}
               metrics={[
                 {
                   label: 'دارایی یا رهن ملک',
-                  value: formatToman(
-                    player.housing.propertyValueToman || player.housing.depositRahnToman,
+                  value: (
+                    <MoneyText
+                      amount={player.housing.propertyValueToman || player.housing.depositRahnToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
                   ),
                 },
                 { label: 'تعداد خودرو', value: `${toPersianDigits(ownedCars.length)} دستگاه` },
-                { label: 'نقدینگی', value: formatToman(player.moneyToman) },
+                {
+                  label: 'نقدینگی',
+                  value: (
+                    <MoneyText
+                      amount={player.moneyToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
+                },
               ]}
             />
 
@@ -691,7 +867,14 @@ export function AssetsFinanceSheet({
                         icon={<IconCar className="h-4 w-4" />}
                         title={car.name}
                         subtitle="نگهداری، سرویس دوره‌ای و فروش"
-                        value={formatToman(car.currentValueToman)}
+                        value={
+                          <MoneyText
+                            amount={car.currentValueToman}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        }
                         showChevron
                         onClick={() => setSelectedCarId(car.id)}
                       />
@@ -707,33 +890,67 @@ export function AssetsFinanceSheet({
                         icon={<IconHome className="h-4 w-4" />}
                         title={opt.titleFa}
                         subtitle={
-                          opt.mode === 'rent'
-                            ? `ودیعه ${formatCurrencyAmount(opt.depositLocal, opt.currencyCode, gameDataset)} · ماهانه ${formatCurrencyAmount(opt.monthlyRentLocal, opt.currencyCode, gameDataset)}`
-                            : `پیش‌پرداخت ${formatCurrencyAmount(opt.downPaymentLocal, opt.currencyCode, gameDataset)} · ${toPersianDigits(opt.areaSqm)} متر`
-                        }
-                        value={
-                          opt.mode === 'rent'
-                            ? formatCurrencyAmount(opt.depositLocal, opt.currencyCode, gameDataset)
-                            : formatCurrencyAmount(opt.downPaymentLocal, opt.currencyCode, gameDataset)
-                        }
-                        ctaLabel={opt.mode === 'rent' ? 'اجاره' : 'خرید'}
-                        onClick={() =>
-                          onUpdateSave(
-                            rentOrBuyAbroadHousingAction(
-                              saveGame,
-                              opt.id,
-                              state.emigration?.residency?.regionId,
-                              gameDataset,
-                            ),
+                          opt.mode === 'rent' ? (
+                            <span className="inline-flex flex-wrap items-center gap-1">
+                              <span>ودیعه</span>
+                              <MoneyText
+                                amount={opt.depositLocal}
+                                currency={opt.currencyCode}
+                                mode="inline"
+                                interactive={false}
+                              />
+                              <span>· ماهانه</span>
+                              <MoneyText
+                                amount={opt.monthlyRentLocal}
+                                currency={opt.currencyCode}
+                                mode="inline"
+                                interactive={false}
+                              />
+                            </span>
+                          ) : (
+                            <span className="inline-flex flex-wrap items-center gap-1">
+                              <span>پیش‌پرداخت</span>
+                              <MoneyText
+                                amount={opt.downPaymentLocal}
+                                currency={opt.currencyCode}
+                                mode="inline"
+                                interactive={false}
+                              />
+                              <span>· {toPersianDigits(opt.areaSqm)} متر</span>
+                            </span>
                           )
                         }
+                        value={
+                          <MoneyText
+                            amount={
+                              opt.mode === 'rent' ? opt.depositLocal : opt.downPaymentLocal
+                            }
+                            currency={opt.currencyCode}
+                            mode="stacked"
+                            interactive={false}
+                          />
+                        }
+                        ctaLabel={opt.mode === 'rent' ? 'اجاره' : 'خرید'}
+                        onClick={() => setPendingAbroadHousing(opt)}
                       />
                     ))
                   ) : (
                     <ActionRow
                       icon={<IconHome className="h-4 w-4" />}
                       title="فهرست مسکن (خرید و اجاره)"
-                      subtitle={`متری تهران: ${formatToman(tehranSqm)} · ${toPersianDigits(gameDataset.housing.housingListings.length)} فایل`}
+                      subtitle={
+                        <span className="inline-flex items-center gap-1">
+                          <span>متری تهران:</span>
+                          <MoneyText
+                            amount={tehranSqm}
+                            currency="IRT"
+                            mode="single"
+                            compact
+                            interactive={false}
+                          />
+                          <span>· {toPersianDigits(gameDataset.housing.housingListings.length)} فایل</span>
+                        </span>
+                      }
                       showChevron
                       onClick={() => setHousingDrill('market')}
                     />
@@ -742,7 +959,17 @@ export function AssetsFinanceSheet({
                     <ActionRow
                       icon={<IconBank className="h-4 w-4" />}
                       title="فروش ملک ایران و انتقال ارز"
-                      subtitle={`ارزش فعلی: ${formatToman(iranPropToman)}`}
+                      subtitle={
+                        <span className="inline-flex items-center gap-1">
+                          <span>ارزش فعلی:</span>
+                          <MoneyText
+                            amount={iranPropToman}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        </span>
+                      }
                       ctaLabel="فروش و تبدیل"
                       onClick={() => setShowSellPropWizard(true)}
                     />
@@ -781,10 +1008,27 @@ export function AssetsFinanceSheet({
               metrics={[
                 {
                   label: 'بدهی معوق',
-                  value: formatToman(player.debtToman),
+                  value: (
+                    <MoneyText
+                      amount={player.debtToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
                   tone: player.debtToman > 0 ? 'danger' : 'default',
                 },
-                { label: 'مانده وام‌ها', value: formatToman(totalLoanDebt) },
+                {
+                  label: 'مانده وام‌ها',
+                  value: (
+                    <MoneyText
+                      amount={totalLoanDebt}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
+                },
                 { label: 'تعداد وام فعال', value: `${toPersianDigits(state.loans.length)} فقره` },
               ]}
             />
@@ -797,7 +1041,14 @@ export function AssetsFinanceSheet({
                     iconTone="warning"
                     title="بدهی معوق"
                     subtitle="در اولویت بازپرداخت قرار دارد"
-                    value={formatToman(player.debtToman)}
+                    value={
+                      <MoneyText
+                        amount={player.debtToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    }
                   />
                 )}
                 {state.loans.slice(0, 5).map((loan) => (
@@ -805,15 +1056,41 @@ export function AssetsFinanceSheet({
                     key={loan.id}
                     icon={<IconBank className="h-4 w-4" />}
                     title={loan.name}
-                    subtitle={`قسط سالانه: ${formatToman(loan.annualPaymentToman)} · ${toPersianDigits(loan.yearsRemaining)} سال باقی‌مانده`}
-                    value={formatToman(loan.principalRemainingToman)}
+                    subtitle={
+                      <span className="inline-flex flex-wrap items-center gap-1">
+                        <span>قسط سالانه:</span>
+                        <MoneyText
+                          amount={loan.annualPaymentToman}
+                          currency="IRT"
+                          mode="single"
+                          compact
+                          interactive={false}
+                        />
+                        <span>· {toPersianDigits(loan.yearsRemaining)} سال باقی‌مانده</span>
+                      </span>
+                    }
+                    value={
+                      <MoneyText
+                        amount={loan.principalRemainingToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    }
                   />
                 ))}
                 <ActionRow
                   icon={<IconCoins className="h-4 w-4" />}
                   title="پرداخت بخشی از بدهی یا وام"
                   subtitle="کاهش سریع بدهی و بهبود رتبه اعتباری"
-                  value={formatToman(Math.min(player.moneyToman, debtPayoffChunk))}
+                  value={
+                    <MoneyText
+                      amount={Math.min(player.moneyToman, debtPayoffChunk)}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   state={player.moneyToman <= 0 ? 'disabled' : 'recommended'}
                   reason={player.moneyToman <= 0 ? 'موجودی نقد نداری' : undefined}
                   ctaLabel="پرداخت"
@@ -834,7 +1111,17 @@ export function AssetsFinanceSheet({
                   icon={<IconCard className="h-4 w-4" />}
                   title={loanPresets.personal.labelFa}
                   subtitle="واریز فوری به نقدینگی · قسط خودکار سالانه"
-                  value={`سقف ${formatToman(loanPresets.personal.principalToman)}`}
+                  value={
+                    <span className="inline-flex items-center gap-1">
+                      <span>سقف</span>
+                      <MoneyText
+                        amount={loanPresets.personal.principalToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    </span>
+                  }
                   ctaLabel="درخواست"
                   onClick={() =>
                     setPendingConfirm({
@@ -849,7 +1136,17 @@ export function AssetsFinanceSheet({
                   icon={<IconHome className="h-4 w-4" />}
                   title={loanPresets.housing.labelFa}
                   subtitle="مناسب خرید یا رهن مسکن"
-                  value={`سقف ${formatToman(loanPresets.housing.principalToman)}`}
+                  value={
+                    <span className="inline-flex items-center gap-1">
+                      <span>سقف</span>
+                      <MoneyText
+                        amount={loanPresets.housing.principalToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    </span>
+                  }
                   ctaLabel="درخواست"
                   onClick={() =>
                     setPendingConfirm({
@@ -907,11 +1204,50 @@ export function AssetsFinanceSheet({
         <HubHeroCard
           icon={usdUp ? <IconTrendUp className="h-5 w-5" /> : <IconTrendDown className="h-5 w-5" />}
           title={`تورم سال جاری: ${toPersianDigits(inflationPct)}٪`}
-          subtitle={`حداقل مزد ماهانه: ${formatToman(minWageMonthly)} · ${formatUsdEquivalentHint(netWorth, state, gameDataset)}`}
+          subtitle={
+            <span className="inline-flex flex-wrap items-center gap-1">
+              <span>حداقل مزد ماهانه:</span>
+              <MoneyText amount={minWageMonthly} currency="IRT" mode="inline" />
+              <span>· معادل</span>
+              <MoneyText
+                amount={netWorth}
+                currency="IRT"
+                mode="single"
+                primaryOverride="USD"
+              />
+            </span>
+          }
           metrics={[
-            { label: 'خالص درآمد سالانه', value: formatToman(annualIncome), tone: 'success' },
-            { label: 'هزینه سالانه', value: formatToman(annualExpenses), tone: 'danger' },
-            { label: 'آپارتمان ۷۰ متری', value: formatToman(tehran70SqmPrice) },
+            {
+              label: 'خالص درآمد سالانه',
+              value: (
+                <MoneyText amount={annualIncome} currency="IRT" mode="inline" interactive={false} />
+              ),
+              tone: 'success',
+            },
+            {
+              label: 'هزینه سالانه',
+              value: (
+                <MoneyText
+                  amount={annualExpenses}
+                  currency="IRT"
+                  mode="inline"
+                  interactive={false}
+                />
+              ),
+              tone: 'danger',
+            },
+            {
+              label: 'آپارتمان ۷۰ متری',
+              value: (
+                <MoneyText
+                  amount={tehran70SqmPrice}
+                  currency="IRT"
+                  mode="inline"
+                  interactive={false}
+                />
+              ),
+            },
           ]}
         />
 
@@ -932,25 +1268,38 @@ export function AssetsFinanceSheet({
             }
             title="نرخ دلار آزاد"
             subtitle="تأثیرگذار بر کالاهای وارداتی و سفر"
-            value={formatToman(usdRate)}
+            value={<MoneyText amount={usdRate} currency="IRT" mode="inline" interactive={false} />}
           />
           <ActionRow
             icon={<IconCoins className="h-4 w-4" />}
             title="طلای ۱۸ عیار (گرم)"
             subtitle="نوسان همگام با سکه و ارز"
-            value={formatToman(goldRate)}
+            value={<MoneyText amount={goldRate} currency="IRT" mode="inline" interactive={false} />}
           />
           <ActionRow
             icon={<IconSparkles className="h-4 w-4" />}
             title="سکه امامی"
             subtitle="شاخص رایج پس‌انداز بلندمدت"
-            value={formatToman(coinRate)}
+            value={<MoneyText amount={coinRate} currency="IRT" mode="inline" interactive={false} />}
           />
           <ActionRow
             icon={<IconHome className="h-4 w-4" />}
             title="متری آگهی مسکن تهران"
-            subtitle={`واحد ۷۰ متری معامله: ${formatToman(tehran70SqmPrice)}`}
-            value={formatToman(tehranSqm)}
+            subtitle={
+              <span className="inline-flex items-center gap-1">
+                <span>واحد ۷۰ متری معامله:</span>
+                <MoneyText
+                  amount={tehran70SqmPrice}
+                  currency="IRT"
+                  mode="single"
+                  compact
+                  interactive={false}
+                />
+              </span>
+            }
+            value={
+              <MoneyText amount={tehranSqm} currency="IRT" mode="inline" interactive={false} />
+            }
           />
         </SectionGroup>
       </DetailSheet>
@@ -972,17 +1321,45 @@ export function AssetsFinanceSheet({
             <>
               <HubHeroCard
                 icon={<IconCoins className="h-5 w-5" />}
-                title={formatToman(heldVal)}
+                title={<MoneyText amount={heldVal} currency="IRT" mode="stacked" />}
                 subtitle={selectedInvestment.hint}
                 status={heldVal > 0 ? 'in_progress' : 'waiting'}
                 metrics={[
                   {
                     label: 'سود یا زیان',
-                    value: <CurrencyText amountToman={pnl} showSign />,
+                    value: (
+                      <MoneyText
+                        amount={pnl}
+                        currency="IRT"
+                        mode="inline"
+                        showSign
+                        interactive={false}
+                      />
+                    ),
                     tone: pnl > 0 ? 'success' : pnl < 0 ? 'danger' : 'default',
                   },
-                  { label: 'حجم خرید سریع', value: formatToman(quickTradeAmount) },
-                  { label: 'نقدینگی آزاد', value: formatToman(player.moneyToman) },
+                  {
+                    label: 'حجم خرید سریع',
+                    value: (
+                      <MoneyText
+                        amount={quickTradeAmount}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'نقدینگی آزاد',
+                    value: (
+                      <MoneyText
+                        amount={player.moneyToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
                 ]}
               />
 
@@ -991,7 +1368,14 @@ export function AssetsFinanceSheet({
                   icon={<IconCoins className="h-4 w-4" />}
                   title="خرید سریع"
                   subtitle="افزودن به دارایی با نرخ روز"
-                  value={formatToman(quickTradeAmount)}
+                  value={
+                    <MoneyText
+                      amount={quickTradeAmount}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   state={player.moneyToman < quickTradeAmount ? 'disabled' : 'recommended'}
                   reason={player.moneyToman < quickTradeAmount ? 'موجودی کافی نیست' : undefined}
                   ctaLabel="خرید"
@@ -1012,7 +1396,14 @@ export function AssetsFinanceSheet({
                   icon={<IconAssets className="h-4 w-4" />}
                   title="فروش کل دارایی"
                   subtitle="تبدیل کامل این دارایی به نقدینگی"
-                  value={heldVal > 0 ? formatToman(heldVal) : '۰ تومان'}
+                  value={
+                    <MoneyText
+                      amount={heldVal}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   state={heldVal <= 0 ? 'disabled' : 'enabled'}
                   reason={heldVal <= 0 ? 'موجودی نداری' : undefined}
                   ctaLabel="فروش کل"
@@ -1083,11 +1474,41 @@ export function AssetsFinanceSheet({
                 icon={<IconHome className="h-4 w-4" />}
                 title={listing.titleFa}
                 subtitle={
-                  listing.mode === 'rent' && rentalTerms
-                    ? `ودیعه ${formatToman(rentalTerms.deposit)} + اجاره ${formatToman(rentalTerms.monthlyRent)}`
-                    : `متراژ ${toPersianDigits(listing.areaSqm)} متر · قیمت آگهی: ${formatToman(quote.listingPriceToman)}`
+                  listing.mode === 'rent' && rentalTerms ? (
+                    <span className="inline-flex flex-wrap items-center gap-1">
+                      <span>ودیعه</span>
+                      <MoneyText
+                        amount={rentalTerms.deposit}
+                        currency="IRT"
+                        mode="single"
+                        compact
+                        interactive={false}
+                      />
+                      <span>+ اجاره</span>
+                      <MoneyText
+                        amount={rentalTerms.monthlyRent}
+                        currency="IRT"
+                        mode="single"
+                        compact
+                        interactive={false}
+                      />
+                    </span>
+                  ) : (
+                    <span className="inline-flex flex-wrap items-center gap-1">
+                      <span>متراژ {toPersianDigits(listing.areaSqm)} متر · قیمت آگهی:</span>
+                      <MoneyText
+                        amount={quote.listingPriceToman}
+                        currency="IRT"
+                        mode="single"
+                        compact
+                        interactive={false}
+                      />
+                    </span>
+                  )
                 }
-                value={formatToman(upfront)}
+                value={
+                  <MoneyText amount={upfront} currency="IRT" mode="inline" interactive={false} />
+                }
                 state={cantAfford ? 'disabled' : 'enabled'}
                 reason={cantAfford ? 'موجودی کافی نیست' : undefined}
                 ctaLabel={listing.mode === 'rent' ? 'اجاره' : 'خرید'}
@@ -1110,7 +1531,12 @@ export function AssetsFinanceSheet({
         open={housingDrill === 'showroom'}
         onClose={() => setHousingDrill(null)}
         title="نمایشگاه خودرو"
-        subtitle={`نقدینگی: ${formatToman(player.moneyToman)}`}
+        subtitle={
+          <span className="inline-flex items-center gap-1">
+            <span>نقدینگی:</span>
+            <MoneyText amount={player.moneyToman} currency="IRT" mode="inline" interactive={false} />
+          </span>
+        }
       >
         <SectionGroup title="مدل‌های قابل خرید">
           {gameDataset.housing.vehicleCatalog.map((veh) => {
@@ -1122,7 +1548,7 @@ export function AssetsFinanceSheet({
                 icon={<IconCar className="h-4 w-4" />}
                 title={veh.titleFa}
                 subtitle={`شادی +${toPersianDigits(veh.happinessBonus)} · ریسک تصادف: ${veh.accidentRiskLabel}`}
-                value={formatToman(price)}
+                value={<MoneyText amount={price} currency="IRT" mode="inline" interactive={false} />}
                 state={poor ? 'disabled' : 'enabled'}
                 reason={poor ? 'موجودی کافی نیست' : undefined}
                 ctaLabel="خرید"
@@ -1153,11 +1579,50 @@ export function AssetsFinanceSheet({
               <HubHeroCard
                 icon={<IconCar className="h-5 w-5" />}
                 title={selectedCar.name}
-                subtitle={`ارزش روز: ${formatToman(selectedCar.currentValueToman)}`}
+                subtitle={
+                  <span className="inline-flex items-center gap-1">
+                    <span>ارزش روز:</span>
+                    <MoneyText
+                      amount={selectedCar.currentValueToman}
+                      currency="IRT"
+                      mode="inline"
+                    />
+                  </span>
+                }
                 metrics={[
-                  { label: 'ارزش روز', value: formatToman(selectedCar.currentValueToman) },
-                  { label: 'هزینه سرویس', value: formatToman(repairCost) },
-                  { label: 'نقدینگی', value: formatToman(player.moneyToman) },
+                  {
+                    label: 'ارزش روز',
+                    value: (
+                      <MoneyText
+                        amount={selectedCar.currentValueToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'هزینه سرویس',
+                    value: (
+                      <MoneyText
+                        amount={repairCost}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
+                  {
+                    label: 'نقدینگی',
+                    value: (
+                      <MoneyText
+                        amount={player.moneyToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
                 ]}
               />
 
@@ -1166,7 +1631,14 @@ export function AssetsFinanceSheet({
                   icon={<IconCar className="h-4 w-4" />}
                   title="سرویس دوره‌ای"
                   subtitle="حفظ سلامت فنی و ارزش فروش خودرو"
-                  value={formatToman(repairCost)}
+                  value={
+                    <MoneyText
+                      amount={repairCost}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   state={player.moneyToman < repairCost ? 'disabled' : 'enabled'}
                   reason={player.moneyToman < repairCost ? 'موجودی کافی نیست' : undefined}
                   ctaLabel="سرویس"
@@ -1182,7 +1654,14 @@ export function AssetsFinanceSheet({
                   icon={<IconWarning className="h-4 w-4" />}
                   title="فروش خودرو"
                   subtitle="فروش فوری به قیمت روز بازار"
-                  value={formatToman(selectedCar.currentValueToman)}
+                  value={
+                    <MoneyText
+                      amount={selectedCar.currentValueToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   ctaLabel="فروش"
                   onClick={() =>
                     setPendingConfirm({
@@ -1207,6 +1686,8 @@ export function AssetsFinanceSheet({
         subtitle={residenceCountry ? `اقامتگاه فعلی: ${residenceCountry.nameFa}` : 'مدیریت ارزهای سبد'}
       >
         <div className="space-y-4">
+          <ExchangeRateStrip state={state} highlightCurrency={fxTo} compact />
+
           <SectionGroup title="موجودی کیف‌پول‌ها">
             {(state.ledger?.wallets ?? []).slice(0, 7).map((w) => {
               const def = getCurrencyDef(w.currencyCode, gameDataset);
@@ -1216,7 +1697,14 @@ export function AssetsFinanceSheet({
                   icon={<IconCoins className="h-4 w-4" />}
                   title={w.labelFa}
                   subtitle={def.nameFa}
-                  value={formatCurrencyAmount(w.balance, w.currencyCode, gameDataset)}
+                  value={
+                    <MoneyText
+                      amount={w.balance}
+                      currency={w.currencyCode}
+                      mode="stacked"
+                      interactive={false}
+                    />
+                  }
                 />
               );
             })}
@@ -1233,7 +1721,7 @@ export function AssetsFinanceSheet({
             />
 
             <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--text-muted)]">از ارز مبدأ</div>
+              <div className="text-xs font-bold text-[var(--text-muted)]">از ارز مبدأ</div>
               <FilterChips<CurrencyCode>
                 value={fxFrom}
                 onChange={(code) => {
@@ -1250,7 +1738,7 @@ export function AssetsFinanceSheet({
             </div>
 
             <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--text-muted)]">به ارز مقصد</div>
+              <div className="text-xs font-bold text-[var(--text-muted)]">به ارز مقصد</div>
               <FilterChips<CurrencyCode>
                 value={fxTo}
                 onChange={setFxTo}
@@ -1262,8 +1750,10 @@ export function AssetsFinanceSheet({
             </div>
 
             <div className="space-y-1.5">
-              <div className="text-[11px] font-bold text-[var(--text-muted)]">
-                سهم انتخابی از موجودی ({formatCurrencyAmount(fxInputAmount, fxFrom, gameDataset)})
+              <div className="flex flex-wrap items-center gap-1 text-xs font-bold text-[var(--text-muted)]">
+                <span>سهم انتخابی از موجودی (</span>
+                <MoneyText amount={fxInputAmount} currency={fxFrom} mode="inline" />
+                <span>)</span>
               </div>
               <SegmentedControl<'25' | '50' | '100'>
                 value={String(fxAmountPct) as '25' | '50' | '100'}
@@ -1278,7 +1768,7 @@ export function AssetsFinanceSheet({
 
             {fxMode === 'transfer' && (
               <div className="space-y-1.5">
-                <div className="text-[11px] font-bold text-[var(--text-muted)]">کانال انتقال</div>
+                <div className="text-xs font-bold text-[var(--text-muted)]">کانال انتقال</div>
                 <FilterChips<TransferChannelDef['id']>
                   value={fxChannelId}
                   onChange={setFxChannelId}
@@ -1291,13 +1781,13 @@ export function AssetsFinanceSheet({
             )}
 
             <div className="rounded-xl bg-[var(--surface-2)] p-2.5 text-xs space-y-1">
-              <div className="flex justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-[var(--text-muted)]">خالص دریافتی مقصد:</span>
                 <span className="font-bold tabular-nums text-[var(--success)]">
-                  <bdi dir="rtl">{formatCurrencyAmount(fxQuote.netToAmount, fxTo, gameDataset)}</bdi>
+                  <MoneyText amount={fxQuote.netToAmount} currency={fxTo} mode="inline" />
                 </span>
               </div>
-              <div className="flex justify-between text-[11px] text-[var(--text-muted)]">
+              <div className="flex justify-between text-xs text-[var(--text-muted)]">
                 <span>کارمزد و شکاف نرخ تبدیل:</span>
                 <span className="tabular-nums">{toPersianDigits(fxQuote.totalFrictionPct)}٪</span>
               </div>
@@ -1342,6 +1832,41 @@ export function AssetsFinanceSheet({
           </Card>
         </div>
       </DetailSheet>
+
+      <ForeignPaymentSheet
+        open={pendingAbroadHousing !== null}
+        onClose={() => setPendingAbroadHousing(null)}
+        title={pendingAbroadHousing ? pendingAbroadHousing.titleFa : 'پرداخت مسکن'}
+        subtitle={
+          pendingAbroadHousing
+            ? pendingAbroadHousing.mode === 'rent'
+              ? 'پرداخت ودیعه قرارداد اجاره در خارج'
+              : 'پرداخت پیش‌پرداخت خرید ملک در خارج'
+            : undefined
+        }
+        amount={
+          pendingAbroadHousing
+            ? pendingAbroadHousing.mode === 'rent'
+              ? pendingAbroadHousing.depositLocal
+              : pendingAbroadHousing.downPaymentLocal
+            : 0
+        }
+        currency={pendingAbroadHousing?.currencyCode ?? 'EUR'}
+        state={state}
+        confirmLabel={pendingAbroadHousing?.mode === 'rent' ? 'امضای اجاره‌نامه' : 'پرداخت و خرید'}
+        onConfirm={(payload) => {
+          if (!pendingAbroadHousing) return;
+          const res = rentOrBuyAbroadHousingAction(
+            saveGame,
+            pendingAbroadHousing.id,
+            state.emigration?.residency?.regionId,
+            gameDataset,
+            { payFromCurrency: payload.payFromCurrency },
+          );
+          onUpdateSave(res);
+          if (res.success) setPendingAbroadHousing(null);
+        }}
+      />
 
       <SellIranPropertyWizard
         open={showSellPropWizard}

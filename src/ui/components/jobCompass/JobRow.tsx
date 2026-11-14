@@ -1,7 +1,7 @@
-import { formatToman, toPersianDigits } from '../../../engine/jalali';
 import type { JobMarketItem } from '../../../engine/jobCompass';
 import { triggerHaptic } from '../../../utils/haptics';
 import { IconCheck } from '../../icons';
+import { MoneyText } from '../MoneyText';
 import { EmojiSprite, JobIconTile } from './JobIcons';
 import { MatchRing, ReadinessRing } from './JobRings';
 
@@ -49,14 +49,13 @@ export function JobRow({
 
   const salaryBlock = (
     <>
-      <bdi
-        dir="rtl"
-        className="text-[15px] font-bold leading-tight tabular-nums text-[var(--text)]"
-      >
-        {formatToman(netAmount).replace(' تومان', '')} {unitLabel}
-      </bdi>
-      <span className="text-xs leading-tight tabular-nums text-[var(--text-muted)]">
-        معادل {toPersianDigits(usdAmount.toLocaleString('en-US'))} دلار
+      <span className="inline-flex items-baseline gap-1 text-[15px] font-bold leading-tight text-[var(--text)]">
+        <MoneyText amount={netAmount} currency="IRT" mode="single" compact interactive={false} />
+        <span>{unitLabel}</span>
+      </span>
+      <span className="inline-flex items-baseline gap-1 text-xs leading-tight text-[var(--text-muted)]">
+        <span>معادل</span>
+        <MoneyText amount={usdAmount} currency="USD" mode="single" compact interactive={false} />
       </span>
     </>
   );

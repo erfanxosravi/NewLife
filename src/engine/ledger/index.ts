@@ -225,51 +225,290 @@ export function getPrimaryLivingCurrency(state: GameState, dataset: GameDataset)
   );
 }
 
+export interface PayFromQuote {
+  sourceCurrency: CurrencyCode;
+  targetCurrency: CurrencyCode;
+  targetAmount: number;
+  sourceRequired: number;
+  feeInSource: number;
+  spreadPct: number;
+  midRateSourceToTarget: number;
+  effectiveRateSourceToTarget: number;
+  netConvertedTargetAmount: number;
+  sourceBalanceBefore: number;
+  sourceBalanceAfter: number;
+  targetBalanceBefore: number;
+  targetBalanceAfter: number;
+  canAfford: boolean;
+}
+
 /**
- * Pays an expense in the destination currency first; if insufficient, automatically converts from IRT/USD with friction.
+ * Exact minimal sourceAmount solver such that quoteConversion(sourceAmount) produces >= targetAmount.
+ * Single source of truth for both pre-payment confirmation UI and actual execution debit.
+ */
+export function quotePayFromWallet(params: {
+  targetAmount: number;
+  targetCurrency: CurrencyCode;
+  sourceCurrency: CurrencyCode;
+  state: GameState;
+  dataset: GameDataset;
+  channelId?: TransferChannelDef['id'];
+}): PayFromQuote {
+  const { targetAmount, targetCurrency, sourceCurrency, state, dataset, channelId } = params;
+  const safeTarget = Math.max(0, roundCurrencyAmount(targetAmount, targetCurrency, dataset));
+  const sourceBalanceBefore = getWalletBalance(state, sourceCurrency);
+  const targetBalanceBefore = getWalletBalance(state, targetCurrency);
+
+  if (safeTarget <= 0) {
+    return {
+      sourceCurrency,
+      targetCurrency,
+      targetAmount: 0,
+      sourceRequired: 0,
+      feeInSource: 0,
+      spreadPct: 0,
+      midRateSourceToTarget: sourceCurrency === targetCurrency ? 1 : getFxRate(state, sourceCurrency, targetCurrency, dataset),
+      effectiveRateSourceToTarget: 1,
+      netConvertedTargetAmount: 0,
+      sourceBalanceBefore,
+      sourceBalanceAfter: sourceBalanceBefore,
+      targetBalanceBefore,
+      targetBalanceAfter: targetBalanceBefore,
+      canAfford: true,
+    };
+  }
+
+  if (sourceCurrency === targetCurrency) {
+    const canAfford = sourceBalanceBefore + 1e-6 >= safeTarget;
+    return {
+      sourceCurrency,
+      targetCurrency,
+      targetAmount: safeTarget,
+      sourceRequired: safeTarget,
+      feeInSource: 0,
+      spreadPct: 0,
+      midRateSourceToTarget: 1,
+      effectiveRateSourceToTarget: 1,
+      netConvertedTargetAmount: safeTarget,
+      sourceBalanceBefore,
+      sourceBalanceAfter: roundCurrencyAmount(Math.max(0, sourceBalanceBefore - safeTarget), sourceCurrency, dataset),
+      targetBalanceBefore,
+      targetBalanceAfter: roundCurrencyAmount(Math.max(0, targetBalanceBefore - safeTarget), targetCurrency, dataset),
+      canAfford,
+    };
+  }
+
+  const def = getCurrencyDef(sourceCurrency, dataset);
+  const stepUnit = Math.pow(10, -def.minorUnit);
+  const midRate = getFxRate(state, sourceCurrency, targetCurrency, dataset);
+
+  const fromModel = dataset.economy.fxParams.usdPairModels[sourceCurrency];
+  const toModel = dataset.economy.fxParams.usdPairModels[targetCurrency];
+  const channel = channelId
+    ? dataset.economy.fxParams.transferChannels.find((c) => c.id === channelId)
+    : undefined;
+  const spreadRatio =
+    (Math.max(fromModel.spreadBps.value, toModel.spreadBps.value) + (channel ? channel.spreadBps.value : 0)) /
+    10_000;
+  const baseFeePct = Math.max(fromModel.conversionFeePct.value, toModel.conversionFeePct.value);
+  const feePct = channel ? Math.max(baseFeePct, channel.feePct.value) : baseFeePct;
+
+  const analyticalGuess =
+    safeTarget / Math.max(1e-9, midRate * (1 - spreadRatio) * (1 - feePct));
+
+  let low = Math.max(0, roundCurrencyAmount(analyticalGuess * 0.9, sourceCurrency, dataset) - stepUnit * 10);
+  let high = Math.max(
+    stepUnit,
+    roundCurrencyAmount(analyticalGuess * 1.1 + stepUnit * 20, sourceCurrency, dataset),
+  );
+
+  while (
+    quoteConversion({ amount: high, from: sourceCurrency, to: targetCurrency, state, dataset, channelId })
+      .netToAmount +
+      1e-6 <
+    safeTarget
+  ) {
+    high = roundCurrencyAmount(high * 1.5 + stepUnit * 10, sourceCurrency, dataset);
+    if (high > 1e16) break;
+  }
+
+  // Binary search in discrete minor-unit steps for minimal sourceRequired where netToAmount >= safeTarget
+  const factor = Math.pow(10, def.minorUnit);
+  let loInt = Math.max(0, Math.floor(low * factor));
+  let hiInt = Math.ceil(high * factor);
+  while (loInt < hiInt) {
+    const midInt = Math.floor((loInt + hiInt) / 2);
+    const candidate = midInt / factor;
+    const q = quoteConversion({
+      amount: candidate,
+      from: sourceCurrency,
+      to: targetCurrency,
+      state,
+      dataset,
+      channelId,
+    });
+    if (q.netToAmount + 1e-6 >= safeTarget) {
+      hiInt = midInt;
+    } else {
+      loInt = midInt + 1;
+    }
+  }
+
+  const sourceRequired = loInt / factor;
+  const finalQuote = quoteConversion({
+    amount: sourceRequired,
+    from: sourceCurrency,
+    to: targetCurrency,
+    state,
+    dataset,
+    channelId,
+  });
+
+  const canAfford = sourceBalanceBefore + 1e-6 >= sourceRequired;
+  const leftoverInTarget = Math.max(0, finalQuote.netToAmount - safeTarget);
+
+  return {
+    sourceCurrency,
+    targetCurrency,
+    targetAmount: safeTarget,
+    sourceRequired,
+    feeInSource: finalQuote.feeInFromCurrency,
+    spreadPct: finalQuote.spreadPct,
+    midRateSourceToTarget: finalQuote.midRate,
+    effectiveRateSourceToTarget: finalQuote.effectiveRate,
+    netConvertedTargetAmount: finalQuote.netToAmount,
+    sourceBalanceBefore,
+    sourceBalanceAfter: roundCurrencyAmount(
+      Math.max(0, sourceBalanceBefore - sourceRequired),
+      sourceCurrency,
+      dataset,
+    ),
+    targetBalanceBefore,
+    targetBalanceAfter: roundCurrencyAmount(targetBalanceBefore + leftoverInTarget, targetCurrency, dataset),
+    canAfford,
+  };
+}
+
+/**
+ * Pays a cost from a specific user-chosen wallet. If sourceCurrency !== targetCurrency,
+ * performs the exact conversion quoted by quotePayFromWallet and debits targetAmount.
+ */
+export function payFromSpecificWallet(params: {
+  state: GameState;
+  targetAmount: number;
+  targetCurrency: CurrencyCode;
+  sourceCurrency: CurrencyCode;
+  dataset: GameDataset;
+  channelId?: TransferChannelDef['id'];
+  noteFa?: string;
+}): { ok: boolean; errorFa?: string; quote: PayFromQuote } {
+  const { state, targetAmount, targetCurrency, sourceCurrency, dataset, channelId, noteFa } = params;
+  const quote = quotePayFromWallet({
+    targetAmount,
+    targetCurrency,
+    sourceCurrency,
+    state,
+    dataset,
+    channelId,
+  });
+
+  if (quote.targetAmount <= 0) {
+    return { ok: true, quote };
+  }
+  if (!quote.canAfford) {
+    return { ok: false, errorFa: 'موجودی کیف پول انتخاب‌شده کافی نیست.', quote };
+  }
+
+  if (sourceCurrency === targetCurrency) {
+    const ok = debitWallet({
+      state,
+      currencyCode: targetCurrency,
+      amount: quote.targetAmount,
+      dataset,
+    });
+    return { ok, quote };
+  }
+
+  const conv = executeCurrencyConversion({
+    state,
+    fromCurrency: sourceCurrency,
+    toCurrency: targetCurrency,
+    fromAmount: quote.sourceRequired,
+    channelId,
+    noteFa: noteFa ?? 'تبدیل خودکار برای پرداخت هزینه',
+    dataset,
+  });
+  if (!conv.ok) {
+    return { ok: false, errorFa: conv.errorFa, quote };
+  }
+  const debited = debitWallet({
+    state,
+    currencyCode: targetCurrency,
+    amount: quote.targetAmount,
+    dataset,
+  });
+  return { ok: debited, quote };
+}
+
+/**
+ * Pays an expense in the destination currency first; if insufficient, converts from the specified or fallback wallet with exact quote.
  */
 export function payInCurrencyOrConvert(params: {
   state: GameState;
   currencyCode: CurrencyCode;
   amount: number;
   dataset: GameDataset;
+  preferredSourceCurrency?: CurrencyCode;
+  channelId?: TransferChannelDef['id'];
 }): { ok: boolean; convertedFrom?: CurrencyCode; feePaid?: number } {
-  const { state, currencyCode, amount, dataset } = params;
+  const { state, currencyCode, amount, dataset, preferredSourceCurrency, channelId } = params;
   if (amount <= 0) return { ok: true };
+
+  if (preferredSourceCurrency) {
+    const res = payFromSpecificWallet({
+      state,
+      targetAmount: amount,
+      targetCurrency: currencyCode,
+      sourceCurrency: preferredSourceCurrency,
+      dataset,
+      channelId,
+    });
+    if (res.ok) {
+      return {
+        ok: true,
+        convertedFrom: preferredSourceCurrency !== currencyCode ? preferredSourceCurrency : undefined,
+        feePaid: res.quote.feeInSource,
+      };
+    }
+    return { ok: false };
+  }
+
   if (debitWallet({ state, currencyCode, amount, dataset })) {
     return { ok: true };
   }
-  // Try fallback wallets (USD then IRT then largest wallet)
+
+  const directBalance = getWalletBalance(state, currencyCode);
+  const shortfall = roundCurrencyAmount(Math.max(0, amount - directBalance), currencyCode, dataset);
   const fallbackOrder: CurrencyCode[] = ['USD', 'IRT', 'EUR', 'GBP', 'CAD', 'AED', 'TRY'].filter(
     (c): c is CurrencyCode => c !== currencyCode,
   );
-  const directBalance = getWalletBalance(state, currencyCode);
-  const shortfall = amount - directBalance;
 
   for (const src of fallbackOrder) {
-    const srcBal = getWalletBalance(state, src);
-    if (srcBal <= 0) continue;
-    const sampleSrcAmount = Math.max(
-      100,
-      roundCurrencyAmount(100 * getFxRate(state, 'USD', src, dataset), src, dataset),
-    );
-    const sampleQuote = quoteConversion({
-      amount: sampleSrcAmount,
-      from: src,
-      to: currencyCode,
+    const q = quotePayFromWallet({
+      targetAmount: shortfall,
+      targetCurrency: currencyCode,
+      sourceCurrency: src,
       state,
       dataset,
+      channelId,
     });
-    const ratio = sampleQuote.netToAmount / sampleSrcAmount;
-    if (ratio <= 0) continue;
-    const rawNeeded = (shortfall / ratio) * 1.015;
-    const neededSrc = Math.min(srcBal, roundCurrencyAmount(rawNeeded, src, dataset));
-    if (srcBal + 1e-6 >= neededSrc && neededSrc > 0) {
+    if (q.canAfford && q.sourceRequired > 0) {
       const conv = executeCurrencyConversion({
         state,
         fromCurrency: src,
         toCurrency: currencyCode,
-        fromAmount: neededSrc,
+        fromAmount: q.sourceRequired,
+        channelId,
         noteFa: 'تبدیل خودکار برای پرداخت هزینه',
         dataset,
       });

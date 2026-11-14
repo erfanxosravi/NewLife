@@ -7,9 +7,9 @@ interface InfoSheetProps {
   open: boolean;
   onClose: () => void;
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   body?: string;
-  bullets?: string[];
+  bullets?: ReactNode[];
   children?: ReactNode;
 }
 
@@ -52,7 +52,7 @@ interface DetailSheetProps {
   open: boolean;
   onClose: () => void;
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   onInfo?: () => void;
   infoLabel?: string;
   headerRight?: ReactNode;

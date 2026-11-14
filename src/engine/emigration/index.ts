@@ -410,9 +410,14 @@ export interface RankedCountrySuggestion {
   countryId: string;
   nameFa: string;
   currencyCode: CurrencyCode;
+  currencyNameFa: string;
   score: number;
+  opennessScore: number;
   monthlyNetMedianLocal: number;
+  monthlyNetMedianToman: number;
   monthlyBudgetLocal: number;
+  monthlyBudgetToman: number;
+  costLevelLabelFa: string;
   monthlySurplusLocal: number;
   monthlySurplusToman: number;
   difficulty: EmigrationDifficultyReport;
@@ -465,6 +470,7 @@ export function rankCountriesForPlayer(
     const budget = getAbroadMonthlyBudget(state, dataset, c.id);
     const monthlySurplusLocal = incomeRange.monthlyNetMedian - budget.totalMonthlyLocal;
     const fxToIrt = getFxRate(state, c.currencyCode, 'IRT', dataset);
+    const monthlyNetMedianToman = Math.round(incomeRange.monthlyNetMedian * fxToIrt);
     const monthlySurplusToman = Math.round(monthlySurplusLocal * fxToIrt);
     const surplusRatio = monthlySurplusLocal / Math.max(1, budget.totalMonthlyLocal);
 
@@ -486,6 +492,13 @@ export function rankCountriesForPlayer(
       totalWeight;
 
     const score = Math.max(15, Math.min(98, Math.round(weighted)));
+    const currencyDef = dataset.economy.currencies.find((cur) => cur.code === c.currencyCode);
+    const costLevelLabelFa =
+      budget.ratioToMinWage <= 1.05
+        ? 'مقرون‌به‌صرفه'
+        : budget.ratioToMinWage <= 1.45
+          ? 'متعادل'
+          : 'گران';
     const highlightFa =
       monthlySurplusLocal > 0 && bestDiff.hasProofOfFunds
         ? 'تراز درآمد و هزینه مثبت و تمکن آماده'
@@ -499,9 +512,14 @@ export function rankCountriesForPlayer(
       countryId: c.id,
       nameFa: c.nameFa,
       currencyCode: c.currencyCode,
+      currencyNameFa: currencyDef?.nameFa ?? c.currencyCode,
       score,
+      opennessScore: openness,
       monthlyNetMedianLocal: incomeRange.monthlyNetMedian,
+      monthlyNetMedianToman,
       monthlyBudgetLocal: budget.totalMonthlyLocal,
+      monthlyBudgetToman: budget.totalMonthlyToman,
+      costLevelLabelFa,
       monthlySurplusLocal,
       monthlySurplusToman,
       difficulty: bestDiff,

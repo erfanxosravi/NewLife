@@ -7,6 +7,7 @@ import {
   getCountryMacroDef,
   getCountryPathsDef,
   getCredentialTrackForJob,
+  type CredentialCategory,
 } from '../../../engine/countries';
 import {
   INTEGRATION_CHECKLIST_ITEMS,
@@ -15,10 +16,9 @@ import {
   getPassportStatusLabelFa,
   getStudyLanguageCost,
 } from '../../../engine/emigration';
-import { formatCurrencyAmount, getFxRate } from '../../../engine/fx';
 import { toPersianDigits } from '../../../engine/jalali';
 import { getWalletBalance } from '../../../engine/ledger';
-import type { PassportStatusStage, SaveGame } from '../../../engine/types';
+import type { CurrencyCode, PassportStatusStage, SaveGame } from '../../../engine/types';
 import { useI18n } from '../../../i18n/useI18n';
 import {
   completeIntegrationChecklistAction,
@@ -29,6 +29,9 @@ import {
   studyForeignLanguageAction,
   type ActionOutcome,
 } from '../../../state/actions';
+import { ExchangeRateStrip } from '../ExchangeRateStrip';
+import { ForeignPaymentSheet } from '../ForeignPaymentSheet';
+import { MoneyText } from '../MoneyText';
 import { CountryFlag } from '../flags/CountryFlag';
 import {
   ActionButton,
@@ -57,6 +60,11 @@ interface AbroadDashboardProps {
   onDeepLink?: (tab: 'work' | 'assets' | 'activities', subTarget?: string) => void;
 }
 
+type PendingAbroadPayment =
+  | { kind: 'checklist'; itemId: string; title: string; subtitle: string; amount: number; currency: CurrencyCode }
+  | { kind: 'language'; title: string; subtitle: string; amount: number; currency: CurrencyCode }
+  | { kind: 'relicense'; credTrack: CredentialCategory; title: string; subtitle: string; amount: number; currency: CurrencyCode };
+
 const STAGE_ORDER: PassportStatusStage[] = ['temporary', 'renewable', 'permanent', 'citizenship'];
 
 export function AbroadDashboard({
@@ -73,6 +81,7 @@ export function AbroadDashboard({
 
   const [confirmReturn, setConfirmReturn] = useState(false);
   const [showSellWizard, setShowSellWizard] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState<PendingAbroadPayment | null>(null);
 
   if (!countryDef || !pathsDef || state.player.countryId === 'iran') {
     return null;
@@ -115,12 +124,12 @@ export function AbroadDashboard({
     <div className="space-y-4">
       {/* Section 1: Abroad Hero & Passport Ladder */}
       <section className="space-y-3 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-4">
-        <div className="flex items-start justify-between gap-2.5">
+        <div className="flex flex-wrap items-start justify-between gap-2.5">
           <div className="flex min-w-0 items-center gap-3">
             <CountryFlag countryId={countryDef.id} size="lg" />
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h3 className="truncate text-sm font-bold text-[var(--text)]">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <h3 className="text-sm font-bold leading-snug text-[var(--text)]">
                   {countryDef.nameFa} {regionDef ? `· ${regionDef.nameFa}` : ''}
                 </h3>
                 <Badge tone="primary">{getPassportStatusLabelFa(emig.residency.statusStage)}</Badge>
@@ -130,12 +139,15 @@ export function AbroadDashboard({
               </p>
             </div>
           </div>
-          <div className="shrink-0 text-left">
-            <div className="text-[10px] text-[var(--text-muted)]">کیف‌پول محلی</div>
-            <div className="text-xs font-bold tabular-nums text-[var(--text)]">
-              <bdi dir="rtl">
-                {formatCurrencyAmount(localBalance, countryDef.currencyCode, gameDataset)}
-              </bdi>
+          <div className="shrink-0 text-right">
+            <div className="text-xs text-[var(--text-muted)]">کیف‌پول محلی</div>
+            <div className="mt-0.5">
+              <MoneyText
+                amount={localBalance}
+                currency={countryDef.currencyCode}
+                mode="stacked"
+                stateOverride={state}
+              />
             </div>
           </div>
         </div>
@@ -170,7 +182,7 @@ export function AbroadDashboard({
             <button
               type="button"
               onClick={() => onSilentSave(dismissArrivalWelcomeAction(saveGame))}
-              className="shrink-0 rounded-lg bg-[var(--surface)] px-2 py-1 text-[11px] font-bold text-[var(--text)]"
+              className="shrink-0 rounded-lg bg-[var(--surface)] px-2.5 py-1 text-xs font-bold text-[var(--text)]"
             >
               متوجه شدم
             </button>
@@ -185,7 +197,7 @@ export function AbroadDashboard({
                 <div className="font-bold text-[var(--text)]">
                   مهلت ویزای کار: {toPersianDigits(emig.residency.jobLossGraceMonthsRemaining)} ماه باقی‌مانده
                 </div>
-                <div className="text-[11px] text-[var(--text-muted)]">
+                <div className="text-xs text-[var(--text-muted)]">
                   برای تمدید اقامت، قرارداد کاری تازه ببند.
                 </div>
               </div>
@@ -194,7 +206,7 @@ export function AbroadDashboard({
               <button
                 type="button"
                 onClick={() => onDeepLink('work', 'jobs')}
-                className="min-h-[34px] shrink-0 rounded-xl bg-[var(--primary)] px-2.5 text-[11px] font-bold text-[var(--on-primary)]"
+                className="min-h-[34px] shrink-0 rounded-xl bg-[var(--primary)] px-2.5 text-xs font-bold text-[var(--on-primary)]"
               >
                 بازار کار
               </button>
@@ -205,48 +217,67 @@ export function AbroadDashboard({
 
       {/* Section 2: Annual Economic Report & Monthly Cost */}
       <section className="space-y-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3.5">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-xs font-bold text-[var(--text)]">گزارش اقتصادی اقامت</h3>
-          <span className="text-[11px] text-[var(--text-muted)]">
-            هزینه ماهانه: <bdi dir="rtl">{formatCurrencyAmount(budget.totalMonthlyLocal, budget.currencyCode, gameDataset)}</bdi>
-          </span>
+          <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
+            <span>هزینه ماهانه:</span>
+            <MoneyText
+              amount={budget.totalMonthlyLocal}
+              currency={budget.currencyCode}
+              mode="inline"
+              stateOverride={state}
+              primaryClassName="font-bold text-[var(--text)]"
+            />
+          </div>
         </div>
         {emig.lastReportCard ? (
-          <div className="grid grid-cols-3 gap-2 rounded-xl bg-[var(--surface-2)] p-2.5 text-center text-xs">
+          <div className="grid grid-cols-1 gap-2 rounded-xl bg-[var(--surface-2)] p-3 sm:grid-cols-3">
             <div>
-              <div className="text-[10px] text-[var(--text-muted)]">درآمد خالص سال</div>
-              <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                <bdi dir="rtl">
-                  {formatCurrencyAmount(emig.lastReportCard.netIncomeLocal, emig.lastReportCard.currencyCode, gameDataset)}
-                </bdi>
+              <div className="text-xs text-[var(--text-muted)]">درآمد خالص سال</div>
+              <div className="mt-1">
+                <MoneyText
+                  amount={emig.lastReportCard.netIncomeLocal}
+                  currency={emig.lastReportCard.currencyCode}
+                  mode="stacked"
+                  stateOverride={state}
+                />
               </div>
             </div>
             <div>
-              <div className="text-[10px] text-[var(--text-muted)]">مخارج و مالیات</div>
-              <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                <bdi dir="rtl">
-                  {formatCurrencyAmount(emig.lastReportCard.livingCostsLocal, emig.lastReportCard.currencyCode, gameDataset)}
-                </bdi>
+              <div className="text-xs text-[var(--text-muted)]">مخارج و مالیات</div>
+              <div className="mt-1">
+                <MoneyText
+                  amount={emig.lastReportCard.livingCostsLocal}
+                  currency={emig.lastReportCard.currencyCode}
+                  mode="stacked"
+                  stateOverride={state}
+                />
               </div>
             </div>
             <div>
-              <div className="text-[10px] text-[var(--text-muted)]">تراز سال اخیر</div>
-              <div
-                className={`mt-0.5 font-bold tabular-nums ${
-                  emig.lastReportCard.savingsDeltaLocal >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
-                }`}
-              >
-                <bdi dir="rtl">
-                  {formatCurrencyAmount(emig.lastReportCard.savingsDeltaLocal, emig.lastReportCard.currencyCode, gameDataset)}
-                </bdi>
+              <div className="text-xs text-[var(--text-muted)]">تراز سال اخیر</div>
+              <div className="mt-1">
+                <MoneyText
+                  amount={emig.lastReportCard.savingsDeltaLocal}
+                  currency={emig.lastReportCard.currencyCode}
+                  mode="stacked"
+                  showSign
+                  stateOverride={state}
+                  primaryClassName={
+                    emig.lastReportCard.savingsDeltaLocal >= 0
+                      ? 'text-[var(--success)]'
+                      : 'text-[var(--danger)]'
+                  }
+                />
               </div>
             </div>
           </div>
         ) : (
-          <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[11px] text-[var(--text-muted)]">
+          <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs text-[var(--text-muted)]">
             گزارش سالانه درآمد، مالیات و پس‌انداز از پایان نخستین سال اقامت در این بخش ثبت می‌شود.
           </div>
         )}
+        <ExchangeRateStrip state={state} highlightCurrency={countryDef.currencyCode} compact />
       </section>
 
       {/* Section 3: 12-Month Integration Checklist */}
@@ -263,11 +294,28 @@ export function AbroadDashboard({
               icon={<IconCheck className="h-4 w-4" />}
               title={item.titleFa}
               subtitle={item.subtitleFa}
-              value={done ? undefined : formatCurrencyAmount(costLocal, countryDef.currencyCode, gameDataset)}
+              value={
+                done ? undefined : (
+                  <MoneyText
+                    amount={costLocal}
+                    currency={countryDef.currencyCode}
+                    mode="inline"
+                    stateOverride={state}
+                    interactive={false}
+                  />
+                )
+              }
               state={done ? 'done' : 'enabled'}
               ctaLabel={done ? undefined : 'انجام'}
               onClick={() =>
-                onUpdateSave(completeIntegrationChecklistAction(saveGame, item.id, gameDataset))
+                setPendingPayment({
+                  kind: 'checklist',
+                  itemId: item.id,
+                  title: item.titleFa,
+                  subtitle: item.subtitleFa,
+                  amount: costLocal,
+                  currency: countryDef.currencyCode,
+                })
               }
             />
           );
@@ -281,9 +329,17 @@ export function AbroadDashboard({
           title={`تقویت زبان (${getLanguageLevelLabelFa(langLevel)})`}
           subtitle="سطح بالاتر زبان درآمد و مسیر اقامت دائم را تسریع می‌کند"
           value={
-            langLevel >= 6
-              ? 'پیشرفته'
-              : formatCurrencyAmount(langCost.costLocal, langCost.currencyCode, gameDataset)
+            langLevel >= 6 ? (
+              'پیشرفته'
+            ) : (
+              <MoneyText
+                amount={langCost.costLocal}
+                currency={langCost.currencyCode}
+                mode="inline"
+                stateOverride={state}
+                interactive={false}
+              />
+            )
           }
           state={
             langLevel >= 6
@@ -293,9 +349,19 @@ export function AbroadDashboard({
                 : 'enabled'
           }
           ctaLabel={langLevel >= 6 ? undefined : 'کلاس زبان'}
-          onClick={() =>
-            onUpdateSave(studyForeignLanguageAction(saveGame, countryDef.id, gameDataset))
-          }
+          onClick={() => {
+            if (langCost.costLocal <= 0) {
+              onUpdateSave(studyForeignLanguageAction(saveGame, countryDef.id, gameDataset));
+              return;
+            }
+            setPendingPayment({
+              kind: 'language',
+              title: `دوره زبان ${countryDef.nameFa}`,
+              subtitle: `ارتقای سطح زبان (${getLanguageLevelLabelFa(langLevel)})`,
+              amount: langCost.costLocal,
+              currency: langCost.currencyCode,
+            });
+          }}
         />
 
         {credSpec.needsRelicensing && !isRelicensed && (
@@ -303,10 +369,25 @@ export function AbroadDashboard({
             icon={<IconSparkles className="h-4 w-4" />}
             title="آزمون معادل‌سازی مدرک تخصصی"
             subtitle={`پیش‌نیاز زبان: ${getLanguageLevelLabelFa(credSpec.minLanguageLevel)}`}
-            value={formatCurrencyAmount(credSpec.costLocal, countryDef.currencyCode, gameDataset)}
+            value={
+              <MoneyText
+                amount={credSpec.costLocal}
+                currency={countryDef.currencyCode}
+                mode="inline"
+                stateOverride={state}
+                interactive={false}
+              />
+            }
             ctaLabel="معادل‌سازی"
             onClick={() =>
-              onUpdateSave(relicenseCredentialAbroadAction(saveGame, credTrack, gameDataset))
+              setPendingPayment({
+                kind: 'relicense',
+                credTrack,
+                title: 'آزمون معادل‌سازی مدرک تخصصی',
+                subtitle: `رشته مورد بررسی در ${countryDef.nameFa}`,
+                amount: credSpec.costLocal,
+                currency: countryDef.currencyCode,
+              })
             }
           />
         )}
@@ -314,8 +395,16 @@ export function AbroadDashboard({
         <ActionRow
           icon={<IconCoins className="h-4 w-4" />}
           title="ارسال حواله حمایتی به خانواده"
-          subtitle={`معادل حدود ${formatCurrencyAmount(Math.round(remitPresetSmall * getFxRate(state, countryDef.currencyCode, 'IRT', gameDataset)), 'IRT', gameDataset, { compact: true })}`}
-          value={formatCurrencyAmount(remitPresetSmall, countryDef.currencyCode, gameDataset)}
+          subtitle="حواله مستقیم به حساب خانواده در ایران با تسویه ریالی"
+          value={
+            <MoneyText
+              amount={remitPresetSmall}
+              currency={countryDef.currencyCode}
+              mode="inline"
+              stateOverride={state}
+              interactive={false}
+            />
+          }
           ctaLabel="ارسال"
           onClick={() =>
             onUpdateSave(sendRemittanceToIranAction(saveGame, remitPresetSmall, gameDataset))
@@ -327,7 +416,15 @@ export function AbroadDashboard({
             icon={<IconCoins className="h-4 w-4" />}
             title="حمایت ویژه مالی از خانواده"
             subtitle="ارسال مبلغ بیشتر و تقویت پیوند عاطفی"
-            value={formatCurrencyAmount(remitPresetMed, countryDef.currencyCode, gameDataset)}
+            value={
+              <MoneyText
+                amount={remitPresetMed}
+                currency={countryDef.currencyCode}
+                mode="inline"
+                stateOverride={state}
+                interactive={false}
+              />
+            }
             ctaLabel="ارسال"
             onClick={() =>
               onUpdateSave(sendRemittanceToIranAction(saveGame, remitPresetMed, gameDataset))
@@ -349,7 +446,18 @@ export function AbroadDashboard({
           <ActionRow
             icon={<IconShield className="h-4 w-4" />}
             title="فروش ملک ایران و انتقال سرمایه"
-            subtitle={`ارزش روز ملک: ${formatCurrencyAmount(iranPropValue, 'IRT', gameDataset, { compact: true })}`}
+            subtitle={
+              <span className="inline-flex items-center gap-1">
+                <span>ارزش روز ملک:</span>
+                <MoneyText
+                  amount={iranPropValue}
+                  currency="IRT"
+                  mode="inline"
+                  stateOverride={state}
+                  interactive={false}
+                />
+              </span>
+            }
             ctaLabel="شروع جادوگر"
             onClick={() => setShowSellWizard(true)}
           />
@@ -386,6 +494,43 @@ export function AbroadDashboard({
         onClose={() => setShowSellWizard(false)}
         onUpdateSave={onUpdateSave}
       />
+
+      {pendingPayment && (
+        <ForeignPaymentSheet
+          open={true}
+          onClose={() => setPendingPayment(null)}
+          title={pendingPayment.title}
+          subtitle={pendingPayment.subtitle}
+          amount={pendingPayment.amount}
+          currency={pendingPayment.currency}
+          state={state}
+          onConfirm={({ payFromCurrency }) => {
+            if (pendingPayment.kind === 'checklist') {
+              onUpdateSave(
+                completeIntegrationChecklistAction(
+                  saveGame,
+                  pendingPayment.itemId,
+                  gameDataset,
+                  { payFromCurrency },
+                ),
+              );
+            } else if (pendingPayment.kind === 'language') {
+              onUpdateSave(
+                studyForeignLanguageAction(saveGame, countryDef.id, gameDataset, {
+                  payFromCurrency,
+                }),
+              );
+            } else {
+              onUpdateSave(
+                relicenseCredentialAbroadAction(saveGame, pendingPayment.credTrack, gameDataset, {
+                  payFromCurrency,
+                }),
+              );
+            }
+            setPendingPayment(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { gameDataset } from '../../../data/registry';
 import { compareCountries } from '../../../engine/emigration';
-import { formatCurrencyAmount } from '../../../engine/fx';
 import { toPersianDigits } from '../../../engine/jalali';
 import type { GameState } from '../../../engine/types';
+import { MoneyText } from '../MoneyText';
 import { CountryFlag } from '../flags/CountryFlag';
 import { Badge, DetailSheet, EmptyState, SectionGroup } from '../Primitives';
 import { COMPARE_SERIES_COLORS } from '../jobCompass/FingerprintRadar';
@@ -131,7 +131,7 @@ export function CountryCompareModal({
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fill="var(--text)"
-                      fontSize="11.5"
+                      fontSize="12"
                       fontWeight="700"
                     >
                       {axis.labelFa}
@@ -163,17 +163,7 @@ export function CountryCompareModal({
 
           <SectionGroup title="جدول مقایسه شاخص‌های کلیدی">
             {columns.map((col) => {
-              const netLocalText = formatCurrencyAmount(
-                col.monthlyNetMedianLocal,
-                col.currencyCode,
-                gameDataset,
-              );
-              const budgetLocalText = formatCurrencyAmount(
-                col.monthlyBudgetLocal,
-                col.currencyCode,
-                gameDataset,
-              );
-              const surplusToman = col.monthlyNetMedianToman - col.monthlyBudgetToman;
+              const surplusLocal = col.monthlyNetMedianLocal - col.monthlyBudgetLocal;
               return (
                 <div
                   key={col.countryId}
@@ -183,10 +173,10 @@ export function CountryCompareModal({
                     <div className="flex min-w-0 items-center gap-2">
                       <CountryFlag countryId={col.countryId} size="sm" />
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-bold text-[var(--text)]">
+                        <div className="text-sm font-bold text-[var(--text)]">
                           {col.nameFa}
                         </div>
-                        <div className="text-[11px] text-[var(--text-muted)]">
+                        <div className="text-xs text-[var(--text-muted)]">
                           سختی پذیرش: {toPersianDigits(col.totalDifficulty)}٪ · تورم: {toPersianDigits(col.inflationPct)}٪
                         </div>
                       </div>
@@ -196,34 +186,47 @@ export function CountryCompareModal({
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-2 rounded-xl bg-[var(--surface-2)] p-2.5 text-xs">
+                  <div className="grid grid-cols-1 gap-2 rounded-xl bg-[var(--surface-2)] p-2.5 sm:grid-cols-3">
                     <div>
-                      <div className="text-[10px] text-[var(--text-muted)]">میانه حقوق ماهانه</div>
-                      <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                        <bdi dir="rtl">{netLocalText}</bdi>
+                      <div className="text-xs text-[var(--text-muted)]">میانه حقوق ماهانه</div>
+                      <div className="mt-0.5">
+                        <MoneyText
+                          amount={col.monthlyNetMedianLocal}
+                          currency={col.currencyCode}
+                          mode="stacked"
+                          stateOverride={state}
+                        />
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[var(--text-muted)]">هزینه ماهانه</div>
-                      <div className="mt-0.5 font-bold tabular-nums text-[var(--text)]">
-                        <bdi dir="rtl">{budgetLocalText}</bdi>
+                      <div className="text-xs text-[var(--text-muted)]">هزینه ماهانه</div>
+                      <div className="mt-0.5">
+                        <MoneyText
+                          amount={col.monthlyBudgetLocal}
+                          currency={col.currencyCode}
+                          mode="stacked"
+                          stateOverride={state}
+                        />
                       </div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-[var(--text-muted)]">تراز تقریبی (تومان)</div>
-                      <div
-                        className={`mt-0.5 font-bold tabular-nums ${
-                          surplusToman >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
-                        }`}
-                      >
-                        <bdi dir="rtl">
-                          {formatCurrencyAmount(surplusToman, 'IRT', gameDataset, { compact: true })}
-                        </bdi>
+                      <div className="text-xs text-[var(--text-muted)]">تراز تقریبی</div>
+                      <div className="mt-0.5">
+                        <MoneyText
+                          amount={surplusLocal}
+                          currency={col.currencyCode}
+                          mode="stacked"
+                          showSign
+                          stateOverride={state}
+                          primaryClassName={
+                            surplusLocal >= 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
+                          }
+                        />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 text-[11px] text-[var(--text-muted)]">
+                  <div className="flex items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
                     <span>زمان معمول تا اقامت دائم: {toPersianDigits(col.permanentYears)} سال</span>
                     {onSelectCountry && (
                       <button

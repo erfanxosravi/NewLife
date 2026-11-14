@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
-import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { toPersianDigits } from '../../engine/jalali';
 import type { LicenseStatus } from '../../engine/careers';
 import type { EmployerOfferData } from '../../engine/businesses';
 import type {
@@ -25,12 +25,12 @@ import {
   getBusinessQuotePreview,
   getFamilyBusinessCandidates,
 } from '../../state/selectors';
+import { MoneyText } from './MoneyText';
 import {
   ActionButton,
   ActionRow,
   Card,
   ConfirmDialog,
-  CurrencyText,
   DangerZoneGroup,
   DetailSheet,
   HubHeroCard,
@@ -115,14 +115,28 @@ export function OwnedBusinessDetailSheet({
               {
                 label: 'سود/زیان پارسال',
                 value:
-                  ownedBiz.yearsOperating === 0
-                    ? 'سال نخست'
-                    : formatToman(ownedBiz.lastYearProfitToman),
+                  ownedBiz.yearsOperating === 0 ? (
+                    'سال نخست'
+                  ) : (
+                    <MoneyText
+                      amount={ownedBiz.lastYearProfitToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
                 tone: ownedBiz.lastYearProfitToman >= 0 ? 'success' : 'danger',
               },
               {
                 label: 'ذخیره نقدی',
-                value: <CurrencyText amountToman={ownedBiz.cashReserveToman} />,
+                value: (
+                  <MoneyText
+                    amount={ownedBiz.cashReserveToman}
+                    currency="IRT"
+                    mode="inline"
+                    interactive={false}
+                  />
+                ),
               },
               {
                 label: 'پایگاه مشتری',
@@ -203,7 +217,17 @@ export function OwnedBusinessDetailSheet({
                   iconTone="neutral"
                   title={st.fullName}
                   subtitle={`${st.roleTitleFa} · رده ${toPersianDigits(st.level)}`}
-                  value={`${formatToman(st.annualWageToman)} / سال`}
+                  value={
+                    <span className="inline-flex items-center gap-1">
+                      <MoneyText
+                        amount={st.annualWageToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                      <span>/ سال</span>
+                    </span>
+                  }
                 />
               ))}
               <ActionRow
@@ -242,9 +266,22 @@ export function OwnedBusinessDetailSheet({
         onClose={() => setInfoOpen(false)}
         title="جزئیات مالی کسب‌وکار"
         bullets={[
-          `درآمد ناخالص پارسال: ${formatToman(ownedBiz.lastYearRevenueToman)}`,
-          `اجاره و حقوق پرسنل پارسال: ${formatToman(ownedBiz.lastYearCostsToman.rent + ownedBiz.lastYearCostsToman.staff)}`,
-          `ودیعه قفل‌شده مکان: ${formatToman(ownedBiz.depositLockedToman)}`,
+          <span key="rev">
+            درآمد ناخالص پارسال:{' '}
+            <MoneyText amount={ownedBiz.lastYearRevenueToman} currency="IRT" mode="inline" />
+          </span>,
+          <span key="costs">
+            اجاره و حقوق پرسنل پارسال:{' '}
+            <MoneyText
+              amount={ownedBiz.lastYearCostsToman.rent + ownedBiz.lastYearCostsToman.staff}
+              currency="IRT"
+              mode="inline"
+            />
+          </span>,
+          <span key="dep">
+            ودیعه قفل‌شده مکان:{' '}
+            <MoneyText amount={ownedBiz.depositLockedToman} currency="IRT" mode="inline" />
+          </span>,
           ...(ownedBiz.partnerName
             ? [`شریک تجاری: ${ownedBiz.partnerName} (توافق ${toPersianDigits(ownedBiz.partnerCloseness ?? 70)}٪)`]
             : []),
@@ -338,7 +375,14 @@ export function OwnershipFlowDetailSheet({
         footer={
           <ActionButton
             label={`ثبت و شروع: ${customName.trim() || selectedBizDef.titleFa}`}
-            costText={formatToman(quote.playerCashRequiredToman)}
+            costText={
+              <MoneyText
+                amount={quote.playerCashRequiredToman}
+                currency="IRT"
+                mode="inline"
+                interactive={false}
+              />
+            }
             disabled={!quote.eligible}
             disabledReason={quote.blockedReasons[0]}
             onClick={() => {
@@ -386,12 +430,12 @@ export function OwnershipFlowDetailSheet({
                 }`}
               >
                 <div className="text-xs font-bold">{m.label}</div>
-                <div className="text-[10px] text-[var(--text-muted)]">{m.hint}</div>
+                <div className="text-xs text-[var(--text-muted)]">{m.hint}</div>
               </button>
             ))}
           </div>
           {acqMode === 'family_takeover' && familyCandidates.length > 0 && (
-            <div className="px-3 py-2 text-[11px] text-[var(--text-muted)]">
+            <div className="px-3 py-2 text-xs text-[var(--text-muted)]">
               پیشه خانوادگی شناسایی‌شده:{' '}
               {familyCandidates
                 .map((c) => `${c.family.parentName} (${c.family.parentJobTitle}) ← ${c.businessDef.titleFa}`)
@@ -417,7 +461,7 @@ export function OwnershipFlowDetailSheet({
                   }`}
                 >
                   <div>{b.titleFa}</div>
-                  <div className="text-[10px] text-[var(--text-muted)]">{b.categoryFa}</div>
+                  <div className="text-xs text-[var(--text-muted)]">{b.categoryFa}</div>
                 </button>
               );
             })}
@@ -433,7 +477,7 @@ export function OwnershipFlowDetailSheet({
                   key={r.id}
                   type="button"
                   onClick={() => setRegionTier(r.id)}
-                  className={`min-h-[44px] rounded-xl border px-2 text-[11px] font-bold ${
+                  className={`min-h-[44px] rounded-xl border px-2 text-xs font-bold ${
                     regionTier === r.id
                       ? 'border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-strong)]'
                       : 'border-[var(--border)] bg-[var(--surface-2)]'
@@ -449,7 +493,7 @@ export function OwnershipFlowDetailSheet({
                   key={s.id}
                   type="button"
                   onClick={() => setSize(s.id)}
-                  className={`min-h-[44px] rounded-xl border px-2 text-[11px] font-bold ${
+                  className={`min-h-[44px] rounded-xl border px-2 text-xs font-bold ${
                     size === s.id
                       ? 'border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-strong)]'
                       : 'border-[var(--border)] bg-[var(--surface-2)]'
@@ -465,7 +509,7 @@ export function OwnershipFlowDetailSheet({
                   key={f.id}
                   type="button"
                   onClick={() => setFinancingMode(f.id)}
-                  className={`min-h-[44px] rounded-xl border px-2 text-[11px] font-bold ${
+                  className={`min-h-[44px] rounded-xl border px-2 text-xs font-bold ${
                     financingMode === f.id
                       ? 'border-[var(--primary)] bg-[var(--primary-soft)] text-[var(--primary-strong)]'
                       : 'border-[var(--border)] bg-[var(--surface-2)]'
@@ -494,36 +538,80 @@ export function OwnershipFlowDetailSheet({
                 شانس پایداری: {toPersianDigits(quote.breakevenChancePct)}٪
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-1.5 text-[11px] tabular-nums">
-              <div>ودیعه مکان: {formatToman(quote.depositRahnToman)}</div>
-              <div>اجاره ماهانه: {formatToman(quote.monthlyRentToman)}</div>
-              <div>تجهیزات و دکور: {formatToman(quote.equipmentCostToman)}</div>
-              <div>موجودی و ذخیره: {formatToman(quote.initialStockCostToman + quote.workingReserveToman)}</div>
+            <div className="grid grid-cols-2 gap-1.5 text-xs tabular-nums">
+              <div className="inline-flex flex-wrap items-center gap-1">
+                <span>ودیعه مکان:</span>
+                <MoneyText amount={quote.depositRahnToman} currency="IRT" mode="single" compact />
+              </div>
+              <div className="inline-flex flex-wrap items-center gap-1">
+                <span>اجاره ماهانه:</span>
+                <MoneyText amount={quote.monthlyRentToman} currency="IRT" mode="single" compact />
+              </div>
+              <div className="inline-flex flex-wrap items-center gap-1">
+                <span>تجهیزات و دکور:</span>
+                <MoneyText amount={quote.equipmentCostToman} currency="IRT" mode="single" compact />
+              </div>
+              <div className="inline-flex flex-wrap items-center gap-1">
+                <span>موجودی و ذخیره:</span>
+                <MoneyText
+                  amount={quote.initialStockCostToman + quote.workingReserveToman}
+                  currency="IRT"
+                  mode="single"
+                  compact
+                />
+              </div>
               {quote.goodwillOrFranchiseFeeToman > 0 && (
-                <div className="col-span-2">
-                  سرقفلی / حق برند: {formatToman(quote.goodwillOrFranchiseFeeToman)}
+                <div className="col-span-2 inline-flex flex-wrap items-center gap-1">
+                  <span>سرقفلی / حق برند:</span>
+                  <MoneyText
+                    amount={quote.goodwillOrFranchiseFeeToman}
+                    currency="IRT"
+                    mode="single"
+                    compact
+                  />
                 </div>
               )}
               {quote.loanPrincipalToman > 0 && (
-                <div className="col-span-2 text-[var(--primary-strong)]">
-                  وام بانکی ۵ ساله: {formatToman(quote.loanPrincipalToman)} (قسط سالانه {formatToman(quote.loanAnnualPaymentToman)})
+                <div className="col-span-2 inline-flex flex-wrap items-center gap-1 text-[var(--primary-strong)]">
+                  <span>وام بانکی ۵ ساله:</span>
+                  <MoneyText amount={quote.loanPrincipalToman} currency="IRT" mode="single" compact />
+                  <span>(قسط سالانه</span>
+                  <MoneyText
+                    amount={quote.loanAnnualPaymentToman}
+                    currency="IRT"
+                    mode="single"
+                    compact
+                  />
+                  <span>)</span>
                 </div>
               )}
             </div>
 
-            <div className="border-t border-[var(--border)] pt-2 text-[11px] leading-5 tabular-nums">
+            <div className="border-t border-[var(--border)] pt-2 text-xs leading-5 tabular-nums">
               <div className="flex justify-between font-bold">
                 <span>نقدینگی مورد نیاز الان:</span>
-                <span>{formatToman(quote.playerCashRequiredToman)}</span>
+                <MoneyText amount={quote.playerCashRequiredToman} currency="IRT" mode="inline" />
               </div>
               <div className="flex justify-between text-[var(--text-muted)]">
                 <span>تاب‌آوری نقدینگی:</span>
                 <span>{toPersianDigits(quote.runwayMonths)} ماه</span>
               </div>
-              <div className="flex justify-between text-[var(--text-muted)]">
+              <div className="flex justify-between gap-2 text-[var(--text-muted)]">
                 <span>بازه سود/زیان سالانه:</span>
-                <span>
-                  {formatToman(quote.expectedAnnualNetMinToman)} تا {formatToman(quote.expectedAnnualNetMaxToman)}
+                <span className="inline-flex flex-wrap items-center gap-1">
+                  <MoneyText
+                    amount={quote.expectedAnnualNetMinToman}
+                    currency="IRT"
+                    mode="single"
+                    compact
+                  />
+                  <span>تا</span>
+                  <MoneyText
+                    amount={quote.expectedAnnualNetMaxToman}
+                    currency="IRT"
+                    mode="single"
+                    compact
+                  />
                 </span>
               </div>
             </div>
@@ -592,7 +680,17 @@ export function LicensesDetailSheet({
               icon={<IconShield className="h-5 w-5" />}
               iconTone={item.owned ? 'success' : item.eligible ? 'primary' : 'neutral'}
               title={item.license.titleFa}
-              subtitle={`${item.license.issuerFa} · ${formatToman(item.feeToman)}`}
+              subtitle={
+                <span className="inline-flex items-center gap-1">
+                  <span>{item.license.issuerFa} ·</span>
+                  <MoneyText
+                    amount={item.feeToman}
+                    currency="IRT"
+                    mode="inline"
+                    interactive={false}
+                  />
+                </span>
+              }
               statusChip={item.owned ? 'done' : item.eligible ? 'in_progress' : 'locked'}
               showChevron
               onClick={() => setSelectedLicense(item)}
@@ -615,7 +713,14 @@ export function LicensesDetailSheet({
                   ? 'ثبت‌نام آزمون و صدور مجوز'
                   : 'درخواست صدور مجوز'
               }
-              costText={formatToman(activeLicense.feeToman)}
+              costText={
+                <MoneyText
+                  amount={activeLicense.feeToman}
+                  currency="IRT"
+                  mode="inline"
+                  interactive={false}
+                />
+              }
               disabled={!activeLicense.eligible}
               disabledReason={activeLicense.missingReasons[0]}
               onClick={() => {
@@ -646,7 +751,17 @@ export function LicensesDetailSheet({
               }
               metrics={[
                 { label: 'مرجع صادرکننده', value: activeLicense.license.issuerFa },
-                { label: 'هزینه صدور', value: formatToman(activeLicense.feeToman) },
+                {
+                  label: 'هزینه صدور',
+                  value: (
+                    <MoneyText
+                      amount={activeLicense.feeToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
+                },
                 {
                   label: 'فرآیند',
                   value: activeLicense.license.examRequired ? 'آزمونی' : 'ثبتی',
@@ -719,9 +834,34 @@ export function EmployerOfferDetailSheet({
         title={offer.businessNameFa}
         subtitle="کارفرمای قدیمی‌ات به پشتوانه اعتماد سال‌ها، واگذاری با تخفیف را پیشنهاد داده است."
         metrics={[
-          { label: 'ارزش بازار', value: formatToman(offer.fullPriceToman) },
-          { label: 'قیمت پیشنهادی', value: formatToman(offer.discountedPriceToman) },
-          { label: 'حداقل نقد با وام', value: formatToman(loanUpfront) },
+          {
+            label: 'ارزش بازار',
+            value: (
+              <MoneyText
+                amount={offer.fullPriceToman}
+                currency="IRT"
+                mode="inline"
+                interactive={false}
+              />
+            ),
+          },
+          {
+            label: 'قیمت پیشنهادی',
+            value: (
+              <MoneyText
+                amount={offer.discountedPriceToman}
+                currency="IRT"
+                mode="inline"
+                interactive={false}
+              />
+            ),
+          },
+          {
+            label: 'حداقل نقد با وام',
+            value: (
+              <MoneyText amount={loanUpfront} currency="IRT" mode="inline" interactive={false} />
+            ),
+          },
         ]}
       />
 
@@ -729,7 +869,14 @@ export function EmployerOfferDetailSheet({
         <ActionRow
           title="خرید نقدی کامل"
           subtitle="بدون بدهی و قسط بانکی"
-          value={formatToman(offer.discountedPriceToman)}
+          value={
+            <MoneyText
+              amount={offer.discountedPriceToman}
+              currency="IRT"
+              mode="inline"
+              interactive={false}
+            />
+          }
           state={player.moneyToman < offer.discountedPriceToman ? 'disabled' : 'recommended'}
           reason={player.moneyToman < offer.discountedPriceToman ? 'نقدینگی کافی نیست' : undefined}
           ctaLabel="خرید نقدی"
@@ -741,7 +888,7 @@ export function EmployerOfferDetailSheet({
         <ActionRow
           title="خرید با وام بانکی"
           subtitle="پرداخت ۵۵٪ نقدی و الباقی قسط"
-          value={formatToman(loanUpfront)}
+          value={<MoneyText amount={loanUpfront} currency="IRT" mode="inline" interactive={false} />}
           state={player.moneyToman < loanUpfront ? 'disabled' : 'enabled'}
           reason={player.moneyToman < loanUpfront ? 'نقدینگی کافی نیست' : undefined}
           ctaLabel="خرید با وام"

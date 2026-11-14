@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
-import { formatToman, toPersianDigits } from '../../engine/jalali';
+import { toPersianDigits } from '../../engine/jalali';
 import { formatSpecialRouteChoiceSummary } from '../../engine/talents';
 import {
   ensureJobCompassState,
@@ -33,7 +33,6 @@ import {
   type ActionOutcome,
 } from '../../state/actions';
 import {
-  formatUsdEquivalentHint,
   getActionCooldownRemaining,
   getAllLicensesStatus,
   getCurrentJobPromotionState,
@@ -66,13 +65,13 @@ import {
   type JobGapActionTarget,
 } from '../components/jobCompass';
 import { FullScreenSheet } from '../components/FullScreenSheet';
+import { MoneyText } from '../components/MoneyText';
 import {
   ActionButton,
   ActionRow,
   Badge,
   Card,
   ConfirmDialog,
-  CurrencyText,
   DangerZoneGroup,
   DetailSheet,
   EmptyState,
@@ -410,7 +409,14 @@ export function WorkEducationSheet({
                       icon={<IconEducation className="h-4 w-4" />}
                       title="کلاس تقویتی و معلم خصوصی"
                       subtitle="هوش +۶ · جهش معدل"
-                      value={formatToman(tutorCost)}
+                      value={
+                        <MoneyText
+                          amount={tutorCost}
+                          currency="IRT"
+                          mode="inline"
+                          interactive={false}
+                        />
+                      }
                       state={
                         getActionCooldownRemaining(state, 'edu_tutor') > 0
                           ? 'cooldown'
@@ -462,7 +468,14 @@ export function WorkEducationSheet({
                       icon={<IconTrophy className="h-4 w-4" />}
                       title={t('education.takeKonkur')}
                       subtitle="نتیجه بر پایه هوش، معدل و تلاش درسی"
-                      value={formatToman(konkurFee)}
+                      value={
+                        <MoneyText
+                          amount={konkurFee}
+                          currency="IRT"
+                          mode="inline"
+                          interactive={false}
+                        />
+                      }
                       state={
                         getActionCooldownRemaining(state, 'konkur') > 0
                           ? 'cooldown'
@@ -532,9 +545,15 @@ export function WorkEducationSheet({
                       {
                         label: 'خالص حقوق ماهانه',
                         value: (
-                          <bdi dir="rtl" className="tabular-nums">
-                            {formatToman(Math.round(player.job.annualSalaryToman / 12))} / ماه
-                          </bdi>
+                          <span className="inline-flex items-center gap-1">
+                            <MoneyText
+                              amount={Math.round(player.job.annualSalaryToman / 12)}
+                              currency="IRT"
+                              mode="inline"
+                              interactive={false}
+                            />
+                            <span>/ ماه</span>
+                          </span>
                         ),
                         tone: 'success',
                       },
@@ -564,7 +583,14 @@ export function WorkEducationSheet({
                       { label: 'مدرک فعلی', value: currentStageLabel },
                       {
                         label: 'نقدینگی',
-                        value: <CurrencyText amountToman={player.moneyToman} />,
+                        value: (
+                          <MoneyText
+                            amount={player.moneyToman}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        ),
                       },
                       {
                         label: 'مسیر ویژه',
@@ -671,7 +697,14 @@ export function WorkEducationSheet({
                         emoji="💼"
                         title="پیشنهاد واگذاری کارفرما"
                         subtitle={pendingEmployerOffer.businessNameFa}
-                        value={formatToman(pendingEmployerOffer.discountedPriceToman)}
+                        value={
+                          <MoneyText
+                            amount={pendingEmployerOffer.discountedPriceToman}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        }
                         state="recommended"
                         isNew
                         showChevron
@@ -753,9 +786,16 @@ export function WorkEducationSheet({
                       title={ownedBiz.nameFa}
                       subtitle={`${toPersianDigits(ownedBiz.branchCount)} شعبه · ${toPersianDigits(ownedBiz.yearsOperating)} سال فعالیت`}
                       value={
-                        ownedBiz.yearsOperating === 0
-                          ? 'سال نخست'
-                          : formatToman(ownedBiz.lastYearProfitToman)
+                        ownedBiz.yearsOperating === 0 ? (
+                          'سال نخست'
+                        ) : (
+                          <MoneyText
+                            amount={ownedBiz.lastYearProfitToman}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                        )
                       }
                       showChevron
                       onClick={() => setOpenOwnedBizSheet(true)}
@@ -871,7 +911,14 @@ export function WorkEducationSheet({
                 },
                 {
                   label: 'نقدینگی',
-                  value: <CurrencyText amountToman={player.moneyToman} />,
+                  value: (
+                    <MoneyText
+                      amount={player.moneyToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
                 },
               ]}
             />
@@ -978,7 +1025,19 @@ export function WorkEducationSheet({
                     icon={<IconSkill className="h-4 w-4" />}
                     title={skill.titleFa}
                     subtitle={skill.effectHintFa}
-                    value={maxed ? undefined : `${formatToman(cost)} · سطح ${toPersianDigits(level)}/۵`}
+                    value={
+                      maxed ? undefined : (
+                        <span className="inline-flex items-center gap-1">
+                          <MoneyText
+                            amount={cost}
+                            currency="IRT"
+                            mode="inline"
+                            interactive={false}
+                          />
+                          <span>· سطح {toPersianDigits(level)}/۵</span>
+                        </span>
+                      )
+                    }
                     state={rowState}
                     reason={reason}
                     ctaLabel={maxed ? undefined : 'ارتقا'}
@@ -1070,7 +1129,14 @@ export function WorkEducationSheet({
                     icon={<IconCoins className="h-4 w-4" />}
                     title="خرید جریمه / معافیت نقدی"
                     subtitle="حل فوری وضعیت نظام وظیفه"
-                    value={formatToman(buyoutCost)}
+                    value={
+                      <MoneyText
+                        amount={buyoutCost}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    }
                     state={player.moneyToman < buyoutCost ? 'disabled' : 'enabled'}
                     reason={player.moneyToman < buyoutCost ? 'موجودی کافی نیست' : undefined}
                     ctaLabel="خرید"
@@ -1153,7 +1219,14 @@ export function WorkEducationSheet({
                 icon={<IconEducation className="h-4 w-4" />}
                 title={`${offer.majorFa} — ${offer.tierLabel}`}
                 subtitle={`${toPersianDigits(offer.years)} سال تحصیل`}
-                value={formatToman(tuition)}
+                value={
+                  <MoneyText
+                    amount={tuition}
+                    currency="IRT"
+                    mode="inline"
+                    interactive={false}
+                  />
+                }
                 state={!rankOk ? 'locked' : !moneyOk ? 'disabled' : 'enabled'}
                 reason={
                   !rankOk
@@ -1213,22 +1286,59 @@ export function WorkEducationSheet({
             <HubHeroCard
               icon={<IconCareerEdu className="h-5 w-5" />}
               title={player.job.title}
-              subtitle={formatUsdEquivalentHint(player.job.annualSalaryToman, state, gameDataset)}
+              subtitle={
+                <span className="inline-flex items-center gap-1">
+                  <span>معادل</span>
+                  <MoneyText
+                    amount={player.job.annualSalaryToman}
+                    currency="IRT"
+                    mode="single"
+                    primaryOverride="USD"
+                  />
+                </span>
+              }
               status={promotionState?.eligibility.atCeiling ? 'done' : 'in_progress'}
               onInfo={() => setInfoTopic('salary_breakdown')}
               metrics={[
                 {
                   label: 'خالص سالانه',
-                  value: <CurrencyText amountToman={player.job.annualSalaryToman} />,
+                  value: (
+                    <MoneyText
+                      amount={player.job.annualSalaryToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  ),
                   tone: 'success',
                 },
                 {
                   label: 'ناخالص پارسال',
-                  value: lastJobGross !== null ? formatToman(lastJobGross) : '—',
+                  value:
+                    lastJobGross !== null ? (
+                      <MoneyText
+                        amount={lastJobGross}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ) : (
+                      '—'
+                    ),
                 },
                 {
                   label: 'کسورات و مالیات',
-                  value: lastJobDeductions !== null ? formatToman(lastJobDeductions) : '—',
+                  value:
+                    lastJobDeductions !== null ? (
+                      <MoneyText
+                        amount={lastJobDeductions}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ) : (
+                      '—'
+                    ),
                 },
               ]}
             />
@@ -1471,7 +1581,7 @@ export function WorkEducationSheet({
                     }))}
                   />
                   {routeNote && (
-                    <p className="text-[11px] leading-5 text-[var(--text-muted)]">{routeNote}</p>
+                    <p className="text-xs leading-5 text-[var(--text-muted)]">{routeNote}</p>
                   )}
                 </div>
               </SectionGroup>
@@ -1653,7 +1763,17 @@ export function WorkEducationSheet({
                     tone: activeTalent.isDiscovered ? 'primary' : 'default',
                   },
                   { label: 'سطح مهارت', value: activeTalent.skillLevelLabelFa },
-                  { label: 'هزینه کلاس', value: formatToman(activeTalent.lessonCostToman) },
+                  {
+                    label: 'هزینه کلاس',
+                    value: (
+                      <MoneyText
+                        amount={activeTalent.lessonCostToman}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    ),
+                  },
                 ]}
               />
 
@@ -1679,7 +1799,14 @@ export function WorkEducationSheet({
                 <ActionRow
                   title={activeTalent.lessonTitleFa}
                   subtitle="رشد سریع‌تر زیر نظر مربی یا استاد"
-                  value={formatToman(activeTalent.lessonCostToman)}
+                  value={
+                    <MoneyText
+                      amount={activeTalent.lessonCostToman}
+                      currency="IRT"
+                      mode="inline"
+                      interactive={false}
+                    />
+                  }
                   state={
                     commonBlockedState !== 'enabled'
                       ? commonBlockedState
@@ -1706,7 +1833,14 @@ export function WorkEducationSheet({
                   <ActionRow
                     title="مسابقه و فراخوان"
                     subtitle="آزمون توانمندی و افزایش شهرت"
-                    value={formatToman(auditionCost)}
+                    value={
+                      <MoneyText
+                        amount={auditionCost}
+                        currency="IRT"
+                        mode="inline"
+                        interactive={false}
+                      />
+                    }
                     state={
                       commonBlockedState !== 'enabled'
                         ? commonBlockedState
@@ -1791,7 +1925,14 @@ export function WorkEducationSheet({
                 icon={<IconSkill className="h-4 w-4" />}
                 title={skill.titleFa}
                 subtitle={skill.descriptionFa}
-                value={maxed ? undefined : `${formatToman(cost)} · سطح ${toPersianDigits(level)}/۵`}
+                value={
+                  maxed ? undefined : (
+                    <span className="inline-flex items-center gap-1">
+                      <MoneyText amount={cost} currency="IRT" mode="inline" interactive={false} />
+                      <span>· سطح {toPersianDigits(level)}/۵</span>
+                    </span>
+                  )
+                }
                 state={rowState}
                 reason={reason}
                 ctaLabel={maxed ? undefined : 'ارتقا'}

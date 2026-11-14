@@ -161,7 +161,7 @@ function EntryCard({
                 return (
                   <span
                     key={key}
-                    className={`rounded-lg px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${
+                    className={`rounded-lg px-2 py-0.5 text-xs font-bold tabular-nums ${
                       positive
                         ? 'bg-[var(--success)]/12 text-[var(--success)]'
                         : 'bg-[var(--danger)]/12 text-[var(--danger)]'
@@ -296,7 +296,7 @@ export function LifeFeed({
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="flex justify-center py-1"
         >
-          <span className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-[11px] font-bold tabular-nums text-[var(--text-muted)]">
+          <span className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1 text-xs font-bold tabular-nums text-[var(--text-muted)]">
             <bdi dir="rtl">{formatAgeYearDivider(group.age, group.jalaliYear)}</bdi>
           </span>
         </motion.div>

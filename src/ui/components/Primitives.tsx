@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../../engine/jalali';
 import {
   IconCheck,
   IconChevronDown,
@@ -61,7 +61,7 @@ export function SectionHeader({
   return (
     <div className="mb-2 flex items-center justify-between gap-2">
       <div className="min-w-0">
-        <h3 className="truncate text-sm font-bold text-[var(--text)]">{title}</h3>
+        <h3 className="text-sm font-bold leading-snug text-[var(--text)]">{title}</h3>
         {subtitle && <p className="text-xs text-[var(--text-muted)]">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -90,12 +90,12 @@ export function StatBar({
       <div className="flex items-center justify-between gap-1 text-xs">
         <span className="flex min-w-0 items-center gap-1 font-medium text-[var(--text)]">
           {icon}
-          <span className="truncate">{label}</span>
+          <span>{label}</span>
         </span>
         <span className="flex shrink-0 items-center gap-1 tabular-nums">
           {delta !== undefined && delta !== 0 && (
             <span
-              className={`text-[10px] font-bold ${
+              className={`text-xs font-bold ${
                 delta > 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
               }`}
             >
@@ -193,7 +193,7 @@ export function Badge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${toneClass[tone]}`}
+      className={`inline-flex items-center gap-1 rounded-lg border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${toneClass[tone]}`}
     >
       {children}
     </span>
@@ -272,7 +272,7 @@ export function SegmentedControl<T extends string>({
             aria-selected={active}
             onClick={() => onChange(item.value)}
             className={`min-h-[40px] flex-1 rounded-xl py-1.5 whitespace-nowrap transition-all ${
-              dense ? 'px-1.5 text-[11px]' : 'px-2.5 text-xs'
+              dense ? 'px-1.5 text-xs' : 'px-2.5 text-xs'
             } ${
               active
                 ? 'bg-[var(--surface)] font-bold text-[var(--primary-strong)] shadow-xs'
@@ -307,9 +307,9 @@ export function ListRow({
       <div className="flex min-w-0 items-center gap-3">
         {leading && <div className="shrink-0">{leading}</div>}
         <div className="min-w-0 text-right">
-          <div className="truncate text-sm font-bold text-[var(--text)]">{title}</div>
+          <div className="text-sm font-bold leading-snug text-[var(--text)]">{title}</div>
           {subtitle && (
-            <div className="mt-0.5 truncate text-xs text-[var(--text-muted)]">{subtitle}</div>
+            <div className="mt-0.5 text-xs leading-snug text-[var(--text-muted)]">{subtitle}</div>
           )}
         </div>
       </div>
@@ -421,7 +421,7 @@ export function Slider({
         className="h-2 w-full cursor-pointer accent-[var(--primary)]"
       />
       {(minLabel || maxLabel) && (
-        <div className="flex justify-between text-[11px] text-[var(--text-muted)]">
+        <div className="flex justify-between text-xs text-[var(--text-muted)]">
           <span>{minLabel}</span>
           <span>{maxLabel}</span>
         </div>
@@ -442,7 +442,7 @@ export function ConfirmDialog({
 }: {
   open: boolean;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
@@ -521,7 +521,7 @@ export function Toast({
           <button
             type="button"
             onClick={onAction}
-            className="min-h-[32px] shrink-0 rounded-xl bg-white/20 px-2.5 py-1 text-[11px] font-bold text-[var(--on-primary)] transition-colors hover:bg-white/30"
+            className="min-h-[32px] shrink-0 rounded-xl bg-white/20 px-2.5 py-1 text-xs font-bold text-[var(--on-primary)] transition-colors hover:bg-white/30"
           >
             {actionLabel}
           </button>
@@ -572,7 +572,7 @@ export function Sparkline({
   if (values.length < 2) {
     return (
       <div
-        className="flex items-center justify-center rounded-xl bg-[var(--surface-2)] text-[10px] text-[var(--text-muted)]"
+        className="flex items-center justify-center rounded-xl bg-[var(--surface-2)] text-xs text-[var(--text-muted)]"
         style={{ height }}
       >
         داده کافی نیست
@@ -611,24 +611,6 @@ export function Sparkline({
   );
 }
 
-export function CurrencyText({
-  amountToman,
-  className = '',
-  showSign = false,
-}: {
-  amountToman: number;
-  className?: string;
-  showSign?: boolean;
-}) {
-  const prefix = showSign && amountToman > 0 ? '+' : '';
-  return (
-    <bdi dir="rtl" className={`tabular-nums ${className}`}>
-      {prefix}
-      {formatToman(amountToman)}
-    </bdi>
-  );
-}
-
 export function AgeBadge({ age, jalaliYear }: { age: number; jalaliYear?: number }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--surface-2)] px-2.5 py-1 text-xs font-bold tabular-nums text-[var(--primary-strong)]">
@@ -654,8 +636,8 @@ export function ActionButton({
   icon,
 }: {
   label: string;
-  costText?: string;
-  effectHint?: string;
+  costText?: ReactNode;
+  effectHint?: ReactNode;
   disabledReason?: string;
   variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'disabled';
   disabled?: boolean;
@@ -689,13 +671,13 @@ export function ActionButton({
           <span>{label}</span>
         </span>
         {costText && (
-          <span className="shrink-0 text-[11px] font-bold tabular-nums opacity-95">
+          <span className="shrink-0 text-xs font-bold tabular-nums opacity-95">
             {costText}
           </span>
         )}
       </div>
       {(disabledReason || effectHint) && (
-        <div className="mt-0.5 text-[11px] opacity-85">
+        <div className="mt-0.5 text-xs opacity-85">
           {disabledReason ?? effectHint}
         </div>
       )}
@@ -784,7 +766,7 @@ export function StatusChip({ status }: { status: StatusChipStatus }) {
   const cfg = STATUS_CHIP_CONFIG[status];
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-lg border px-2 py-0.5 text-[11px] font-bold whitespace-nowrap ${cfg.className}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-lg border px-2 py-0.5 text-xs font-bold whitespace-nowrap ${cfg.className}`}
     >
       {cfg.icon}
       <span>{cfg.label}</span>
@@ -823,15 +805,15 @@ export function MetricTriplet({
       {sliced.map((item, idx) => (
         <div key={idx} className="min-w-0 text-right">
           <div
-            className={`flex items-center gap-1 text-[10px] ${
+            className={`flex items-center gap-1 text-xs ${
               onPrimarySurface ? 'opacity-85' : 'text-[var(--text-muted)]'
             }`}
           >
             {item.icon && <span className="shrink-0">{item.icon}</span>}
-            <span className="truncate">{item.label}</span>
+            <span>{item.label}</span>
           </div>
           <div
-            className={`mt-0.5 truncate text-xs font-bold tabular-nums ${
+            className={`mt-0.5 text-xs font-bold tabular-nums ${
               valueToneClass[item.tone ?? 'default']
             }`}
           >
@@ -857,8 +839,8 @@ export function HubHeroCard({
   testId,
 }: {
   icon?: ReactNode;
-  title: string;
-  subtitle?: string;
+  title: ReactNode;
+  subtitle?: ReactNode;
   status?: StatusChipStatus;
   badge?: ReactNode;
   metrics?: MetricTripletItem[];
@@ -893,7 +875,7 @@ export function HubHeroCard({
           )}
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h3 className="truncate text-sm font-bold">{title}</h3>
+              <h3 className="text-sm font-bold leading-snug">{title}</h3>
               {onInfo && (
                 <button
                   type="button"
@@ -983,7 +965,7 @@ export function SectionGroup({
             <div className="flex min-w-0 items-center gap-1.5">
               {isDanger && <IconWarning className="h-3.5 w-3.5 shrink-0 text-[var(--danger)]" />}
               <h3
-                className={`truncate text-xs font-bold ${
+                className={`text-xs font-bold leading-snug ${
                   isDanger ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'
                 }`}
               >
@@ -999,9 +981,9 @@ export function SectionGroup({
         ) : (
           <div className="flex min-w-0 items-center gap-1.5">
             <div className="min-w-0">
-              <h3 className="truncate text-xs font-bold text-[var(--text-muted)]">{title}</h3>
+              <h3 className="text-xs font-bold leading-snug text-[var(--text-muted)]">{title}</h3>
               {subtitle && (
-                <p className="truncate text-[11px] text-[var(--text-muted)] opacity-85">
+                <p className="text-xs leading-snug text-[var(--text-muted)] opacity-85">
                   {subtitle}
                 </p>
               )}
@@ -1083,7 +1065,7 @@ export function ActionRow({
   testId,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   icon?: ReactNode;
   emoji?: string;
   iconTone?: 'primary' | 'neutral' | 'success' | 'warning' | 'danger';
@@ -1149,9 +1131,9 @@ export function ActionRow({
           </div>
         )}
         <div className="min-w-0 flex-1 text-right">
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span
-              className={`truncate text-sm font-bold ${
+              className={`text-sm font-bold leading-snug ${
                 isDanger
                   ? 'text-[var(--danger)]'
                   : isBlocked
@@ -1170,7 +1152,7 @@ export function ActionRow({
           </div>
           {effectiveSubtitle && (
             <div
-              className={`mt-0.5 truncate text-xs ${
+              className={`mt-0.5 text-xs leading-snug ${
                 isBlocked ? 'text-[var(--text-muted)]' : 'text-[var(--text-muted)]'
               }`}
             >
@@ -1192,7 +1174,7 @@ export function ActionRow({
           </span>
         )}
         {state === 'cooldown' && (
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--text-muted)]">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-muted)]">
             <ProgressRing value={1} max={1} size={22} strokeWidth={2.5} label="۱" colorVar="--text-muted" />
             <span className="hidden sm:inline">{cooldownLabel}</span>
           </div>
@@ -1268,7 +1250,7 @@ export function ProgressStepper({
           return (
             <div
               key={step.id}
-              className={`rounded-xl border px-1.5 py-2 text-center text-[11px] transition-colors ${
+              className={`rounded-xl border px-1.5 py-2 text-center text-xs transition-colors ${
                 isDone
                   ? 'border-[var(--success)]/45 bg-[var(--success)]/12 text-[var(--success)]'
                   : isCurrent
@@ -1281,7 +1263,7 @@ export function ProgressStepper({
               <div className="font-bold tabular-nums">
                 {isDone ? '✓' : toPersianDigits(idx + 1)}
               </div>
-              <div className="mt-0.5 truncate font-bold">{step.title}</div>
+              <div className="mt-0.5 font-bold leading-tight">{step.title}</div>
             </div>
           );
         })}
@@ -1299,7 +1281,7 @@ export function ProgressStepper({
           <div key={step.id} className="relative flex items-start gap-3">
             <div className="flex flex-col items-center pt-1">
               <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold ${
+                className={`flex h-5 w-5 items-center justify-center rounded-full border text-xs font-bold ${
                   isDone
                     ? 'border-[var(--success)] bg-[var(--success)] text-[var(--on-primary)]'
                     : isCurrent
@@ -1314,7 +1296,7 @@ export function ProgressStepper({
             <div className={`min-w-0 flex-1 ${isLast ? 'pb-0' : 'pb-3'}`}>
               <div className="flex items-center justify-between gap-2">
                 <span
-                  className={`truncate text-xs font-bold ${
+                  className={`text-xs font-bold leading-snug ${
                     isCurrent
                       ? 'text-[var(--primary-strong)]'
                       : isDone
@@ -1328,7 +1310,7 @@ export function ProgressStepper({
                 {isDone && <StatusChip status="done" />}
               </div>
               {step.subtitle && (
-                <p className="mt-0.5 text-[11px] text-[var(--text-muted)]">{step.subtitle}</p>
+                <p className="mt-0.5 text-xs text-[var(--text-muted)]">{step.subtitle}</p>
               )}
             </div>
           </div>
@@ -1378,12 +1360,12 @@ export function RequirementsChecklist({
                   {item.label}
                 </div>
                 {!item.met && item.fixHint && (
-                  <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">{item.fixHint}</div>
+                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">{item.fixHint}</div>
                 )}
               </div>
             </div>
             {(item.currentText || item.requiredText) && (
-              <span className="shrink-0 text-[11px] font-medium tabular-nums text-[var(--text-muted)]">
+              <span className="shrink-0 text-xs font-medium tabular-nums text-[var(--text-muted)]">
                 {item.currentText && item.requiredText
                   ? `${item.currentText} / ${item.requiredText}`
                   : item.requiredText ?? item.currentText}

@@ -136,31 +136,63 @@ export function getPinnedUrgentAlert(
   titleFa: string;
   bodyFa: string;
   activity: ActivityDefinition;
+  actions: ActivityDefinition[];
 } | null {
   const { state } = save;
-  if (!state.isAlive || state.player.stats.health >= 20) return null;
+  if (!state.isAlive) return null;
 
-  const healthCandidates = dataset.activities
-    .filter((a) => a.category === 'health' && isActivityExecutableBase(a, save))
-    .sort((a, b) => {
-      const priorityIds = ['act_hospital_visit', 'act_medical_checkup', 'act_sleep_hygiene'];
-      const ia = priorityIds.indexOf(a.id);
-      const ib = priorityIds.indexOf(b.id);
-      if (ia !== -1 && ib !== -1) return ia - ib;
-      if (ia !== -1) return -1;
-      if (ib !== -1) return 1;
-      return a.costToman - b.costToman;
-    });
+  const isHealthCritical = state.player.stats.health < 20;
+  const isMentalCritical = !isHealthCritical && state.player.stats.mentalHealth < 18;
+  const isHappinessCritical = !isHealthCritical && !isMentalCritical && state.player.stats.happiness < 18;
 
-  const best =
-    healthCandidates[0] ??
-    dataset.activities.find((a) => a.category === 'health' && a.costToman === 0);
-  if (!best) return null;
+  if (!isHealthCritical && !isMentalCritical && !isHappinessCritical) return null;
+
+  if (isHealthCritical) {
+    const priorityIds = ['act_hospital_visit', 'act_medical_checkup', 'act_sleep_hygiene', 'act_healthy_cook'];
+    const executableHealth = dataset.activities
+      .filter((a) => a.category === 'health' && isActivityExecutableBase(a, save))
+      .sort((a, b) => {
+        const ia = priorityIds.indexOf(a.id);
+        const ib = priorityIds.indexOf(b.id);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return a.costToman - b.costToman;
+      });
+
+    const fallbackHealth = dataset.activities.filter(
+      (a) =>
+        a.category === 'health' &&
+        a.minAge <= state.player.age &&
+        !executableHealth.some((e) => e.id === a.id),
+    );
+    const actions = [...executableHealth, ...fallbackHealth].slice(0, 3);
+    if (actions.length === 0) return null;
+
+    return {
+      titleFa: 'سلامتت در خطره',
+      bodyFa: 'سلامت بدنی تو به سطح هشدار رسیده است؛ همین حالا یکی از راه‌های درمان یا استراحت فوری را بزن.',
+      activity: actions[0],
+      actions,
+    };
+  }
+
+  const targetCategories: ActivityCategory[] = isMentalCritical
+    ? ['health', 'leisure', 'travel']
+    : ['leisure', 'social_digital', 'travel'];
+
+  const candidates = dataset.activities
+    .filter((a) => targetCategories.includes(a.category) && isActivityExecutableBase(a, save))
+    .slice(0, 3);
+  if (candidates.length === 0) return null;
 
   return {
-    titleFa: 'اولویت فوری سلامت',
-    bodyFa: 'سلامت بدنی تو به سطح هشدار رسیده است؛ رسیدگی پزشکی یا استراحت فوری را در اولویت بگذار.',
-    activity: best,
+    titleFa: isMentalCritical ? 'فشار روحی بالاست' : 'روحیه‌ات نیاز به تنوع دارد',
+    bodyFa: isMentalCritical
+      ? 'آرامش روان تو افت شدیدی کرده است؛ با یک اقدام سبک حال‌وهوایت را برگردان.'
+      : 'شادی تو به سطح پایینی رسیده است؛ یک تفریح یا دیدار تازه می‌تواند کمکت کند.',
+    activity: candidates[0],
+    actions: candidates,
   };
 }
 

@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { gameDataset } from '../data/registry';
 import { getCountryMacroDef } from '../engine/countries';
-import { formatCurrencyAmount, getCurrencyDef } from '../engine/fx';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { getCurrencyDef } from '../engine/fx';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import type { DisplayCurrencyMode, GameState } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
 import { getHeaderMoneySummary } from '../state/selectors';
 import { BottomSheet } from './components/BottomSheet';
-import { CurrencyText, SectionGroup, SegmentedControl } from './components/Primitives';
+import { useMoneyContext } from './components/MoneyContext';
+import { MoneyText } from './components/MoneyText';
+import { SectionGroup, SegmentedControl } from './components/Primitives';
 import { CountryFlag } from './components/flags/CountryFlag';
 import { IconAssets, IconCash, IconMenu } from './icons';
 
@@ -38,6 +40,7 @@ export function HeaderBar({
   onOpenMenu,
 }: HeaderBarProps) {
   const { t } = useI18n();
+  const moneyCtx = useMoneyContext();
   const [visibleDelta, setVisibleDelta] = useState<{ amount: number; key: number } | null>(null);
   const [moneySheetOpen, setMoneySheetOpen] = useState(false);
 
@@ -76,7 +79,7 @@ export function HeaderBar({
       <header className="relative flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="truncate text-[18px] font-bold leading-snug text-[var(--text)]">
+            <h1 className="text-[18px] font-bold leading-snug text-[var(--text)]">
               {fullName}
             </h1>
             {state && state.player.countryId !== 'iran' && (
@@ -91,15 +94,25 @@ export function HeaderBar({
                 type="button"
                 onClick={handleChipClick}
                 aria-label="مشاهده دارایی‌ها و نقدینگی"
-                className="inline-flex min-h-[30px] max-w-full items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2 py-0.5 text-[11px] font-bold text-[var(--primary-strong)] tabular-nums transition-colors hover:border-[var(--primary)]"
+                className="inline-flex min-h-[32px] max-w-full items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-0.5 text-xs font-bold text-[var(--primary-strong)] tabular-nums transition-colors hover:border-[var(--primary)]"
               >
                 <IconCash className="h-3.5 w-3.5 shrink-0" />
                 {moneySummary ? (
-                  <bdi dir="rtl" className="truncate">
-                    {moneySummary.cashDisplayText}
-                  </bdi>
+                  <MoneyText
+                    amount={moneySummary.cashDisplayAmount}
+                    currency={moneySummary.displayCurrency}
+                    mode="single"
+                    compact
+                    interactive={false}
+                  />
                 ) : (
-                  <CurrencyText amountToman={moneyToman} className="truncate" />
+                  <MoneyText
+                    amount={moneyToman}
+                    currency="IRT"
+                    mode="single"
+                    compact
+                    interactive={false}
+                  />
                 )}
               </button>
 
@@ -111,14 +124,18 @@ export function HeaderBar({
                     animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 14, scale: 1 }}
                     exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.95 }}
                     transition={{ duration: reducedMotion ? 0.16 : 0.28 }}
-                    className={`pointer-events-none absolute top-full right-0 z-30 mt-1 whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-[10px] font-bold tabular-nums shadow-sm ${
+                    className={`pointer-events-none absolute top-full right-0 z-30 mt-1 whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-xs font-bold tabular-nums shadow-sm ${
                       visibleDelta.amount > 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
                     }`}
                   >
-                    <bdi dir="rtl">
-                      {visibleDelta.amount > 0 ? '+' : '−'}
-                      {formatToman(Math.abs(visibleDelta.amount))}
-                    </bdi>
+                    <MoneyText
+                      amount={visibleDelta.amount}
+                      currency="IRT"
+                      mode="single"
+                      showSign
+                      compact
+                      interactive={false}
+                    />
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -153,18 +170,19 @@ export function HeaderBar({
         >
           <div className="space-y-4">
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3.5 text-right">
-              <div className="text-[11px] font-medium text-[var(--text-muted)]">
+              <div className="text-xs font-medium text-[var(--text-muted)]">
                 دارایی خالص ({t(`currencySwitch.${state.displayCurrencyMode ?? 'local'}`)})
               </div>
-              <div className="mt-1 text-lg font-bold tabular-nums text-[var(--text)]">
-                <bdi dir="rtl">{moneySummary.netWorth.primaryFormatted}</bdi>
+              <div className="mt-1">
+                <MoneyText
+                  amount={moneySummary.netWorth.displayAmount}
+                  currency={moneySummary.netWorth.displayCurrency}
+                  mode="stacked"
+                  stateOverride={state}
+                  primaryClassName="text-lg font-bold text-[var(--text)]"
+                />
               </div>
-              {moneySummary.netWorth.displayCurrency !== 'IRT' && (
-                <div className="mt-0.5 text-xs font-medium tabular-nums text-[var(--text-muted)]">
-                  معادل ریالی: <bdi dir="rtl">{moneySummary.netWorth.secondaryTomanFormatted}</bdi>
-                </div>
-              )}
-              <div className="mt-2 inline-block rounded-lg bg-[var(--surface)] px-2.5 py-1 text-[11px] font-bold tabular-nums text-[var(--primary-strong)]">
+              <div className="mt-2 inline-block rounded-lg bg-[var(--surface)] px-2.5 py-1 text-xs font-bold tabular-nums text-[var(--primary-strong)]">
                 {moneySummary.netWorth.purchasingPowerHintFa}
               </div>
             </section>
@@ -194,11 +212,16 @@ export function HeaderBar({
                       className="flex min-h-[48px] items-center justify-between gap-2 px-3.5 py-2 text-xs"
                     >
                       <div className="min-w-0 text-right">
-                        <div className="truncate font-bold text-[var(--text)]">{w.labelFa}</div>
-                        <div className="text-[11px] text-[var(--text-muted)]">{def.nameFa}</div>
+                        <div className="font-bold text-[var(--text)]">{w.labelFa}</div>
+                        <div className="text-xs text-[var(--text-muted)]">{def.nameFa}</div>
                       </div>
-                      <div className="shrink-0 font-bold tabular-nums text-[var(--text)]">
-                        <bdi dir="rtl">{formatCurrencyAmount(w.balance, w.currencyCode, gameDataset)}</bdi>
+                      <div className="shrink-0 text-left">
+                        <MoneyText
+                          amount={w.balance}
+                          currency={w.currencyCode}
+                          mode="stacked"
+                          stateOverride={state}
+                        />
                       </div>
                     </div>
                   );
@@ -206,17 +229,32 @@ export function HeaderBar({
               </SectionGroup>
             )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setMoneySheetOpen(false);
-                onOpenAssets();
-              }}
-              className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-4 text-xs font-bold text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-strong)]"
-            >
-              <IconAssets className="h-4 w-4" />
-              <span>مدیریت دارایی‌ها، تبدیل و انتقال ارز</span>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              {moneyCtx.onOpenCalculator && (
+                <button
+                  type="button"
+                  data-testid="header-open-calculator-btn"
+                  onClick={() => {
+                    setMoneySheetOpen(false);
+                    moneyCtx.onOpenCalculator?.({ fromCurrency: 'EUR', toCurrency: 'IRT' });
+                  }}
+                  className="flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-2xl border border-[var(--primary)] bg-[var(--primary-soft)] px-4 text-xs font-bold text-[var(--primary-strong)] transition-colors hover:bg-[var(--primary)] hover:text-[var(--on-primary)]"
+                >
+                  <span>ماشین‌حساب ارز</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMoneySheetOpen(false);
+                  onOpenAssets();
+                }}
+                className="flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-4 text-xs font-bold text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-strong)]"
+              >
+                <IconAssets className="h-4 w-4" />
+                <span>مدیریت دارایی‌ها و تبدیل</span>
+              </button>
+            </div>
           </div>
         </BottomSheet>
       )}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../../engine/jalali';
 import type { Person, Relationship, SaveGame } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
 import {
@@ -18,6 +18,7 @@ import {
 import { AdoptionSheet } from '../AdoptionSheet';
 import { PersonAvatar } from '../components/PersonAvatar';
 import { FullScreenSheet } from '../components/FullScreenSheet';
+import { MoneyText } from '../components/MoneyText';
 import {
   ActionRow,
   Card,
@@ -476,7 +477,7 @@ export function RelationshipsTabSheet({
                 icon={<IconGift className="h-4 w-4" />}
                 title="خرید هدیه"
                 subtitle="صمیمیت +۱۴ · احترام +۸"
-                value={formatToman(giftCost)}
+                value={<MoneyText amount={giftCost} currency="IRT" mode="inline" interactive={false} />}
                 state={
                   getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_gift`) > 0
                     ? 'cooldown'
@@ -518,7 +519,7 @@ export function RelationshipsTabSheet({
                 icon={<IconPlane className="h-4 w-4" />}
                 title="سفر و تفریح مشترک"
                 subtitle="صمیمیت +۱۶ · سلامت روان +۶"
-                value={formatToman(tripCost)}
+                value={<MoneyText amount={tripCost} currency="IRT" mode="inline" interactive={false} />}
                 state={
                   getActionCooldownRemaining(state, `rel_${selectedEntry.person.id}_trip`) > 0
                     ? 'cooldown'
@@ -563,7 +564,9 @@ export function RelationshipsTabSheet({
                   icon={<IconSparkles className="h-4 w-4" />}
                   title="برگزاری مراسم ازدواج و تعیین مهریه"
                   subtitle="شادی +۱۲ · آغاز زندگی مشترک رسمی"
-                  value={formatToman(weddingCost)}
+                  value={
+                    <MoneyText amount={weddingCost} currency="IRT" mode="inline" interactive={false} />
+                  }
                   state={player.moneyToman < weddingCost ? 'disabled' : 'recommended'}
                   reason={player.moneyToman < weddingCost ? 'موجودی کافی نیست' : undefined}
                   ctaLabel="ازدواج"
@@ -686,9 +689,15 @@ export function RelationshipsTabSheet({
         open={confirmMarry}
         title="برگزاری مراسم ازدواج"
         message={
-          selectedEntry
-            ? `آیا برای آغاز زندگی مشترک رسمی با ${selectedEntry.person.firstName} ${selectedEntry.person.lastName} به هزینه ${formatToman(weddingCost)} آماده‌ای؟`
-            : ''
+          selectedEntry ? (
+            <span>
+              آیا برای آغاز زندگی مشترک رسمی با {selectedEntry.person.firstName}{' '}
+              {selectedEntry.person.lastName} به هزینه{' '}
+              <MoneyText amount={weddingCost} currency="IRT" mode="inline" /> آماده‌ای؟
+            </span>
+          ) : (
+            ''
+          )
         }
         confirmLabel="برگزاری مراسم"
         onCancel={() => setConfirmMarry(false)}

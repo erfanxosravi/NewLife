@@ -119,14 +119,14 @@ export function BottomNav({
       <button
         type="button"
         onClick={() => onSelectTab(id)}
-        className={`flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] transition-colors ${
+        className={`flex min-h-[50px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-xs transition-colors ${
           active
             ? 'bg-[var(--primary-soft)] font-bold text-[var(--primary-strong)]'
             : 'font-medium text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
         }`}
       >
         {icon}
-        <span className="truncate">{label}</span>
+        <span className="leading-tight">{label}</span>
       </button>
     );
   };
@@ -212,7 +212,7 @@ export function BottomNav({
           {isAutoAdvancing ? (
             <>
               <Square className="h-4 w-4 fill-current" />
-              <span className="text-[10px] font-bold leading-none">
+              <span className="text-xs font-bold leading-none">
                 {t('yearTransition.stopAutoAdvance')}
               </span>
             </>
@@ -224,7 +224,7 @@ export function BottomNav({
           ) : (
             <>
               <IconNextYear className="h-5 w-5" />
-              <span className="text-[10px] font-bold leading-none">{t('nextYear')}</span>
+              <span className="text-xs font-bold leading-none">{t('nextYear')}</span>
             </>
           )}
         </button>

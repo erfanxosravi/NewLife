@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { gameDataset } from '../data/registry';
 import { calculateNetWorthToman } from '../engine/economy';
 import { createNewSaveGame } from '../engine/generator';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import { migrateSaveGame } from '../engine/migrations';
 import type { ContentSettings, SaveGame } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
@@ -13,12 +13,12 @@ import type {
   ThemePreference,
 } from '../storage/saveStore';
 import { FullScreenSheet } from './components/FullScreenSheet';
+import { MoneyText } from './components/MoneyText';
 import {
   ActionButton,
   Badge,
   Card,
   ConfirmDialog,
-  CurrencyText,
   ListRow,
   SectionHeader,
   SegmentedControl,
@@ -310,7 +310,7 @@ export function MenuSheet({
                 <div className="text-[var(--text-muted)]">محل سکونت</div>
                 <div className="mt-0.5 flex items-center gap-1.5 font-bold">
                   <CountryFlag countryId={player.countryId} size="xs" />
-                  <span className="truncate">{locationLabel}</span>
+                  <span>{locationLabel}</span>
                 </div>
               </div>
               <div className="rounded-xl bg-[var(--surface-2)] p-2.5">
@@ -334,8 +334,11 @@ export function MenuSheet({
             </div>
             <div className="flex items-center justify-between rounded-xl border border-[var(--border)] px-3 py-2 text-xs">
               <span className="text-[var(--text-muted)]">دارایی خالص</span>
-              <CurrencyText
-                amountToman={calculateNetWorthToman(state)}
+              <MoneyText
+                amount={calculateNetWorthToman(state)}
+                currency="IRT"
+                mode="inline"
+                stateOverride={state}
                 className="font-bold text-[var(--primary-strong)]"
               />
             </div>
@@ -383,10 +386,10 @@ export function MenuSheet({
                           {item.tierLabelFa}
                         </Badge>
                       </div>
-                      <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+                      <p className="text-xs leading-relaxed text-[var(--text-muted)]">
                         {item.hintTextFa}
                       </p>
-                      <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+                      <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
                         <span>کشف در {toPersianDigits(item.discoveredAge)} سالگی</span>
                         <span>آمادگی فعلی: {item.skillLevelLabelFa}</span>
                       </div>
@@ -489,9 +492,14 @@ export function MenuSheet({
                   {summary ? (
                     <>
                       <div className="text-xs font-bold">{summary.fullName}</div>
-                      <div className="text-[11px] text-[var(--text-muted)]">
+                      <div className="text-xs text-[var(--text-muted)]">
                         {formatAgeLabel(summary.age)} · سال {toPersianDigits(summary.jalaliYear)} ·{' '}
-                        {formatToman(summary.moneyToman)}
+                        <MoneyText
+                          amount={summary.moneyToman}
+                          currency="IRT"
+                          mode="single"
+                          interactive={false}
+                        />
                       </div>
                       <div className="flex gap-2 pt-1">
                         {!isActive && (
@@ -676,7 +684,7 @@ export function MenuSheet({
                 title="ابزار آزمایشی کد زندگی"
                 subtitle="فقط برای بررسی و بازپخش یک زندگی مشخص"
               />
-              <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-[11px]">
+              <div className="rounded-xl bg-[var(--surface-2)] px-3 py-2 text-xs">
                 <span className="text-[var(--text-muted)]">کد زندگی فعلی: </span>
                 <span className="font-mono font-bold text-[var(--text)]">{saveGame.seed}</span>
               </div>

@@ -5,7 +5,7 @@ interface FullScreenSheetProps {
   open: boolean;
   onClose: () => void;
   title: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   headerRight?: ReactNode;
   stickySubHeader?: ReactNode;
   scrollKey?: string;
@@ -107,9 +107,9 @@ export function FullScreenSheet({
               <IconBackRtl className="h-5 w-5" />
             </button>
             <div className="min-w-0">
-              <h2 className="truncate text-base font-bold text-[var(--text)]">{title}</h2>
+              <h2 className="text-base font-bold leading-snug text-[var(--text)]">{title}</h2>
               {subtitle && (
-                <p className="truncate text-xs text-[var(--text-muted)]">{subtitle}</p>
+                <p className="text-xs leading-snug text-[var(--text-muted)]">{subtitle}</p>
               )}
             </div>
           </div>

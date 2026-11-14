@@ -93,6 +93,8 @@ describe('Activities Expansion, Non-Repeating Outcomes & Smart Recommendations',
     const urgent = getPinnedUrgentAlert(criticalHealthSave, gameDataset);
     expect(urgent).not.toBeNull();
     expect(urgent?.activity.category).toBe('health');
+    expect(urgent?.actions.length).toBeGreaterThanOrEqual(2);
+    expect(urgent?.actions.every((a) => a.category === 'health')).toBe(true);
 
     const urgentTop = getSmartRecommendations(criticalHealthSave, gameDataset, 5);
     expect(urgentTop.length).toBeGreaterThan(0);

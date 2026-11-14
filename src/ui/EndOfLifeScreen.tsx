@@ -1,9 +1,10 @@
 import { gameDataset } from '../data/registry';
-import { formatAgeLabel, formatToman, toPersianDigits } from '../engine/jalali';
+import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
 import type { DeathSummary, GameState, Player } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
-import { formatUsdEquivalentHint, getAmountPurchasingPower } from '../state/selectors';
-import { ActionButton, Badge, Card, CurrencyText, ProgressRing } from './components/Primitives';
+import { getAmountPurchasingPower } from '../state/selectors';
+import { formatMoneyTextForCanvas, MoneyText } from './components/MoneyText';
+import { ActionButton, Badge, Card, ProgressRing } from './components/Primitives';
 import { IconBrandMark, IconReset, IconShare } from './icons';
 
 interface EndOfLifeScreenProps {
@@ -28,9 +29,6 @@ export function EndOfLifeScreen({
   onShareDone,
 }: EndOfLifeScreenProps) {
   const { t } = useI18n();
-  const usdHint = state
-    ? formatUsdEquivalentHint(deathSummary.finalNetWorthToman, state, gameDataset)
-    : null;
   const pp = state
     ? getAmountPurchasingPower(deathSummary.finalNetWorthToman, state, gameDataset)
     : null;
@@ -90,9 +88,7 @@ export function EndOfLifeScreen({
       ctx.fillStyle = '#8A7568';
       ctx.font = '500 24px Vazirmatn, sans-serif';
       ctx.fillText(`علت پایان: ${deathSummary.causeOfDeath}`, 360, 525);
-      const netWorthCardLine = usdHint
-        ? `دارایی نهایی: ${formatToman(deathSummary.finalNetWorthToman)} (${usdHint})`
-        : `دارایی نهایی: ${formatToman(deathSummary.finalNetWorthToman)}`;
+      const netWorthCardLine = `دارایی نهایی: ${formatMoneyTextForCanvas(deathSummary.finalNetWorthToman, 'IRT', state)}`;
       ctx.fillText(netWorthCardLine, 360, 575);
 
       ctx.textAlign = 'right';
@@ -155,7 +151,7 @@ export function EndOfLifeScreen({
 
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-black/15 p-3">
           <div>
-            <div className="text-[11px] opacity-85">{t('endOfLife.scoreLabel')}</div>
+            <div className="text-xs opacity-85">{t('endOfLife.scoreLabel')}</div>
             <div className="text-2xl font-bold tabular-nums">
               {toPersianDigits(deathSummary.lifeScore)}
             </div>
@@ -177,14 +173,25 @@ export function EndOfLifeScreen({
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className="text-[var(--text-muted)]">{t('endOfLife.netWorthLabel')}</span>
-          <div className="text-left">
-            <CurrencyText
-              amountToman={deathSummary.finalNetWorthToman}
-              className="font-bold text-[var(--primary-strong)]"
+          <div className="flex flex-col items-end text-left">
+            <MoneyText
+              amount={deathSummary.finalNetWorthToman}
+              currency="IRT"
+              mode="stacked"
+              stateOverride={state}
+              className="items-end"
+              primaryClassName="font-bold text-[var(--primary-strong)]"
             />
-            {usdHint && pp && (
-              <div className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                {usdHint} · {toPersianDigits(pp.tehran70SqmApts)} واحد ۷۰ متری تهران
+            {state && (
+              <div className="mt-0.5 text-xs text-[var(--text-muted)]">
+                <MoneyText
+                  amount={deathSummary.finalNetWorthToman}
+                  currency="IRT"
+                  mode="inline"
+                  stateOverride={state}
+                  primaryOverride="USD"
+                />
+                {pp ? ` · ${toPersianDigits(pp.tehran70SqmApts)} واحد ۷۰ متری تهران` : ''}
               </div>
             )}
           </div>

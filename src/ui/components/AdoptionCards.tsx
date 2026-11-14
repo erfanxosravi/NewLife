@@ -1,6 +1,8 @@
-import { formatAgeLabel, formatToman, toPersianDigits } from '../../engine/jalali';
+import type { ReactNode } from 'react';
+import { formatAgeLabel, toPersianDigits } from '../../engine/jalali';
 import type { AdoptionInspectorVisit, Gender, InspectorOutcome } from '../../engine/types';
 import { IconCheck, IconLock, IconShield } from '../icons';
+import { MoneyText } from './MoneyText';
 import { PersonAvatar } from './PersonAvatar';
 import { Badge } from './Primitives';
 
@@ -9,7 +11,7 @@ export interface ChecklistCardItem {
   title: string;
   subtitle?: string;
   done: boolean;
-  valueText?: string;
+  valueText?: ReactNode;
   ctaLabel?: string;
   disabled?: boolean;
   reason?: string;
@@ -31,9 +33,9 @@ export function ChecklistCard({
     <section className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
       <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--surface-2)]/55 px-3.5 py-2.5">
         <div className="min-w-0">
-          <h4 className="truncate text-xs font-bold text-[var(--text)]">{title}</h4>
+          <h4 className="text-xs font-bold text-[var(--text)]">{title}</h4>
           {subtitle && (
-            <p className="mt-0.5 truncate text-[11px] text-[var(--text-muted)]">{subtitle}</p>
+            <p className="mt-0.5 text-xs text-[var(--text-muted)]">{subtitle}</p>
           )}
         </div>
         <span className="shrink-0 text-xs font-bold tabular-nums text-[var(--primary-strong)]">
@@ -70,12 +72,12 @@ export function ChecklistCard({
                   {item.title}
                 </div>
                 {item.subtitle && (
-                  <div className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                  <div className="mt-0.5 text-xs leading-relaxed text-[var(--text-muted)]">
                     {item.subtitle}
                   </div>
                 )}
                 {item.reason && !item.done && (
-                  <div className="mt-0.5 text-[11px] font-medium text-[var(--warning)]">
+                  <div className="mt-0.5 text-xs font-medium text-[var(--warning)]">
                     {item.reason}
                   </div>
                 )}
@@ -84,7 +86,7 @@ export function ChecklistCard({
 
             <div className="flex shrink-0 items-center gap-2">
               {item.valueText && !item.done && (
-                <span className="text-[11px] font-bold tabular-nums text-[var(--text-muted)]">
+                <span className="text-xs font-bold tabular-nums text-[var(--text-muted)]">
                   {item.valueText}
                 </span>
               )}
@@ -150,11 +152,11 @@ export function InspectorVisitCard({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <IconShield className="h-3.5 w-3.5 shrink-0 text-[var(--primary-strong)]" />
-              <span className="truncate text-xs font-bold text-[var(--text)]">
+              <span className="text-xs font-bold text-[var(--text)]">
                 {visit.inspectorNameFa}
               </span>
             </div>
-            <div className="mt-0.5 truncate text-[11px] text-[var(--text-muted)]">
+            <div className="mt-0.5 text-xs text-[var(--text-muted)]">
               ناظر بهزیستی · سال {toPersianDigits(visit.jalaliYear)} · {visit.childNameFa} ({formatAgeLabel(visit.childAge)})
             </div>
           </div>
@@ -168,7 +170,7 @@ export function InspectorVisitCard({
 
       {visit.tasks.length > 0 && (
         <div className="space-y-1.5">
-          <div className="text-[11px] font-bold text-[var(--text-muted)]">
+          <div className="text-xs font-bold text-[var(--text-muted)]">
             توصیه‌ها و تکالیف حمایتی تا بازدید بعدی:
           </div>
           <div className="divide-y divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)]">
@@ -182,7 +184,7 @@ export function InspectorVisitCard({
                 >
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold text-[var(--text)]">{task.titleFa}</div>
-                    <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                    <div className="mt-0.5 text-xs text-[var(--text-muted)]">
                       {task.descriptionFa}
                     </div>
                   </div>
@@ -196,17 +198,18 @@ export function InspectorVisitCard({
                       type="button"
                       disabled={cannotAfford}
                       onClick={() => onCompleteTask(visit.id, task.id)}
-                      className={`shrink-0 min-h-[38px] rounded-xl px-2.5 text-xs font-bold transition-colors ${
+                      className={`inline-flex shrink-0 min-h-[38px] items-center gap-1 rounded-xl px-2.5 text-xs font-bold transition-colors ${
                         cannotAfford
                           ? 'cursor-not-allowed border border-[var(--border)] bg-[var(--surface-2)] text-[var(--text-muted)] opacity-60'
                           : 'bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-strong)]'
                       }`}
                     >
-                      {formatToman(task.costToman)} · اجرا
+                      <MoneyText amount={task.costToman} currency="IRT" mode="inline" interactive={false} />
+                      <span>· اجرا</span>
                     </button>
                   ) : (
-                    <span className="shrink-0 text-[11px] font-bold tabular-nums text-[var(--text-muted)]">
-                      {formatToman(task.costToman)}
+                    <span className="shrink-0 text-xs font-bold tabular-nums text-[var(--text-muted)]">
+                      <MoneyText amount={task.costToman} currency="IRT" mode="inline" interactive={false} />
                     </span>
                   )}
                 </div>

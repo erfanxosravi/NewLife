@@ -109,7 +109,7 @@ function CompactStatCell({
             animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: -14, scale: 1 }}
             exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -22 }}
             transition={{ duration: reducedMotion ? 0.16 : 0.28 }}
-            className={`pointer-events-none absolute -top-2 right-0 z-20 whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-[10px] font-bold tabular-nums shadow-xs ${
+            className={`pointer-events-none absolute -top-2 right-0 z-20 whitespace-nowrap rounded-lg border border-[var(--border)] bg-[var(--surface)] px-1.5 py-0.5 text-xs font-bold tabular-nums shadow-xs ${
               delta > 0 ? 'text-[var(--success)]' : 'text-[var(--danger)]'
             }`}
           >
@@ -121,10 +121,10 @@ function CompactStatCell({
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between gap-0.5 text-[10px]">
+      <div className="flex items-center justify-between gap-0.5 text-xs">
         <span className="flex min-w-0 items-center gap-0.5 font-bold text-[var(--text)]">
           <Icon className="h-3 w-3 shrink-0" style={{ color: `var(${colorVar})` }} />
-          <span className="truncate">{label}</span>
+          <span>{label}</span>
         </span>
         <span className="shrink-0 font-bold tabular-nums text-[var(--text)]">
           {toPersianDigits(animatedVal)}٪
@@ -293,7 +293,7 @@ export function ExpandedStatsSheet({
               icon={item.icon}
             />
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] leading-snug text-[var(--text-muted)]">{item.hint}</p>
+              <p className="text-xs leading-snug text-[var(--text-muted)]">{item.hint}</p>
               <div className="w-24 shrink-0">
                 <Sparkline values={item.series} colorVar={item.colorVar} height={26} />
               </div>
