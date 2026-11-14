@@ -1,0 +1,408 @@
+[
+  {
+    "id": "singer",
+    "titleFa": "خواننده حرفه‌ای",
+    "requiredTalentId": "singing",
+    "minTier": "clear_talent",
+    "minSkill": 35,
+    "minAge": 17,
+    "peakEndAge": 36,
+    "maxEntryAge": 45,
+    "baseStageSuccessRate": 0.56,
+    "luckWeight": 0.25,
+    "fameRequirementForStage3": 25,
+    "stageTitlesFa": [
+      "خواننده تازه‌کار استودیویی",
+      "صدا و تک‌آهنگ‌های پرشنونده",
+      "خواننده کنسرت‌ها و آلبوم‌های پرفروش",
+      "چهره ماندگار آواز و موسیقی ایران"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.85,
+      "stage2": 2.4,
+      "stage3": 6.5,
+      "stage4": 15.0
+    },
+    "tailPayout": {
+      "probability": 0.035,
+      "yearlyCapMultiplierOfMinWage": 45,
+      "titleFa": "اجرای پرمخاطب و قرارداد موسیقی",
+      "resultTextFa": "یک قطعه پرطرفدار و همکاری با گروه بزرگ، درآمد سالانه‌ات را جهش داد."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "صحنه رسمی، ارکستر و مجوز انتشار",
+        "noteFa": "مسیر سنتی و پاپ با آزمون صدا، اخذ مجوز و همکاری با تهیه‌کننده"
+      },
+      {
+        "id": "online",
+        "titleFa": "انتشار مستقل در فضای مجازی و پادکست",
+        "noteFa": "شروع با قطعات خانگی و جذب مخاطب آنلاین بدون نیاز به سرمایه کلان"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "صداسازی، همخوانی استودیو و آهنگسازی",
+        "noteFa": "مسیر پایدار در تولید اثر، صدابرداری و پرورش هنرجو"
+      },
+      {
+        "id": "abroad",
+        "titleFa": "همکاری بین‌المللی و اجرا در خارج از کشور",
+        "noteFa": "گسترش اجراهای صحنه‌ای برای مخاطبان خارج از ایران"
+      }
+    ],
+    "femaleMainstreamNoteFa": "در مسیر اجرای صحنه‌ای عمومی محدودیت‌هایی برای خوانندگی انفرادی بانوان وجود دارد؛ مسیرهای استودیویی، همخوانی، تدریس صداسازی، انتشار آنلاین و اجرای بین‌المللی فعال‌اند.",
+    "fallbackCareerFa": "مدرس آواز و صداسازی",
+    "fallbackMonthlyMinWageMultiplier": 1.45,
+    "socialEventGate": true
+  },
+  {
+    "id": "musician",
+    "titleFa": "نوازنده حرفه‌ای",
+    "requiredTalentId": "music_instrument",
+    "minTier": "clear_talent",
+    "minSkill": 38,
+    "minAge": 17,
+    "peakEndAge": 45,
+    "maxEntryAge": 55,
+    "baseStageSuccessRate": 0.62,
+    "luckWeight": 0.2,
+    "fameRequirementForStage3": 20,
+    "stageTitlesFa": [
+      "نوازنده استودیو و گروه‌های کوچک",
+      "نوازنده شناخته‌شده موسیقی سنتی و پاپ",
+      "سولیست ارکستر و تنظیم‌کننده برجسته",
+      "استاد صاحب‌سبک موسیقی"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.95,
+      "stage2": 2.2,
+      "stage3": 5.2,
+      "stage4": 11.0
+    },
+    "tailPayout": {
+      "probability": 0.03,
+      "yearlyCapMultiplierOfMinWage": 32,
+      "titleFa": "تنظیم موسیقی فیلم و تور کنسرت",
+      "resultTextFa": "ساخت و اجرای موسیقی یک پروژه پرمخاطب، پاداش مالی خوبی برایت آورد."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "ارکستر، گروه نوازی و کنسرت رسمی",
+        "noteFa": "همکاری با گروه‌های موسیقی ایرانی و مدرن در تالارها"
+      },
+      {
+        "id": "online",
+        "titleFa": "تولید قطعه بی‌کلام و آموزش آنلاین",
+        "noteFa": "فروش پارتیتور، موسیقی متن و دوره‌های نوازندگی"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "آموزشگاه موسیقی و مسترکلاس",
+        "noteFa": "تربیت هنرجو و اجرای نشست‌های تخصصی ساز"
+      }
+    ],
+    "fallbackCareerFa": "مدرس ساز و تئوری موسیقی",
+    "fallbackMonthlyMinWageMultiplier": 1.5,
+    "socialEventGate": false
+  },
+  {
+    "id": "actor",
+    "titleFa": "بازیگر سینما و تئاتر",
+    "requiredTalentId": "acting",
+    "minTier": "clear_talent",
+    "minSkill": 35,
+    "minAge": 18,
+    "peakEndAge": 42,
+    "maxEntryAge": 52,
+    "baseStageSuccessRate": 0.5,
+    "luckWeight": 0.3,
+    "fameRequirementForStage3": 30,
+    "stageTitlesFa": [
+      "هنرور و بازیگر تئاتر مستقل",
+      "بازیگر نقش‌های مکمل سریال و سینما",
+      "بازیگر نقش اصلی و نامزد جشنواره‌ها",
+      "چهره ماندگار سینمای ایران"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.75,
+      "stage2": 2.3,
+      "stage3": 7.5,
+      "stage4": 18.0
+    },
+    "tailPayout": {
+      "probability": 0.03,
+      "yearlyCapMultiplierOfMinWage": 55,
+      "titleFa": "جایزه جشنواره و قرارداد سریال نمایش خانگی",
+      "resultTextFa": "درخشش در یک اثر پرمخاطب پیشنهادهای قرارداد بعدی‌ات را چند برابر کرد."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "تست بازیگری، تئاتر شهر و سینما",
+        "noteFa": "پیشرفت از صحنه تئاتر به مجموعه‌های تلویزیونی و نمایش خانگی"
+      },
+      {
+        "id": "online",
+        "titleFa": "فیلم کوتاه و اجراهای دیجیتال",
+        "noteFa": "دیده شدن در جشنواره‌های مستقل و شبکه‌های تصویری"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "دوبله، صداپیشگی و کارگاه فن بیان",
+        "noteFa": "مسیر حرفه‌ای در استودیوهای دوبلاژ و تدریس بازیگری"
+      }
+    ],
+    "fallbackCareerFa": "دوبلور و مدرس فن بیان",
+    "fallbackMonthlyMinWageMultiplier": 1.65,
+    "socialEventGate": true
+  },
+  {
+    "id": "pro_athlete",
+    "titleFa": "ورزشکار حرفه‌ای",
+    "requiredTalentId": "athletics",
+    "minTier": "clear_talent",
+    "minSkill": 40,
+    "minAge": 16,
+    "peakEndAge": 31,
+    "maxEntryAge": 33,
+    "baseStageSuccessRate": 0.55,
+    "luckWeight": 0.22,
+    "fameRequirementForStage3": 28,
+    "stageTitlesFa": [
+      "ورزشکار تیم جوانان و لیگ استانی",
+      "بازیکن یا قهرمان لیگ برتر کشور",
+      "ملی‌پوش و مدال‌آور آسیایی",
+      "قهرمان بین‌المللی و افتخار ملی"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 1.0,
+      "stage2": 3.4,
+      "stage3": 9.5,
+      "stage4": 22.0
+    },
+    "tailPayout": {
+      "probability": 0.03,
+      "yearlyCapMultiplierOfMinWage": 60,
+      "titleFa": "پاداش قهرمانی و قرارداد باشگاهی بزرگ",
+      "resultTextFa": "کسب مدال یا فصل درخشان در لیگ، قرارداد و پاداش قابل توجهی به همراه داشت."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "باشگاه‌های لیگ کشور و اردوی تیم ملی",
+        "noteFa": "رقابت در لیگ فوتبال، کشتی، والیبال، تکواندو یا وزنه‌برداری"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "مربیگری پایه و بدنسازی تخصصی",
+        "noteFa": "انتقال تجربه ورزشی در آکادمی‌ها و باشگاه‌های شهر"
+      },
+      {
+        "id": "abroad",
+        "titleFa": "لژیونر شدن در باشگاه‌های خارجی",
+        "noteFa": "دعوت به رقابت‌های بین‌المللی پس از درخشش در سطح ملی"
+      }
+    ],
+    "femaleMainstreamNoteFa": "در برخی رشته‌های قهرمانی، مسیرهای باشگاهی ویژه بانوان، تیم‌های ملی بانوان و مسابقات بین‌المللی با پوشش استاندارد ورزشی فعال است.",
+    "fallbackCareerFa": "مربی تخصصی و داور ورزشی",
+    "fallbackMonthlyMinWageMultiplier": 1.6,
+    "socialEventGate": false
+  },
+  {
+    "id": "painter",
+    "titleFa": "نقاش و خوشنویس حرفه‌ای",
+    "requiredTalentId": "visual_art",
+    "minTier": "interest",
+    "minSkill": 35,
+    "minAge": 18,
+    "peakEndAge": 65,
+    "maxEntryAge": 65,
+    "baseStageSuccessRate": 0.64,
+    "luckWeight": 0.22,
+    "fameRequirementForStage3": 20,
+    "stageTitlesFa": [
+      "هنرمند کارگاهی و طراح سفارش‌های آزاد",
+      "برگزارکننده نمایشگاه‌های گالری",
+      "هنرمند شناخته‌شده حراج‌ها و مجموعه‌ها",
+      "استاد برجسته هنرهای تجسمی"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.85,
+      "stage2": 1.9,
+      "stage3": 4.8,
+      "stage4": 12.0
+    },
+    "tailPayout": {
+      "probability": 0.025,
+      "yearlyCapMultiplierOfMinWage": 38,
+      "titleFa": "فروش اثر کلکسیونی در حراج هنری",
+      "resultTextFa": "یکی از تابلوها یا آثار خوشنویسی‌ات در نمایشگاه توسط مجموعه‌دار خریداری شد."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "گالری‌ها و انجمن خوشنویسان",
+        "noteFa": "برپایی نمایشگاه انفرادی و دریافت گواهی ممتاز هنری"
+      },
+      {
+        "id": "online",
+        "titleFa": "تصویرسازی دیجیتال و فروش جهانی اثر",
+        "noteFa": "طراحی برای کتاب، برندها و پلتفرم‌های بین‌المللی"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "آتلیه آموزش طراحی و نگارگری",
+        "noteFa": "درآمد پایدار از برگزاری دوره‌های تخصصی هنر"
+      }
+    ],
+    "fallbackCareerFa": "طراح گرافیک و مدرس هنر",
+    "fallbackMonthlyMinWageMultiplier": 1.55,
+    "socialEventGate": false
+  },
+  {
+    "id": "writer",
+    "titleFa": "نویسنده و شاعر",
+    "requiredTalentId": "writing",
+    "minTier": "interest",
+    "minSkill": 36,
+    "minAge": 18,
+    "peakEndAge": 70,
+    "maxEntryAge": 70,
+    "baseStageSuccessRate": 0.6,
+    "luckWeight": 0.22,
+    "fameRequirementForStage3": 22,
+    "stageTitlesFa": [
+      "نویسنده مجلات و داستان‌های کوتاه",
+      "مؤلف کتاب‌های چاپ‌شده و فیلم‌نامه‌نویس",
+      "نویسنده پرفروش و برگزیده جوایز ادبی",
+      "ادیب و چهره ماندگار ادبیات فارسی"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.75,
+      "stage2": 1.65,
+      "stage3": 3.8,
+      "stage4": 8.5
+    },
+    "tailPayout": {
+      "probability": 0.025,
+      "yearlyCapMultiplierOfMinWage": 28,
+      "titleFa": "چاپ مجدد کتاب و قرارداد اقتباس فیلم‌نامه",
+      "resultTextFa": "رمان و طرح داستانت مورد توجه ناشر و تهیه‌کننده قرار گرفت."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "نشر کتاب، شعر و فیلم‌نامه‌نویسی",
+        "noteFa": "همکاری با ناشران معتبر و اتاق فکر سریال و سینما"
+      },
+      {
+        "id": "online",
+        "titleFa": "نشر دیجیتال، وبلاگ و کتاب صوتی",
+        "noteFa": "انتشار داستان و پادکست روایت‌محور برای مخاطبان جوان"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "ویراستاری، ترجمه و کارگاه داستان",
+        "noteFa": "فعالیت پیوسته در تحریریه و آموزش نویسندگی خلاق"
+      }
+    ],
+    "fallbackCareerFa": "ویراستار و مدرس ادبیات",
+    "fallbackMonthlyMinWageMultiplier": 1.4,
+    "socialEventGate": true
+  },
+  {
+    "id": "comedian",
+    "titleFa": "طنزپرداز و مجری کمدی",
+    "requiredTalentId": "comedy",
+    "minTier": "interest",
+    "minSkill": 35,
+    "minAge": 18,
+    "peakEndAge": 45,
+    "maxEntryAge": 55,
+    "baseStageSuccessRate": 0.58,
+    "luckWeight": 0.26,
+    "fameRequirementForStage3": 25,
+    "stageTitlesFa": [
+      "استندآپ‌کار جمع‌های دانشجویی و صحنه کوچک",
+      "طنزنویس و مجری برنامه‌های سرگرمی",
+      "کمدین محبوب نمایش خانگی و سالن‌ها",
+      "چهره شاخص طنز معاصر"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.8,
+      "stage2": 2.1,
+      "stage3": 5.5,
+      "stage4": 13.0
+    },
+    "tailPayout": {
+      "probability": 0.03,
+      "yearlyCapMultiplierOfMinWage": 35,
+      "titleFa": "اجرای ویژه نوروز و قرارداد برنامه پربیننده",
+      "resultTextFa": "حضور در یک برنامه پرمخاطب نامت را سر زبان‌ها انداخت."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "mainstream",
+        "titleFa": "صحنه استندآپ، تئاتر کمدی و اجرا",
+        "noteFa": "اجرای زنده در سالن‌های فرهنگی و برنامه‌های سرگرمی"
+      },
+      {
+        "id": "online",
+        "titleFa": "تولید آیتم طنز و پادکست کمدی",
+        "noteFa": "جذب مخاطب با روایت‌های روزمره و شوخ‌طبعی سالم"
+      }
+    ],
+    "fallbackCareerFa": "نویسنده طنز و تولیدکننده برنامه",
+    "fallbackMonthlyMinWageMultiplier": 1.5,
+    "socialEventGate": true
+  },
+  {
+    "id": "influencer",
+    "titleFa": "تولیدکننده محتوای حرفه‌ای",
+    "requiredTalentId": "leadership",
+    "optionalAltTalentIds": ["comedy", "cooking", "programming_tech", "visual_art"],
+    "minTier": "curiosity",
+    "minSkill": 32,
+    "minAge": 16,
+    "peakEndAge": 40,
+    "maxEntryAge": 50,
+    "baseStageSuccessRate": 0.65,
+    "luckWeight": 0.3,
+    "fameRequirementForStage3": 24,
+    "stageTitlesFa": [
+      "سازنده محتوای تخصصی با مخاطب محدود",
+      "تولیدکننده محتوای روبه‌رشد و اسپانسر محلی",
+      "رسانه مستقل پربازدید",
+      "چهره دیجیتال اثرگذار در سطح کشور"
+    ],
+    "monthlyIncomeMinWageMultiplier": {
+      "stage1": 0.65,
+      "stage2": 2.0,
+      "stage3": 5.8,
+      "stage4": 14.0
+    },
+    "tailPayout": {
+      "probability": 0.035,
+      "yearlyCapMultiplierOfMinWage": 36,
+      "titleFa": "کمپین برند بزرگ و ویدیوی پربازدید",
+      "resultTextFa": "یک مجموعه محتوای دقیق و خلاقانه با استقبال گسترده و قرارداد اسپانسری همراه شد."
+    },
+    "alternativeRoutes": [
+      {
+        "id": "online",
+        "titleFa": "کانال ویدیویی، پادکست و محتوای آموزشی",
+        "noteFa": "مسیر مستقل بدون محدودیت جغرافیایی از هر شهر ایران"
+      },
+      {
+        "id": "teaching_studio",
+        "titleFa": "مشاوره برند و مدیریت شبکه‌های اجتماعی",
+        "noteFa": "همکاری حرفه‌ای با کسب‌وکارها و استودیوهای تولید محتوا"
+      }
+    ],
+    "fallbackCareerFa": "کارشناس بازاریابی دیجیتال",
+    "fallbackMonthlyMinWageMultiplier": 1.65,
+    "socialEventGate": false
+  }
+]

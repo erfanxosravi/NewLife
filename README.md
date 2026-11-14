@@ -1,11 +1,19 @@
-<div align="center">
+# زندگینامه (Zendegi-Nameh)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+شبیه‌ساز متنی زندگی ایرانی از تولد تا پایان عمر؛ کاملاً آفلاین، راست‌به‌چپ (RTL) و داده‌محور.
 
-  <h1>Built with AI Studio</h2>
+## اجرا و تست
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+```bash
+npm install
+npm run dev           # اجرای سرور توسعه روی پورت 3000 (مسیر /styleguide برای مشاهده کامپوننت‌ها)
+npm run validate:data # اعتبارسنجی تمام فایل‌های JSON با Zod
+npm test              # اجرای تست‌های واحد و شبیه‌سازی ۱۰۰۰ زندگی
+npm run build         # اعتبارسنجی داده‌ها + بیلد نسخه PWA
+```
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## مجوزهای کتابخانه‌های متن‌باز
 
-</div>
+- **Lucide Icons (`lucide-react`)**: تحت مجوز **ISC License** (آیکون‌های خطی متن‌باز، تنظیم‌شده با `strokeWidth={1.75}`).
+- **Vazirmatn Font**: تحت مجوز **SIL Open Font License (OFL 1.1)**.
+- **jalaali-js**: تحت مجوز **MIT License**.

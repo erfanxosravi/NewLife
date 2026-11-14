@@ -1,0 +1,496 @@
+[
+  {
+    "jobId": "snapp_driver",
+    "confidence": "verified",
+    "asOf": "1405-08",
+    "source": "آمار تاکسی اینترنتی آبان ۱۴۰۵ (پلتفرم‌های سواری آنلاین، ۱۸٪ کارمزد، ۱۵ میلیون هزینه جاری روی ۶۵ میلیون ناخالص) و رکورد ۱۴۰۴",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.0827,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "راننده کم‌کار ۱۷٬۶۰۰٬۰۰۰ تومان ناخالص تقسیم بر ۱۶٬۲۵۵٬۰۰۰ تومان حداقل مزد",
+        "confidence": "verified"
+      },
+      "median": {
+        "value": 2.14,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه فعالیت تمام‌وقت بین کم‌کار (۱۷.۶ میلیون) و پرکار (۵۲ میلیون) ناخالص ماهانه",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 3.199,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "راننده پرکار ۵۲٬۰۰۰٬۰۰۰ تومان ناخالص تقسیم بر ۱۶٬۲۵۵٬۰۰۰ تومان حداقل مزد",
+        "confidence": "verified"
+      }
+    },
+    "commissionRate": {
+      "value": 0.18,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "کارمزد متعارف ۱۸ درصدی پلتفرم تاکسی اینترنتی",
+      "confidence": "verified"
+    },
+    "costRatioOfGross": {
+      "value": 0.2308,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "۱۵٬۰۰۰٬۰۰۰ تومان هزینه ماهانه استهلاک و سوخت تقسیم بر ۶۵٬۰۰۰٬۰۰۰ تومان ناخالص",
+      "confidence": "verified"
+    },
+    "taxExempt": true,
+    "tail": {
+      "probability": {
+        "value": 0.00025,
+        "unit": "probability_per_year",
+        "asOf": "1404-12",
+        "source": "رویداد بسیار نادر رکورددار کشوری ناوگان تاکسی اینترنتی (کمتر از ۱ درصد در طول عمر شغلی)",
+        "confidence": "estimate"
+      },
+      "yearlyCapMultiplierOfMinWage": {
+        "value": 124.63,
+        "unit": "minWageMonthly_multiple_annual_gross",
+        "asOf": "1404-12",
+        "source": "رکورد برترین راننده ۱۴۰۴ (۱٬۲۹۵٬۰۰۰٬۰۰۰ تومان ناخالص سالانه تقسیم بر ۱۰٬۳۹۰٬۹۶۸ تومان حداقل مزد ۱۴۰۴)",
+        "confidence": "verified"
+      },
+      "titleFa": "رکورد کم‌سابقه در تاکسی اینترنتی",
+      "resultTextFa": "امسال با ساعت‌های کاری بی‌وقفه و سفرهای بین‌شهری و فرودگاهی مداوم، جزو چند راننده رکورددار کل کشور شدی."
+    }
+  },
+  {
+    "jobId": "software_engineer",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد بازاری حقوق توسعه‌دهندگان نرم‌افزار در ایران (نیازمند جایگزینی با داده‌های نظرسنجی رسمی آینده)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.6,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد دهک پایین برنامه‌نویس تازه‌کار (حدود ۲۶ میلیون تومان ناخالص ماهانه)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 3.4,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه برنامه‌نویس میان‌رده (حدود ۵۵ میلیون تومان ناخالص ماهانه)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 7.5,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد دهک بالای مهندس ارشد و سرپرست فنی (حدود ۱۲۲ میلیون تومان ناخالص ماهانه)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد پلتفرمی",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.03,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه جاری تجهیزات، اینترنت و رفت‌وآمد",
+      "confidence": "estimate"
+    },
+    "taxExempt": false,
+    "tail": {
+      "probability": {
+        "value": 0.002,
+        "unit": "probability_per_year",
+        "asOf": "1405-08",
+        "source": "برآورد شانس قرارداد ریموت دلاری یا سهام استارتاپ موفق",
+        "confidence": "estimate"
+      },
+      "yearlyCapMultiplierOfMinWage": {
+        "value": 145.0,
+        "unit": "minWageMonthly_multiple_annual_gross",
+        "asOf": "1405-08",
+        "source": "برآورد درآمد سالانه قرارداد ریموت خارجی ارشد",
+        "confidence": "estimate"
+      },
+      "titleFa": "قرارداد ارزی بین‌المللی",
+      "resultTextFa": "با یک شرکت فناوری خارجی قرارداد ریموت بستی و درآمد امسال با نرخ ارز آزاد جهش قابل توجهی پیدا کرد."
+    }
+  },
+  {
+    "jobId": "teacher",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد دریافتی فرهنگیان و دبیران بر اساس ضرایب حقوقی دولتی (نیازمند جایگزینی با حکم رتبه‌بندی دقیق)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.35,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد دهک پایین آموزگار تازه‌کار (حدود ۲۲ میلیون تومان ناخالص ماهانه)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 1.9,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه دبیر رسمی باسابقه (حدود ۳۱ میلیون تومان ناخالص ماهانه)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 2.8,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد دهک بالای دبیر با سابقه بالا یا تدریس اضافه (حدود ۴۵.۵ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.02,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه ایاب‌وذهاب و لوازم آموزشی",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "doctor",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد درآمد پزشک عمومی طرحی تا متخصص و مطب‌دار (نیازمند داده نظرسنجی رسمی نظام پزشکی)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 2.2,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد پزشک عمومی طرحی یا بیمارستان دولتی (حدود ۳۵.۸ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 5.2,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه پزشک عمومی باسابقه یا متخصص جوان (حدود ۸۴.۵ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 12.5,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد دهک بالای پزشک متخصص با مطب پرمراجعه (حدود ۲۰۳ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد پلتفرمی",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.1,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه نظام پزشکی، بیمه مسئولیت و امور مطب",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "bazaar_merchant",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد دستمزد شاگرد و مباشر استخدامی مغازه و حجره در بازار (تملک مستقل مغازه در بخش کسب‌وکار محاسبه می‌شود)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.15,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد شاگرد تازه‌کار مغازه در بازار (حدود ۱۸.۷ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 2.05,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه فروشنده باتجربه حجره (حدود ۳۳.۳ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 3.55,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد مباشر و مسئول فروش باسابقه حجره بدون مالکیت (حدود ۵۷.۷ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد پلتفرمی",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.15,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه‌های جاری مغازه، انبارداری و حمل بار",
+      "confidence": "estimate"
+    },
+    "taxExempt": false,
+    "tail": {
+      "probability": {
+        "value": 0.002,
+        "unit": "probability_per_year",
+        "asOf": "1405-08",
+        "source": "احتمال معامله عمده پرسود یا صادرات فصلی در بازار",
+        "confidence": "estimate"
+      },
+      "yearlyCapMultiplierOfMinWage": {
+        "value": 180.0,
+        "unit": "minWageMonthly_multiple_annual_gross",
+        "asOf": "1405-08",
+        "source": "برآورد سقف سود سالانه یک معامله عمده کم‌سابقه",
+        "confidence": "estimate"
+      },
+      "titleFa": "معامله عمده استثنایی در بازار",
+      "resultTextFa": "یک قرارداد تأمین عمده در فصل اوج فروش با حاشیه سود بسیار بالا درآمدت را در این سال چند برابر کرد."
+    }
+  },
+  {
+    "jobId": "civil_servant",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد حقوق کارمندان اداری بخش عمومی در سال ۱۴۰۵ (نیازمند جدول رسمی بودجه)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.25,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد کارشناس تازه‌کار اداری (حدود ۲۰.۳ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 1.85,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه کارشناس ارشد اداری (حدود ۳۰ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 2.9,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد رئیس اداره با مزایای شغلی (حدود ۴۷ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.02,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه ایاب‌وذهاب اداری",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "nurse",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد حقوق و کارانه پرستاران بیمارستان‌های دولتی و خصوصی (نیازمند آمار رسمی نظام پرستاری)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.5,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد پرستار طرحی یا تازه‌کار (حدود ۲۴.۴ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 2.3,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه پرستار بخش با تعرفه‌گذاری و نوبت‌کاری (حدود ۳۷.۴ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 3.5,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد سرپرستار و مترون با اضافه‌کاری شیفت (حدود ۵۷ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.03,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه رفت‌وآمد شیفت شب و ملزومات",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "barber",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد دستمزد شاگرد تا استادکار آرایشگاه (صاحب سالن از مسیر مالکیت کسب‌وکار جداگانه مدل می‌شود)",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.05,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد شاگرد و کارآموز سالن (حدود ۱۷ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 1.85,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه آرایشگر حرفه‌ای درصدی (حدود ۳۰ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 3.05,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد استادکار و سرآرایشگر غیرمالک با مشتری ثابت (حدود ۴۹.۶ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد پلتفرمی",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.14,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه ابزار شخصی و مواد کار",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "pharmacist",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد حقوق مسئول فنی و داروساز استخدامی داروخانه در سال ۱۴۰۵",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 2.1,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد داروساز شیفت تازه‌کار (حدود ۳۴.۱ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 3.4,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه مسئول فنی داروخانه (حدود ۵۵.۳ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 5.2,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد مسئول فنی ارشد داروخانه بیمارستانی یا زنجیره‌ای (حدود ۸۴.۵ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.04,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه حق عضویت انجمن و رفت‌وآمد",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  },
+  {
+    "jobId": "lawyer",
+    "confidence": "estimate",
+    "asOf": "1405-08",
+    "source": "برآورد حق‌الزحمه وکیل همکار و مشاور حقوقی استخدامی در سال ۱۴۰۵",
+    "monthlyIncomeMultiplierOfMinWage": {
+      "p10": {
+        "value": 1.45,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد وکیل همکار تازه‌کار (حدود ۲۳.۶ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "median": {
+        "value": 2.9,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد میانه وکیل پایه یک دفتر همکار (حدود ۴۷.۱ میلیون تومان)",
+        "confidence": "estimate"
+      },
+      "p90": {
+        "value": 5.8,
+        "unit": "minWageMonthly_multiple",
+        "asOf": "1405-08",
+        "source": "برآورد مشاور حقوقی ارشد شرکتی (حدود ۹۴.۳ میلیون تومان)",
+        "confidence": "estimate"
+      }
+    },
+    "commissionRate": {
+      "value": 0,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "بدون کارمزد پلتفرمی",
+      "confidence": "estimate"
+    },
+    "costRatioOfGross": {
+      "value": 0.08,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه صندوق حمایت وکلا، تمبر و امور اداری",
+      "confidence": "estimate"
+    },
+    "taxExempt": false
+  }
+]

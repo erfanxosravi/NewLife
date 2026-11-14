@@ -1,0 +1,172 @@
+[
+  {
+    "id": "sample_nowruz_eidi",
+    "category": "cultural",
+    "calendarTheme": "nowruz",
+    "titleFa": "عیدی‌های عید و نقشه مامان",
+    "textFa": "روز اول عید است و مهمان‌ها تازه رفته‌اند. دو اسکناس نو از عیدی‌هایت کف دستت مانده و مامان دستش را دراز می‌کند: «بده من برات نگه دارم گم نکنی!»",
+    "contentTag": "mild",
+    "weight": 10,
+    "maxOccurrences": 2,
+    "conditions": {
+      "minAge": 5,
+      "maxAge": 12
+    },
+    "choices": [
+      {
+        "id": "give_to_mom",
+        "labelFa": "پول را بدهی مامان برایت پس‌انداز کند",
+        "effects": {
+          "stats": { "happiness": -2, "mentalHealth": 3 },
+          "hiddenStats": { "conscientiousness": 4 },
+          "moneyToman": 450000,
+          "setFlags": { "trusted_mom_with_eidi": true },
+          "resultTextFa": "دلت پیش مغازه سر کوچه می‌ماند، اما چند ماه بعد مامان با همان پول برایت یک جفت کتانی نو می‌خرد."
+        }
+      },
+      {
+        "id": "hide_in_pencilcase",
+        "labelFa": "اسکناس‌ها را ته جامدادی قایم کنی",
+        "effects": {
+          "stats": { "happiness": 6, "mentalHealth": -2 },
+          "hiddenStats": { "riskAppetite": 4 },
+          "moneyToman": 200000,
+          "resultTextFa": "همان هفته کلی خوراکی و کارت بازی می‌خری، ولی نصف اسکناس‌ها وسط جیب شلوارت توی ماشین لباسشویی خیس می‌شود."
+        }
+      }
+    ]
+  },
+  {
+    "id": "sample_konkur_crunch",
+    "category": "teen",
+    "titleFa": "شب امتحان و چای دوم",
+    "textFa": "ساعت دو شب است و هنوز دو فصل زیست مانده. گروه چت هم‌کلاسی‌ها پر از استیکر خواب است، اما همه یواشکی دارند تست می‌زنند.",
+    "contentTag": "mild",
+    "weight": 10,
+    "maxOccurrences": 1,
+    "conditions": {
+      "minAge": 16,
+      "maxAge": 18
+    },
+    "choices": [
+      {
+        "id": "keep_grinding",
+        "labelFa": "چای پررنگ بریزی و تا صبح بیدار بمانی",
+        "effects": {
+          "stats": { "intelligence": 7, "mentalHealth": -5, "health": -4 },
+          "hiddenStats": { "conscientiousness": 5 },
+          "scheduleEvents": [{ "eventId": "sample_konkur_result_echo", "delayYears": 2 }],
+          "resultTextFa": "فصل‌های آخر را می‌بندی، اما فردا سر جلسه امتحان با چشم‌های قرمز و سردرد دست‌وپنجه نرم می‌کنی."
+        }
+      },
+      {
+        "id": "close_book_sleep",
+        "labelFa": "کتاب را ببندی و شش ساعت بخوابی",
+        "effects": {
+          "stats": { "happiness": 4, "mentalHealth": 6, "intelligence": -1 },
+          "resultTextFa": "سرحال بیدار می‌شوی و سر جلسه تمرکز خوبی داری، هرچند سر دو تا تست از آن فصل‌های نخوانده جا می‌مانی."
+        }
+      }
+    ]
+  },
+  {
+    "id": "sample_tehran_traffic_rain",
+    "category": "career",
+    "titleFa": "قفلِ ترافیک زیر باران",
+    "textFa": "عصر بارانی وسط بزرگراه گیر افتاده‌ای و چراغ ترمز ماشین‌ها تا چشم کار می‌کند قرمز است. بیست دقیقه تا یک جلسه کاری مهم مانده و ماشین‌ها تکان نمی‌خورند.",
+    "contentTag": "mild",
+    "weight": 9,
+    "maxOccurrences": 2,
+    "conditions": {
+      "minAge": 22,
+      "maxAge": 55,
+      "cities": ["tehran", "mashhad", "isfahan", "tabriz"]
+    },
+    "choices": [
+      {
+        "id": "call_and_be_honest",
+        "labelFa": "زنگ بزنی و جلسه را آنلاین کنی",
+        "effects": {
+          "stats": { "mentalHealth": 3, "fame": -1 },
+          "hiddenStats": { "conscientiousness": 2 },
+          "resultTextFa": "راحت توی ماشین می‌مانی و کار را آنلاین پیش می‌بری، اما مدیر جلسه ترجیح می‌داد حضوری ببیندت."
+        }
+      },
+      {
+        "id": "park_and_metro",
+        "labelFa": "ماشین را کنار بگذاری و بدوی سمت مترو",
+        "effects": {
+          "stats": { "health": -2, "happiness": -3, "fame": 5 },
+          "moneyToman": -250000,
+          "resultTextFa": "خیسِ باران و نفس‌نفس‌زنان سر ساعت می‌رسی. همه از تعهدت خوششان می‌آید، ولی شب با گلودرد به خانه برمی‌گردی."
+        }
+      }
+    ]
+  },
+  {
+    "id": "sample_dollar_spike_savings",
+    "category": "economy",
+    "titleFa": "گروه فامیلی و تب قیمت طلا",
+    "textFa": "صبح با صدای پیام‌های پشت‌سرهم گروه فامیل بیدار می‌شوی؛ قیمت ارز و طلا دوباره بالا رفته و بخشی از پس‌اندازت نقد توی حساب مانده است.",
+    "contentTag": "social",
+    "weight": 8,
+    "maxOccurrences": 3,
+    "conditions": {
+      "minAge": 20,
+      "maxAge": 70
+    },
+    "choices": [
+      {
+        "id": "buy_gold_hedge",
+        "labelFa": "سریع بروی طلافروشی و سکه بخری",
+        "effects": {
+          "stats": { "mentalHealth": -4, "happiness": 2 },
+          "hiddenStats": { "riskAppetite": 4 },
+          "moneyToman": 4500000,
+          "resultTextFa": "ارزش پولت را حفظ می‌کنی، اما تا چند هفته هر ساعت قیمت لحظه‌ای را چک می‌کنی و خوابت به هم می‌ریزد."
+        }
+      },
+      {
+        "id": "invest_in_self_skill",
+        "labelFa": "بی‌خیال بازار شوی و خرج یک دوره شغلی کنی",
+        "effects": {
+          "stats": { "intelligence": 5, "mentalHealth": 4 },
+          "moneyToman": -3500000,
+          "resultTextFa": "حسابت کمی سبک‌تر می‌شود و تورم به نقدینگی‌ات نیش می‌زند، اما مهارت تازه‌ای یاد می‌گیری که بعدها به کارت می‌آید."
+        }
+      }
+    ]
+  },
+  {
+    "id": "sample_yalda_family_memory",
+    "category": "family",
+    "calendarTheme": "yalda",
+    "titleFa": "بلندترین شب و تعارف فال حافظ",
+    "textFa": "شب یلداست و خانه دایی شلوغ و گرم است. وسط بگووبخندها، مادربزرگ دیوان حافظ را دستت می‌دهد و همه منتظرند برای تک‌تکشان فال بگیری.",
+    "contentTag": "mild",
+    "weight": 10,
+    "maxOccurrences": 3,
+    "conditions": {
+      "minAge": 10,
+      "maxAge": 90
+    },
+    "choices": [
+      {
+        "id": "read_hafez_warmly",
+        "labelFa": "برای همه با حوصله غزل بخوانی و تعبیر بسازی",
+        "effects": {
+          "stats": { "happiness": 6, "fame": 3, "mentalHealth": -2 },
+          "resultTextFa": "جمع حسابی گرم می‌شود و عزیزِ دل فامیل می‌شوی، هرچند تا آخر شب گلویت خشک می‌شود و فرصتی برای استراحت نداری."
+        }
+      },
+      {
+        "id": "pass_to_cousin",
+        "labelFa": "کتاب را بسپاری به پسرخاله و کنار گوشه‌ای بنشینی",
+        "effects": {
+          "stats": { "mentalHealth": 4, "happiness": -2, "fame": -2 },
+          "resultTextFa": "با خیال راحت چای و انار می‌خوری و نفس تازه می‌کنی، ولی دایی با شوخی می‌گوید «امسال کم‌حوصله شدیا!»"
+        }
+      }
+    ]
+  }
+]

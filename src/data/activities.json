@@ -1,0 +1,415 @@
+[
+  {
+    "id": "act_regular_exercise",
+    "titleFa": "ورزش منظم و دویدن",
+    "category": "health",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 8,
+    "effectHintFa": "سلامت +۴، شادی +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 85,
+        "resultTextFa": "سه روز در هفته پیاده‌روی و نرمش کردی و نفس و انرژی بدنت حسابی بالا رفت.",
+        "stats": { "health": 4, "happiness": 2, "mentalHealth": 2 }
+      },
+      {
+        "weight": 15,
+        "resultTextFa": "چند جلسه اول کمی مچ پایت گرفت، اما با گرم‌کردن درست دوباره روال را پیدا کردی.",
+        "stats": { "health": 1, "happiness": -1 }
+      }
+    ]
+  },
+  {
+    "id": "act_healthy_diet",
+    "titleFa": "رژیم غذایی متعادل",
+    "category": "health",
+    "costToman": 6000000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "سلامت +۴، ظاهر +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "شیرینی و فست‌فود را کم کردی و به جایش میوه و پروتئین بیشتر خوردی؛ سبک‌تر و سرحال‌تری.",
+        "stats": { "health": 4, "looks": 2, "happiness": -1 }
+      }
+    ]
+  },
+  {
+    "id": "act_medical_checkup",
+    "titleFa": "چکاپ کامل پزشکی",
+    "category": "health",
+    "costToman": 3500000,
+    "cooldownYears": 1,
+    "minAge": 1,
+    "effectHintFa": "سلامت +۵، پیشگیری",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 80,
+        "resultTextFa": "آزمایش‌های خون و چکاپ سالانه خیالت را راحت کرد و کمبود ویتامینت با مکمل برطرف شد.",
+        "stats": { "health": 5, "mentalHealth": 3 }
+      },
+      {
+        "weight": 20,
+        "resultTextFa": "پزشک تذکر داد استرس و کم‌خوابی را جدی بگیری و کمی بیشتر استراحت کنی.",
+        "stats": { "health": 3, "mentalHealth": 1 }
+      }
+    ]
+  },
+  {
+    "id": "act_hospital_visit",
+    "titleFa": "مراجعه درمانی و بیمارستان",
+    "category": "health",
+    "costToman": 12000000,
+    "cooldownYears": 1,
+    "minAge": 0,
+    "effectHintFa": "درمان بیماری و +۸ سلامت",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 90,
+        "resultTextFa": "درمان تخصصی به موقع انجام شد و بخش زیادی از ضعف جسمی‌ات برطرف شد.",
+        "stats": { "health": 8, "happiness": -2 }
+      },
+      {
+        "weight": 10,
+        "resultTextFa": "روند درمان طولانی و خسته‌کننده بود، اما وضعیتت پایدار ماند.",
+        "stats": { "health": 4, "mentalHealth": -3 }
+      }
+    ]
+  },
+  {
+    "id": "act_therapy",
+    "titleFa": "جلسات مشاوره و روان‌درمانی",
+    "category": "health",
+    "costToman": 8000000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "سلامت روان +۷",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "گفتگو با مشاور کمک کرد گره‌های ذهنی‌ات را بشناسی و فشار روانی‌ات خیلی سبک‌تر شود.",
+        "stats": { "mentalHealth": 7, "happiness": 3 }
+      }
+    ]
+  },
+  {
+    "id": "act_sleep_hygiene",
+    "titleFa": "اصلاح خواب و ترک عادت بد",
+    "category": "health",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "سلامت روان +۴، سلامت +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 75,
+        "resultTextFa": "گوشی را نیم ساعت قبل خواب کنار گذاشتی و صبح‌ها با انرژی بیدار شدی.",
+        "stats": { "health": 3, "mentalHealth": 4, "intelligence": 1 }
+      },
+      {
+        "weight": 25,
+        "resultTextFa": "چند شب اول سخت بود، اما بالاخره ساعت بدنت تنظیم شد.",
+        "stats": { "health": 2, "mentalHealth": 2 }
+      }
+    ]
+  },
+  {
+    "id": "act_cinema_cafe",
+    "titleFa": "سینما و کافه‌گردی عصرانه",
+    "category": "leisure",
+    "costToman": 1500000,
+    "cooldownYears": 1,
+    "minAge": 10,
+    "effectHintFa": "شادی +۴، سلامت روان +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "یک فیلم خوب روی پرده سینما و یک فنجان قهوه گرم حال و هوایت را تازه کرد.",
+        "stats": { "happiness": 4, "mentalHealth": 2 }
+      }
+    ]
+  },
+  {
+    "id": "act_hiking_picnic",
+    "titleFa": "کوهنوردی و پیک‌نیک آخر هفته",
+    "category": "leisure",
+    "costToman": 800000,
+    "cooldownYears": 1,
+    "minAge": 6,
+    "effectHintFa": "سلامت +۳، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 90,
+        "resultTextFa": "چای آتشی در دل طبیعت و هوای پاک کوهستان خستگی کل ماه را شست و برد.",
+        "stats": { "health": 3, "happiness": 4, "mentalHealth": 3 }
+      },
+      {
+        "weight": 10,
+        "resultTextFa": "مسیر برگشت کمی لغزنده بود و خسته شدی، ولی منظره قله ارزشش را داشت.",
+        "stats": { "health": 1, "happiness": 2 }
+      }
+    ]
+  },
+  {
+    "id": "act_music_reading",
+    "titleFa": "کتاب‌خوانی و گوش دادن به موسیقی",
+    "category": "leisure",
+    "costToman": 500000,
+    "cooldownYears": 1,
+    "minAge": 7,
+    "effectHintFa": "هوش +۳، سلامت روان +۳",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "چند رمان ماندگار خواندی و شب‌ها با موسیقی آرام ذهن خودت را مرتب کردی.",
+        "stats": { "intelligence": 3, "mentalHealth": 3, "happiness": 2 }
+      }
+    ]
+  },
+  {
+    "id": "act_social_media",
+    "titleFa": "فعالیت در شبکه‌های اجتماعی",
+    "category": "leisure",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه اجتماعی +۳، ریسک ذهن",
+    "riskLabelFa": "متوسط",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 65,
+        "resultTextFa": "چند محتوای جذاب منتشر کردی و دنبال‌کننده‌هایت بیشتر شدند.",
+        "stats": { "fame": 4, "happiness": 2, "mentalHealth": -2 }
+      },
+      {
+        "weight": 35,
+        "resultTextFa": "ساعت‌ها گشت‌وگذار بی‌هدف در صفحه‌ها فقط تمرکز و اعصابت را خسته کرد.",
+        "stats": { "mentalHealth": -4, "happiness": -2, "fame": 1 }
+      }
+    ]
+  },
+  {
+    "id": "act_travel_north",
+    "titleFa": "سفر به شمال و جاده چالوس",
+    "category": "travel",
+    "costToman": 12000000,
+    "cooldownYears": 1,
+    "minAge": 1,
+    "effectHintFa": "شادی +۷، سلامت روان +۵",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 85,
+        "resultTextFa": "بوی نم باران و جنگل و ماهی کبابی کنار دریا جان تازه‌ای به تو بخشید.",
+        "stats": { "happiness": 7, "mentalHealth": 5 }
+      },
+      {
+        "weight": 15,
+        "resultTextFa": "ترافیک سنگین برگشت کمی خسته‌ات کرد، اما خاطره‌های خوبش ماندگار شد.",
+        "stats": { "happiness": 4, "mentalHealth": 1 }
+      }
+    ]
+  },
+  {
+    "id": "act_travel_mashhad",
+    "titleFa": "سفر معنوی و زیارتی به مشهد",
+    "category": "travel",
+    "costToman": 10000000,
+    "cooldownYears": 1,
+    "minAge": 1,
+    "effectHintFa": "سلامت روان +۶، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "فضای آرام حرم، زیارت شبانه و خرید سوغاتی زعفران آرامش عمیقی به دلت آورد.",
+        "stats": { "mentalHealth": 6, "happiness": 4 }
+      }
+    ]
+  },
+  {
+    "id": "act_travel_shiraz_isfahan",
+    "titleFa": "سفر تاریخی به شیراز یا اصفهان",
+    "category": "travel",
+    "costToman": 14000000,
+    "cooldownYears": 1,
+    "minAge": 5,
+    "effectHintFa": "شادی +۶، هوش +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "قدم‌زدن در کوچه‌های تاریخی و بافت قدیمی شهر پر از ذوق و عکس‌های یادگاری شد.",
+        "stats": { "happiness": 6, "intelligence": 2, "mentalHealth": 4 }
+      }
+    ]
+  },
+  {
+    "id": "act_travel_kish",
+    "titleFa": "سفر تفریحی به جزیره کیش",
+    "category": "travel",
+    "costToman": 28000000,
+    "cooldownYears": 1,
+    "minAge": 6,
+    "effectHintFa": "شادی +۸، جایگاه +۲",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "دوچرخه‌سواری دور جزیره و آب‌های نیلگون خلیج فارس خستگی یک سال را از تنت برد.",
+        "stats": { "happiness": 8, "mentalHealth": 5, "fame": 2 }
+      }
+    ]
+  },
+  {
+    "id": "act_travel_abroad",
+    "titleFa": "سفر خارجی و گردشگری",
+    "category": "travel",
+    "costToman": 85000000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "شادی +۹، هوش +۳، جایگاه +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "دیدن فرهنگ تازه و سفر چندروزه خارج از کشور دیدت به دنیا را بازتر کرد.",
+        "stats": { "happiness": 9, "intelligence": 3, "fame": 4, "mentalHealth": 4 }
+      }
+    ]
+  },
+  {
+    "id": "act_gym_sport",
+    "titleFa": "باشگاه بدنسازی و ورزش حرفه‌ای",
+    "category": "sport",
+    "costToman": 7000000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "سلامت +۵، ظاهر +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 90,
+        "resultTextFa": "تمرین منظم با برنامه درست فرم بدنت را خیلی بهتر کرد و اعتمادبه‌نفست بالا رفت.",
+        "stats": { "health": 5, "looks": 4, "happiness": 3 }
+      },
+      {
+        "weight": 10,
+        "resultTextFa": "زیر وزنه کمی به شانه‌ات فشار آمد و مجبور شدی دو هفته استراحت کنی.",
+        "stats": { "health": -2, "looks": 1 }
+      }
+    ]
+  },
+  {
+    "id": "act_online_course",
+    "titleFa": "دوره آموزشی و خودآموزی آنلاین",
+    "category": "learning",
+    "costToman": 4000000,
+    "cooldownYears": 1,
+    "minAge": 12,
+    "effectHintFa": "هوش +۵، کمی خستگی",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "دوره را با تمرین عملی تمام کردی و یک برگ برنده تازه به رزومه‌ات اضافه شد.",
+        "stats": { "intelligence": 5, "mentalHealth": -2, "fame": 1 }
+      }
+    ]
+  },
+  {
+    "id": "act_charity_volunteer",
+    "titleFa": "داوطلبی و کمک به خیریه محلی",
+    "category": "charity",
+    "costToman": 5000000,
+    "cooldownYears": 1,
+    "minAge": 14,
+    "effectHintFa": "جایگاه +۵، شادی +۴",
+    "riskLabelFa": "کم",
+    "contentTag": "mild",
+    "outcomes": [
+      {
+        "weight": 100,
+        "resultTextFa": "همکاری در بسته معیشتی و کمک به خانواده‌های نیازمند حس ارزشمندی عمیقی به تو داد.",
+        "stats": { "fame": 5, "happiness": 4, "mentalHealth": 5 }
+      }
+    ]
+  },
+  {
+    "id": "act_minor_rulebreak",
+    "titleFa": "رانندگی پرریسک و عبور از محدودیت‌ها",
+    "category": "crime",
+    "costToman": 0,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "هیجان لحظه‌ای · ریسک جریمه و پرونده",
+    "riskLabelFa": "زیاد",
+    "contentTag": "crime",
+    "outcomes": [
+      {
+        "weight": 55,
+        "resultTextFa": "این بار با شانس قسر در رفتی، اما استرسش تا شب با تو ماند.",
+        "stats": { "happiness": 2, "mentalHealth": -3 }
+      },
+      {
+        "weight": 45,
+        "resultTextFa": "دوربین و گشت پلیس متوقفت کردند؛ جریمه سنگین و سابقه تخلف برایت ثبت شد.",
+        "stats": { "happiness": -6, "mentalHealth": -5, "fame": -5 },
+        "moneyToman": -12000000,
+        "criminalRecordDelta": 1
+      }
+    ]
+  },
+  {
+    "id": "act_gamble_bet",
+    "titleFa": "شرط‌بندی و بخت‌آزمایی پرخطر",
+    "category": "gambling",
+    "costToman": 10000000,
+    "cooldownYears": 1,
+    "minAge": 18,
+    "effectHintFa": "ریسک باخت پول یا برد تصادفی",
+    "riskLabelFa": "زیاد",
+    "contentTag": "crime",
+    "outcomes": [
+      {
+        "weight": 28,
+        "resultTextFa": "بخت با تو یار بود و مبلغی بیشتر از سرمایه‌ات برگشت، اما وسوسه ادامه‌اش خطرناک است.",
+        "stats": { "happiness": 4, "mentalHealth": -3 },
+        "moneyToman": 22000000
+      },
+      {
+        "weight": 72,
+        "resultTextFa": "پول را باختی و حس پشیمانی و عصبانیت کل هفته رهات نکرد.",
+        "stats": { "happiness": -7, "mentalHealth": -6 }
+      }
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "english",
+    "titleFa": "زبان انگلیسی",
+    "descriptionFa": "ارتباطات بین‌المللی، مطالعه منابع و امتیاز مهاجرت",
+    "costToman": 3000000,
+    "minAge": 7,
+    "effectHintFa": "مهارت +۱، هوش +۲",
+    "relatedJobTracks": ["tech", "medical", "education"]
+  },
+  {
+    "id": "programming",
+    "titleFa": "برنامه‌نویسی",
+    "descriptionFa": "ساخت نرم‌افزار، دورکاری و مشاغل فناوری",
+    "costToman": 4500000,
+    "minAge": 12,
+    "effectHintFa": "مهارت +۱، هوش +۳",
+    "relatedJobTracks": ["tech"]
+  },
+  {
+    "id": "driving",
+    "titleFa": "رانندگی",
+    "descriptionFa": "مهارت رانندگی ایمن و پیش‌نیاز کار در حمل‌ونقل",
+    "costToman": 5500000,
+    "minAge": 18,
+    "effectHintFa": "مهارت +۱، جایگاه +۱",
+    "relatedJobTracks": ["transport"]
+  },
+  {
+    "id": "cooking",
+    "titleFa": "آشپزی",
+    "descriptionFa": "آشپزی ایرانی و ملل، صرفه‌جویی و سلامت",
+    "costToman": 2500000,
+    "minAge": 10,
+    "effectHintFa": "مهارت +۱، شادی +۲",
+    "relatedJobTracks": ["craft"]
+  },
+  {
+    "id": "art",
+    "titleFa": "طراحی و هنر",
+    "descriptionFa": "طراحی بصری، خلاقیت و آرامش ذهن",
+    "costToman": 3200000,
+    "minAge": 6,
+    "effectHintFa": "مهارت +۱، سلامت روان +۲",
+    "relatedJobTracks": ["craft", "tech"]
+  },
+  {
+    "id": "music",
+    "titleFa": "موسیقی",
+    "descriptionFa": "نوازندگی ساز سنتی یا مدرن و تقویت تمرکز",
+    "costToman": 4000000,
+    "minAge": 6,
+    "effectHintFa": "مهارت +۱، شادی +۳",
+    "relatedJobTracks": ["craft"]
+  },
+  {
+    "id": "sport_skill",
+    "titleFa": "آمادگی جسمانی و ورزش",
+    "descriptionFa": "استقامت بدنی و تندرستی مداوم",
+    "costToman": 2800000,
+    "minAge": 7,
+    "effectHintFa": "مهارت +۱، سلامت +۳",
+    "relatedJobTracks": ["transport", "medical"]
+  },
+  {
+    "id": "technical",
+    "titleFa": "مهارت‌های فنی و تعمیرات",
+    "descriptionFa": "برق، تأسیسات و کارهای فنی پردرآمد",
+    "costToman": 3800000,
+    "minAge": 14,
+    "effectHintFa": "مهارت +۱، هوش +۱",
+    "relatedJobTracks": ["craft", "commerce"]
+  },
+  {
+    "id": "business",
+    "titleFa": "مدیریت و کسب‌وکار",
+    "descriptionFa": "مذاکره، فروش و راه‌اندازی کسب‌وکار شخصی",
+    "costToman": 5000000,
+    "minAge": 16,
+    "effectHintFa": "مهارت +۱، جایگاه +۲",
+    "relatedJobTracks": ["commerce", "government", "tech"]
+  }
+]

@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "titleFa": "قواعد انحصار وراثت و وصیت",
+    "simplified": true,
+    "civilCodeArticles": [837, 843, 868, 869, 907, 913],
+    "summaryFa": "قواعد ارث و وصیت بر پایه اصول کلی قانون مدنی ایران به صورت ساده‌سازی‌شده شبیه‌سازی می‌شود: ابتدا هزینه کفن‌ودفن و بدهی‌های متوفی از ماترک پرداخت شده، سپس تا سقف یک‌سوم ماترک خالص برای وصیت و وقف/خیریه اعمال و باقیمانده میان وراث تقسیم می‌شود. وراث مسئولیت شخصی بابت بدهی مازاد بر دارایی متوفی ندارند.",
+    "asOf": "1405/08",
+    "source": "قانون مدنی ایران — مواد ۸۳۷، ۸۴۳، ۸۶۸، ۸۶۹، ۹۰۷ و ۹۱۳ (نسخه ساده‌سازی‌شده شبیه‌ساز)"
+  },
+  "rules": {
+    "minWillAge": 50,
+    "seriousIllnessHealthThreshold": 35,
+    "maxWillShareRatio": 0.3333333333333333,
+    "noPersonalDebtLiabilityBeyondEstate": true,
+    "settlementOrder": [
+      "funeral_burial",
+      "debts_and_loans",
+      "valid_will_and_charity",
+      "legal_heirs_division"
+    ],
+    "funeralCostMinWageMultiple": {
+      "value": 3.5,
+      "unit": "min_wage_monthly_multiple",
+      "asOf": "1405/08",
+      "source": "برآورد هزینه متعارف مراسم ترحیم و کفن‌ودفن",
+      "confidence": "estimate"
+    },
+    "probateAndAppraisalFeeRate": {
+      "value": 0.015,
+      "unit": "ratio",
+      "asOf": "1405/08",
+      "source": "هزینه اداری انحصار وراثت و کارشناسی اموال (ساده‌سازی‌شده)",
+      "confidence": "estimate"
+    },
+    "spouseShares": {
+      "wifeWithDescendants": 0.125,
+      "wifeNoDescendants": 0.25,
+      "husbandWithDescendants": 0.25,
+      "husbandNoDescendants": 0.5
+    },
+    "sonToDaughterRatio": 2,
+    "parentFallbackShareWhenNoChildren": 0.3333333333333333,
+    "maxMacroJalaliYear": 1520,
+    "contestation": {
+      "baseChance": 0.06,
+      "excessWillBonus": 0.38,
+      "lowClosenessThreshold": 35,
+      "lowClosenessBonus": 0.22,
+      "upholdChanceOnExcess": 0.85,
+      "upholdChanceOnCloseness": 0.25
+    },
+    "geneticsLite": {
+      "ancestorTalentWeight": 0.52,
+      "freshTalentWeight": 0.48,
+      "mutationChance": 0.12,
+      "mutationBoostRange": 18,
+      "healthPredispositionWeight": 0.35
+    }
+  },
+  "legalExplanationsFa": [
+    {
+      "articleFa": "ماده ۸۶۸ و ۸۶۹ قانون مدنی",
+      "titleFa": "تقدم هزینه‌های کفن‌ودفن و دیون بر ارث",
+      "bodyFa": "مالکیت وراث نسبت به ماترک پس از ادای حقوق و دیون مستقر می‌شود؛ بنابراین ابتدا هزینه متعارف کفن‌ودفن و سپس بدهی‌ها و وام‌های متوفی از اصل دارایی کسر می‌گردد. اگر بدهی از کل دارایی بیشتر باشد، وراث بدهی اضافه را به ارث نمی‌برند."
+    },
+    {
+      "articleFa": "ماده ۸۳۷ و ۸۴۳ قانون مدنی",
+      "titleFa": "سقف یک‌سوم (ثلث) وصیت",
+      "bodyFa": "وصیت تا یک‌سوم دارایی خالص پس از کسر بدهی‌ها نافذ است. وصیت مازاد بر یک‌سوم یا محروم کردن کامل یک وارث قانونی، بدون تنفیذ و رضایت سایر وراث قابل اجرا نیست."
+    },
+    {
+      "articleFa": "ماده ۹۰۷ و ۹۱۳ قانون مدنی",
+      "titleFa": "سهم همسر و فرزندان در شبیه‌ساز",
+      "bodyFa": "بر اساس ماده ۹۱۳، سهم همسر در صورت وجود فرزند برای زوجه یک‌هشتم و برای زوج یک‌چهارم و در نبود فرزند دو برابر است. باقیمانده به وراث طبقه اول می‌رسد. در تنظیمات وصیت می‌توانی توافق تقسیم برابر میان فرزندان را نیز ثبت کنی."
+    }
+  ],
+  "dynastyRibbons": [
+    {
+      "id": "dyn_gen_2",
+      "titleFa": "دو نسل پیاپی",
+      "descriptionFa": "ادامه دودمان و ثبت میراث برای نسل دوم خانواده",
+      "minGenerations": 2
+    },
+    {
+      "id": "dyn_gen_3",
+      "titleFa": "سه‌نسلی ریشه‌دار",
+      "descriptionFa": "پشت سر گذاشتن سه نسل پیوسته در تاریخچه دودمان",
+      "minGenerations": 3
+    },
+    {
+      "id": "dyn_gen_5",
+      "titleFa": "پنج نسل ماندگار",
+      "descriptionFa": "نگهداری نام و خاطره خانواده در طول پنج نسل پیاپی",
+      "minGenerations": 5
+    },
+    {
+      "id": "dyn_charity_founder",
+      "titleFa": "بنیان‌گذار وقف و خیریه",
+      "descriptionFa": "اختصاص بخشی از ماترک به امور خیریه یا تأسیس بنیاد خانوادگی",
+      "minCharityReal1405Toman": 500000000
+    },
+    {
+      "id": "dyn_business_steward",
+      "titleFa": "نگهدار کسب‌وکار خانوادگی",
+      "descriptionFa": "انتقال و تداوم یک کسب‌وکار فعال از یک نسل به نسل بعد"
+    },
+    {
+      "id": "dyn_prosperity",
+      "titleFa": "شکوفایی اقتصادی دودمان",
+      "descriptionFa": "رسیدن ارزش واقعی دارایی‌های دودمان به آستانه استقلال مالی",
+      "minPeakReal1405Toman": 25000000000
+    },
+    {
+      "id": "dyn_honorable_name",
+      "titleFa": "نام نیکو در شهر",
+      "descriptionFa": "رسیدن اعتبار خانوادگی دودمان به بالای ۷۵ امتیاز",
+      "minReputation": 75
+    }
+  ]
+}

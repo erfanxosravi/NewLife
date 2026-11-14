@@ -1,0 +1,272 @@
+{
+  "appTitle": "زندگینامه",
+  "appSubtitle": "شبیه‌ساز زندگی ایرانی",
+  "appTagline": "یک عمر انتخاب، از تولد تا یادگار",
+  "loading": "در حال آماده‌سازی زندگینامه...",
+  "welcomeTitle": "دفترچه سرگذشت آماده است",
+  "welcomeHint": "با زدن «سال بعد» مسیر زندگی‌ات را ورق بزن و انتخاب‌هایت را بساز.",
+  "nextYear": "سال بعد",
+  "continue": "ادامه",
+  "cancel": "انصراف",
+  "confirm": "تأیید",
+  "close": "بستن",
+  "back": "بازگشت",
+  "save": "ذخیره",
+  "delete": "حذف",
+  "load": "بارگذاری",
+  "apply": "درخواست",
+  "buy": "خرید",
+  "sell": "فروش",
+  "free": "رایگان",
+  "oncePerYear": "فقط یک بار در سال",
+  "insufficientFunds": "موجودی کافی نیست",
+  "minAgeNotice": "از {age} سالگی به بعد فعال می‌شود",
+  "noData": "موردی برای نمایش نیست",
+  "ageLabel": "{age} سال",
+  "yearPrefix": "سال",
+  "cashLabel": "نقدینگی",
+  "netWorthLabel": "دارایی خالص",
+  "nav": {
+    "workEducation": "شغل و تحصیل",
+    "assets": "دارایی‌ها",
+    "relations": "روابط",
+    "activities": "فعالیت‌ها"
+  },
+  "stats": {
+    "happiness": "شادی",
+    "health": "سلامت",
+    "intelligence": "هوش",
+    "looks": "ظاهر",
+    "mentalHealth": "سلامت روان",
+    "fame": "جایگاه اجتماعی",
+    "moreStats": "همه شاخص‌های شخصیت",
+    "tapForDetails": "برای مشاهده تمام شاخص‌ها ضربه بزنید",
+    "lastYearDelta": "تغییر سال اخیر",
+    "socialStandingLocked": "از ۱۰ سالگی نمایان می‌شود"
+  },
+  "statHints": {
+    "happiness": "رضایت درونی، نشاط روزمره و انگیزه زندگی",
+    "health": "تندرستی جسمی، بنیه و مقاومت در برابر بیماری",
+    "intelligence": "توان تحلیل، یادگیری، تحصیل و تصمیم‌گیری",
+    "looks": "آراستگی، جذابیت ظاهری و اعتمادبه‌نفس اجتماعی",
+    "mentalHealth": "آرامش اعصاب، تاب‌آوری و تعادل روانی",
+    "fame": "اعتبار، شهرت و جایگاه اجتماعی در جمع"
+  },
+  "socialClass": {
+    "poor": "تنگدست",
+    "middle": "متوسط",
+    "upper_middle": "مرفه",
+    "wealthy": "ثروتمند"
+  },
+  "gender": {
+    "male": "مرد",
+    "female": "زن",
+    "boy": "پسر",
+    "girl": "دختر",
+    "random": "تصادفی"
+  },
+  "tabs": {
+    "education": "تحصیل",
+    "career": "شغل",
+    "skills": "مهارت‌ها",
+    "military": "خدمت",
+    "overview": "خلاصه",
+    "investments": "سرمایه‌گذاری",
+    "housing": "مسکن و خودرو",
+    "loans": "وام و بدهی",
+    "shop": "بازار",
+    "all": "همه",
+    "family": "خانواده",
+    "friends": "دوستان",
+    "romance": "عشق و همسر",
+    "children": "فرزندان"
+  },
+  "education": {
+    "stageLabels": {
+      "none": "پیش از دبستان",
+      "preschool": "آمادگی و پیش‌دبستانی",
+      "elementary": "دبستان",
+      "middle_school": "متوسطه اول",
+      "high_school": "متوسطه دوم",
+      "diploma": "دیپلم",
+      "associate": "کاردانی",
+      "bachelor": "کارشناسی",
+      "master": "کارشناسی ارشد",
+      "phd": "دکتری تخصصی",
+      "medical_doctor": "پزشکی عمومی"
+    },
+    "trackLabels": {
+      "math": "ریاضی و فیزیک",
+      "science": "علوم تجربی",
+      "humanities": "علوم انسانی",
+      "vocational": "فنی و حرفه‌ای"
+    },
+    "tierLabels": {
+      "state_top": "دولتی برتر",
+      "state": "دولتی",
+      "azad": "دانشگاه آزاد",
+      "payam_noor": "پیام نور",
+      "applied_science": "علمی‌کاربردی"
+    },
+    "studyEffort": "تلاش درسی",
+    "gpa": "معدل",
+    "konkur": "کنکور سراسری",
+    "takeKonkur": "شرکت در کنکور",
+    "chooseTrack": "انتخاب رشته متوسطه",
+    "graduateHistory": "سوابق تحصیلی"
+  },
+  "career": {
+    "unemployed": "بدون شغل فعلی",
+    "jobBoard": "بازار کار",
+    "entrepreneur": "کسب‌وکار و مالکیت",
+    "startBusiness": "راه‌اندازی کسب‌وکار",
+    "workHistory": "سابقه کاری",
+    "retire": "بازنشستگی",
+    "quit": "استعفا",
+    "overtime": "اضافه‌کار",
+    "requestRaise": "درخواست ارتقا / افزایش حقوق",
+    "changeJob": "تغییر شغل",
+    "changeWorkplace": "تغییر محل کار (با حفظ رده)",
+    "ladderTitle": "نردبان پیشرفت شغلی",
+    "ceilingBadge": "سقف مسیر",
+    "atCeilingTitle": "به سقف مسیر استخدامی رسیده‌ای",
+    "atCeilingBody": "در استخدام دیگران، ارتقای جایگاه از این رده بالاتر نمی‌رود و هیچ ترفیعی تو را مالک نمی‌کند. مسیرهای پیش رو:",
+    "noPromotionsNote": "این شغل ترفیع اداری ندارد؛ افزایش درآمد با ساعت کار یا تأسیس ناوگان شخصی ممکن است.",
+    "licensesTitle": "مجوزها و پروانه‌های تخصصی",
+    "ownershipFlowTitle": "مسیر مالکیت و راه‌اندازی کسب‌وکار",
+    "openOwnershipFlow": "راه‌اندازی یا تملک کسب‌وکار",
+    "businessDashboardTitle": "مدیریت کسب‌وکار فعال",
+    "riskPreviewTitle": "پیش‌نمایش سرمایه و ریسک"
+  },
+  "military": {
+    "not_applicable": "معاف از نظر جنسیت",
+    "pending": "در انتظار وضعیت نظام وظیفه",
+    "serving": "در حال خدمت سربازی",
+    "completed": "پایان خدمت",
+    "exempt_medical": "معافیت پزشکی",
+    "exempt_breadwinner": "معافیت کفالت",
+    "exempt_educational": "معافیت تحصیلی",
+    "bought_out": "خرید خدمت"
+  },
+  "marital": {
+    "single": "مجرد",
+    "engaged": "نامزد",
+    "married": "متأهل",
+    "divorced": "جدا شده",
+    "widowed": "همسر مرحوم"
+  },
+  "housingLabels": {
+    "with_family": "همراه خانواده",
+    "dorm": "خوابگاه دانشجویی",
+    "rent": "اجاره‌نشین",
+    "owned": "صاحب‌خانه",
+    "villa": "خانه ویلایی"
+  },
+  "relations": {
+    "roles": {
+      "father": "پدر",
+      "mother": "مادر",
+      "sibling": "خواهر یا برادر",
+      "friend": "دوست",
+      "partner": "نامزد / شریک عاطفی",
+      "spouse": "همسر",
+      "child": "فرزند"
+    },
+    "closeness": "صمیمیت",
+    "respect": "احترام",
+    "romance": "علاقه عاطفی",
+    "memorial": "یادبود درگذشتگان"
+  },
+  "activities": {
+    "categories": {
+      "health": "سلامت",
+      "leisure": "سرگرمی",
+      "travel": "سفر",
+      "migration": "مهاجرت",
+      "sport": "ورزش",
+      "learning": "یادگیری",
+      "charity": "خیریه و اجتماع",
+      "crime": "جرم و تخلف",
+      "gambling": "قمار و شرط‌بندی"
+    }
+  },
+  "shop": {
+    "categories": {
+      "all": "همه",
+      "appliances": "لوازم خانگی",
+      "clothing": "پوشاک",
+      "tech": "فناوری",
+      "travel": "تجهیزات سفر",
+      "gift": "هدیه",
+      "nutrition": "تغذیه",
+      "luxury": "لوکس"
+    }
+  },
+  "menu": {
+    "title": "منو و تنظیمات",
+    "profile": "پروفایل",
+    "achievements": "دستاوردها",
+    "saves": "ذخیره‌ها",
+    "contentSettings": "تنظیمات محتوا",
+    "theme": "ظاهر برنامه",
+    "themeLight": "روشن (نارنجی و سفید)",
+    "themeDark": "تیره (زغالی گرم)",
+    "themeSystem": "هماهنگ با دستگاه",
+    "familyTree": "شجره‌نامه",
+    "about": "درباره",
+    "newLife": "ساخت شخصیت تازه",
+    "styleguide": "راهنمای اجزا",
+    "exportJson": "خروجی JSON",
+    "importJson": "وارد کردن JSON"
+  },
+  "creation": {
+    "title": "ساخت شخصیت تازه",
+    "subtitle": "هویت آغازین زندگی جدید",
+    "gender": "جنسیت",
+    "ethnicity": "پیشینه قومی",
+    "birthCity": "شهر تولد",
+    "nameLabel": "نام و نام خانوادگی (اختیاری)",
+    "suggestName": "پیشنهاد نام",
+    "birthYear": "سال تولد شمسی",
+    "advancedSettings": "تنظیمات پیشرفته",
+    "identityTitle": "هویت آغازین",
+    "startLife": "شروع زندگی",
+    "randomStart": "شروع کاملاً تصادفی",
+    "lifeCode": "کد زندگی"
+  },
+  "endOfLife": {
+    "title": "پایان یک زندگی",
+    "scoreLabel": "امتیاز زندگی",
+    "causeLabel": "علت درگذشت",
+    "netWorthLabel": "دارایی نهایی",
+    "highlightsLabel": "خلاصه دستاوردهای این عمر",
+    "playAgain": "دوباره زندگی کن",
+    "shareCard": "اشتراک کارت یادگاری",
+    "copyLifeCode": "کپی کد زندگی"
+  },
+  "yearTransition": {
+    "tapToSkip": "برای رد شدن لمس کن",
+    "milestoneMessage": "{age} ساله شدی!",
+    "nowruzMessage": "نوروز و آغاز سال {year}",
+    "deathMessage": "پایان دفتر این زندگی",
+    "stopAutoAdvance": "توقف",
+    "autoAdvancing": "در حال مرور سال‌ها...",
+    "seasons": {
+      "spring": "بهار",
+      "summer": "تابستان",
+      "autumn": "پاییز",
+      "winter": "زمستان"
+    }
+  },
+  "motionSettings": {
+    "title": "تجربه و انیمیشن",
+    "animationSpeed": "سرعت انیمیشن",
+    "speedNormal": "عادی",
+    "speedFast": "سریع",
+    "speedOff": "خاموش",
+    "soundEffects": "افکت‌های صوتی",
+    "soundEffectsDesc": "تیک ملایم تغییر سال و زنگ دستاوردها (پیش‌فرض خاموش)",
+    "longPressAuto": "پیشروی سریع با نگه‌داشتن «سال بعد»",
+    "longPressAutoDesc": "با نگه‌داشتن دکمه، سال‌ها تا رسیدن به رویداد یا نقطه عطف جلو می‌روند"
+  }
+}

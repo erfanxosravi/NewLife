@@ -1,0 +1,32 @@
+[
+  {
+    "id": "aced_konkur",
+    "titleFa": "رتبه برتر کنکور",
+    "descriptionFa": "کسب رتبه تک‌رقمی یا دورقمی و قبولی در بهترین دانشگاه کشور",
+    "category": "education"
+  },
+  {
+    "id": "billionaire",
+    "titleFa": "استقلال مالی (معادل ۱۰۰ هزار دلار)",
+    "descriptionFa": "رسیدن دارایی خالص به ارزش واقعی معادل ۱۰۰٬۰۰۰ دلار یا یک آپارتمان ۷۰ متری تهران",
+    "category": "wealth"
+  },
+  {
+    "id": "centenarian",
+    "titleFa": "صدساله و سرافراز",
+    "descriptionFa": "پشت سر گذاشتن صد سالگی در سلامت نسبی",
+    "category": "longevity"
+  },
+  {
+    "id": "emigrated",
+    "titleFa": "آغاز زندگی در سرزمین تازه",
+    "descriptionFa": "مهاجرت موفق و شروع فصلی تازه در خارج از کشور",
+    "category": "life"
+  },
+  {
+    "id": "grandparent",
+    "titleFa": "ریشه‌دار و نوه-دار",
+    "descriptionFa": "دیدن قد کشیدن نوه در کنار خانواده",
+    "category": "family"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "shop_casual_outfit",
+    "titleFa": "ست لباس روزمره شیک",
+    "category": "clothing",
+    "basePriceToman": 6500000,
+    "effectHintFa": "ظاهر +۳، شادی +۲",
+    "minAge": 10,
+    "stats": { "looks": 3, "happiness": 2 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_formal_suit",
+    "titleFa": "کت‌وشلوار یا مانتو مجلسی",
+    "category": "clothing",
+    "basePriceToman": 18000000,
+    "effectHintFa": "ظاهر +۵، جایگاه +۳",
+    "minAge": 16,
+    "stats": { "looks": 5, "fame": 3, "happiness": 2 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_smartphone",
+    "titleFa": "گوشی هوشمند میان‌رده",
+    "category": "tech",
+    "basePriceToman": 24000000,
+    "effectHintFa": "شادی +۴، جایگاه +۱",
+    "minAge": 12,
+    "stats": { "happiness": 4, "fame": 1 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_laptop",
+    "titleFa": "لپ‌تاپ حرفه‌ای برای کار و تحصیل",
+    "category": "tech",
+    "basePriceToman": 58000000,
+    "effectHintFa": "هوش +۴، شادی +۴",
+    "minAge": 14,
+    "stats": { "intelligence": 4, "happiness": 4 },
+    "repeatable": false
+  },
+  {
+    "id": "shop_home_appliance",
+    "titleFa": "تجهیزات و لوازم راحت خانه",
+    "category": "appliances",
+    "basePriceToman": 32000000,
+    "effectHintFa": "سلامت روان +۴، شادی +۳",
+    "minAge": 18,
+    "stats": { "mentalHealth": 4, "happiness": 3 },
+    "repeatable": false
+  },
+  {
+    "id": "shop_vitamins_nutrition",
+    "titleFa": "مکمل تغذیه و بسته سلامت",
+    "category": "nutrition",
+    "basePriceToman": 4200000,
+    "effectHintFa": "سلامت +۴",
+    "minAge": 8,
+    "stats": { "health": 4, "mentalHealth": 1 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_family_gift",
+    "titleFa": "هدیه و سوغاتی برای نزدیکان",
+    "category": "gift",
+    "basePriceToman": 5000000,
+    "effectHintFa": "شادی +۳، جایگاه +۲",
+    "minAge": 10,
+    "stats": { "happiness": 3, "fame": 2 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_weekend_tour",
+    "titleFa": "تور آخر هفته و اقامتگاه بوم‌گردی",
+    "category": "travel",
+    "basePriceToman": 15000000,
+    "effectHintFa": "شادی +۵، سلامت روان +۴",
+    "minAge": 16,
+    "stats": { "happiness": 5, "mentalHealth": 4 },
+    "repeatable": true
+  },
+  {
+    "id": "shop_luxury_watch",
+    "titleFa": "ساعت لوکس و کلکسیونی",
+    "category": "luxury",
+    "basePriceToman": 95000000,
+    "effectHintFa": "ظاهر +۴، جایگاه +۶",
+    "minAge": 18,
+    "stats": { "looks": 4, "fame": 6, "happiness": 3 },
+    "repeatable": true
+  }
+]

@@ -1,0 +1,823 @@
+{
+  "meta": {
+    "anchorYear": 1405,
+    "anchorMonth": "آبان ۱۴۰۵",
+    "currency": "تومان"
+  },
+  "verifiedBenchmarks": {
+    "minWageMonthly": {
+      "value": 16255000,
+      "min": 16255000,
+      "max": 16625000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "مصوبه شورای عالی کار برای سال ۱۴۰۵ (حداقل مزد پایه؛ برخی گزارش‌ها ۱۶٬۶۲۵٬۰۰۰ تومان — حد پایین مبنا قرار گرفته است)",
+      "confidence": "verified"
+    },
+    "minWageRaise1405": {
+      "value": 0.6,
+      "unit": "ratio",
+      "asOf": "1405-01",
+      "source": "مصوبه شورای عالی کار ۱۴۰۵ — افزایش ۶۰ درصدی حداقل‌بگیران",
+      "confidence": "verified"
+    },
+    "minWageRaise1405Other": {
+      "value": 0.45,
+      "unit": "ratio",
+      "asOf": "1405-01",
+      "source": "مصوبه شورای عالی کار ۱۴۰۵ — افزایش ۴۵ درصدی سایر سطوح مزدی",
+      "confidence": "verified"
+    },
+    "cpiYoyShahrivar1405": {
+      "value": 0.828,
+      "unit": "ratio",
+      "asOf": "1405-06",
+      "source": "گزارش شاخص قیمت مصرف‌کننده شهریور ۱۴۰۵ (تورم نقطه‌به‌نقطه ۸۲.۸٪)",
+      "confidence": "verified"
+    },
+    "usdFree": {
+      "value": 271900,
+      "unit": "toman",
+      "asOf": "1405-08",
+      "source": "نرخ دلار بازار آزاد تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "gold18kPerGram": {
+      "value": 26143000,
+      "unit": "toman/gram",
+      "asOf": "1405-08",
+      "source": "اتحادیه طلا و جواهر تهران — هر گرم طلای ۱۸ عیار آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "emamiCoin": {
+      "value": 266500000,
+      "unit": "toman/coin",
+      "asOf": "1405-08",
+      "source": "بازار سکه تهران — سکه تمام طرح امامی آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "tehranListingPricePerSqm": {
+      "value": 249000000,
+      "unit": "toman/sqm",
+      "asOf": "1405-08",
+      "source": "میانگین قیمت پیشنهادی (آگهی) مسکن تهران — آبان ۱۴۰۵ (قیمت آگهی است، نه معامله قطعی)",
+      "confidence": "verified",
+      "note": "listing_price_not_transaction"
+    },
+    "tehranRegion1PricePerSqm": {
+      "value": 587000000,
+      "unit": "toman/sqm",
+      "asOf": "1405-08",
+      "source": "میانگین قیمت پیشنهادی مسکن منطقه ۱ تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "tehranRentMidDeposit": {
+      "value": 1580000000,
+      "unit": "toman",
+      "asOf": "1405-08",
+      "source": "میانگین ودیعه رهن آپارتمان ۷۰ تا ۱۰۰ متری مناطق میانی تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "tehranRentMidMonthly": {
+      "value": 24500000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "میانگین اجاره ماهانه آپارتمان ۷۰ تا ۱۰۰ متری مناطق میانی تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "tehranRentSouthDeposit": {
+      "value": 641000000,
+      "unit": "toman",
+      "asOf": "1405-08",
+      "source": "میانگین ودیعه رهن آپارتمان متراژ متوسط جنوب تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "tehranRentSouthMonthly": {
+      "value": 6000000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "میانگین اجاره ماهانه آپارتمان متراژ متوسط جنوب تهران — آبان ۱۴۰۵",
+      "confidence": "verified"
+    },
+    "snappDriverMonthlyBusy": {
+      "value": 52000000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "گزارش عملکرد رانندگان پرکار تاکسی اینترنتی (درآمد ناخالص ماهانه)",
+      "confidence": "verified"
+    },
+    "snappDriverMonthlyLowActivity": {
+      "value": 17600000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "گزارش عملکرد رانندگان کم‌کار تاکسی اینترنتی (درآمد ناخالص ماهانه)",
+      "confidence": "verified"
+    },
+    "snappTopDriverYearly1404": {
+      "value": 1295000000,
+      "unit": "toman/year",
+      "asOf": "1404-12",
+      "source": "گزارش سالانه تاکسی اینترنتی ۱۴۰۴ — رکورد پرت (Outlier) برترین راننده سال (ناخالص)",
+      "confidence": "verified"
+    },
+    "rideHailCommission": {
+      "value": 0.18,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "کارمزد متعارف پلتفرم تاکسی اینترنتی (۱۸ درصد)",
+      "confidence": "verified"
+    },
+    "rideHailRunningCostMonthly": {
+      "value": 15000000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "میانگین هزینه سوخت، استهلاک، لاستیک و تعمیرات ماهانه روی ۶۵ میلیون درآمد ناخالص",
+      "confidence": "verified"
+    },
+    "rideHailRunningCostSampleGrossMonthly": {
+      "value": 65000000,
+      "unit": "toman/month",
+      "asOf": "1405-08",
+      "source": "مبنای ناخالص ماهانه در برآورد هزینه جاری خودرو (۱۵ میلیون از ۶۵ میلیون)",
+      "confidence": "verified"
+    }
+  },
+  "policyAndModel": {
+    "listingToTransactionDiscount": {
+      "value": 0.9,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "برآورد کارشناسی شکاف ۱۰ درصدی قیمت آگهی تا معامله قطعی در بازار مسکن",
+      "confidence": "estimate"
+    },
+    "depositToMonthlyRentRate": {
+      "value": 0.03,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "عرف تبدیل رهن به اجاره (هر ۱۰۰ میلیون ودیعه معادل ۳ میلیون اجاره ماهانه)",
+      "confidence": "estimate"
+    },
+    "bankDepositAnnualRate": {
+      "value": 0.23,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "میانگین نرخ سود سپرده بلندمدت و اوراق بانکی",
+      "confidence": "estimate"
+    },
+    "socialSecurityEmployeeRate": {
+      "value": 0.07,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "سهم بیمه تأمین اجتماعی کارمند (۷ درصد)",
+      "confidence": "estimate"
+    },
+    "taxExemptionAnnualMinWageMultiple": {
+      "value": 15.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد معافیت مالیاتی سالانه حقوق در قانون بودجه به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "taxBracket1Rate": {
+      "value": 0.1,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "پله اول مالیات بر درآمد حقوق",
+      "confidence": "estimate"
+    },
+    "taxBracket2MinWageMultiple": {
+      "value": 25.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "آستانه پله دوم مالیات بر درآمد",
+      "confidence": "estimate"
+    },
+    "taxBracket2Rate": {
+      "value": 0.15,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "پله دوم مالیات بر درآمد",
+      "confidence": "estimate"
+    },
+    "taxBracket3MinWageMultiple": {
+      "value": 40.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "آستانه پله سوم مالیات بر درآمد",
+      "confidence": "estimate"
+    },
+    "taxBracket3Rate": {
+      "value": 0.2,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "پله سوم مالیات بر درآمد",
+      "confidence": "estimate"
+    },
+    "referenceApartmentAreaSqm": {
+      "value": 70,
+      "unit": "sqm",
+      "asOf": "1405-08",
+      "source": "متراژ استاندارد آپارتمان مرجع ۷۰ متری تهران برای سنجش قدرت خرید",
+      "confidence": "estimate"
+    },
+    "wealthMilestoneUsdThreshold": {
+      "value": 100000,
+      "unit": "usd",
+      "asOf": "1405-08",
+      "source": "معیار قدرت خرید دلاری جایگزین آستانه اسمی ۱۰ میلیارد تومان (معادل ۱۰۰ هزار دلار یا یک واحد ۷۰ متری تهران)",
+      "confidence": "estimate"
+    },
+    "wealthMilestoneAptCount": {
+      "value": 1,
+      "unit": "apartments",
+      "asOf": "1405-08",
+      "source": "آستانه معادل یک آپارتمان ۷۰ متری تهران برای دستاورد ثروت",
+      "confidence": "estimate"
+    },
+    "baseAnnualLivingExpenseMinWageMultiple": {
+      "value": 9.5,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه معیشت پایه سالانه فرد شاغل مستقل بدون اجاره (حدود ۰.۷۹ حداقل مزد در ماه ضربدر ضریب شهر)",
+      "confidence": "estimate"
+    },
+    "unemployedLivingSupportMinWageMultiple": {
+      "value": 4.2,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه حداقلی زندگی مستقل بدون شغل (در صورت زندگی با خانواده صفر است)",
+      "confidence": "estimate"
+    },
+    "pocketMoneyPoorMinWageMultiple": {
+      "value": 0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "پس‌انداز اولیه طبقه کم‌درآمد به نسبت حداقل دستمزد سال تولد",
+      "confidence": "estimate"
+    },
+    "pocketMoneyMiddleMinWageMultiple": {
+      "value": 0.35,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "پس‌انداز اولیه طبقه متوسط به نسبت حداقل دستمزد سال تولد",
+      "confidence": "estimate"
+    },
+    "pocketMoneyUpperMiddleMinWageMultiple": {
+      "value": 1.6,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "پس‌انداز اولیه طبقه مرفه به نسبت حداقل دستمزد سال تولد",
+      "confidence": "estimate"
+    },
+    "pocketMoneyWealthyMinWageMultiple": {
+      "value": 7.5,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "پس‌انداز اولیه طبقه ثروتمند به نسبت حداقل دستمزد سال تولد",
+      "confidence": "estimate"
+    },
+    "tutorFeeMinWageMultiple": {
+      "value": 0.85,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد هزینه سالانه کلاس تقویتی و معلم خصوصی به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "konkurFeeMinWageMultiple": {
+      "value": 0.18,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد هزینه ثبت‌نام و منابع آزمون کنکور به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "uniTuitionStateTopEngMinWageMultiple": {
+      "value": 0.25,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه سالانه ثبت‌نام و کتاب دانشگاه دولتی روزانه مهندسی",
+      "confidence": "estimate"
+    },
+    "uniTuitionStateTopMedMinWageMultiple": {
+      "value": 0.35,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه سالانه ثبت‌نام و منابع دانشگاه علوم پزشکی روزانه",
+      "confidence": "estimate"
+    },
+    "uniTuitionStateMinWageMultiple": {
+      "value": 0.4,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه سالانه دانشگاه دولتی",
+      "confidence": "estimate"
+    },
+    "uniTuitionAzadMinWageMultiple": {
+      "value": 2.8,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد شهریه سالانه دانشگاه آزاد (معادل حدود ۴۵ میلیون تومان در ۱۴۰۵)",
+      "confidence": "estimate"
+    },
+    "uniTuitionAppliedScienceMinWageMultiple": {
+      "value": 1.5,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد شهریه سالانه دانشگاه علمی‌کاربردی",
+      "confidence": "estimate"
+    },
+    "businessStartupCapitalMinWageMultiple": {
+      "value": 18.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد سرمایه اولیه راه‌اندازی کسب‌وکار کوچک (حدود ۲۹۰ میلیون تومان در ۱۴۰۵)",
+      "confidence": "estimate"
+    },
+    "businessInitialYieldMin": {
+      "value": 0.18,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداقل بازده سالانه اولیه کسب‌وکار خرد",
+      "confidence": "estimate"
+    },
+    "businessInitialYieldMax": {
+      "value": 0.42,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداکثر بازده سالانه اولیه کسب‌وکار خرد",
+      "confidence": "estimate"
+    },
+    "businessRealCatchup": {
+      "value": 0.85,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب همگامی درآمد کسب‌وکار با تورم سالانه",
+      "confidence": "estimate"
+    },
+    "militaryBuyoutMinWageMultiple": {
+      "value": 28.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد جریمه خرید خدمت نظام وظیفه به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "loanPersonalMinWageMultiple": {
+      "value": 15.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "سقف وام ضروری و ازدواج به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "loanPersonalRate": {
+      "value": 0.18,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "نرخ سود سالانه وام ضروری",
+      "confidence": "estimate"
+    },
+    "loanPersonalYears": {
+      "value": 4,
+      "unit": "years",
+      "asOf": "1405-08",
+      "source": "مدت بازپرداخت وام ضروری",
+      "confidence": "estimate"
+    },
+    "loanHousingMinWageMultiple": {
+      "value": 65.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "سقف وام مسکن و ودیعه به نسبت حداقل مزد (حدود ۱ میلیارد تومان در ۱۴۰۵)",
+      "confidence": "estimate"
+    },
+    "loanHousingRate": {
+      "value": 0.22,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "نرخ سود سالانه تسهیلات مسکن",
+      "confidence": "estimate"
+    },
+    "loanHousingYears": {
+      "value": 6,
+      "unit": "years",
+      "asOf": "1405-08",
+      "source": "مدت بازپرداخت تسهیلات مسکن",
+      "confidence": "estimate"
+    },
+    "debtPayoffChunkMinWageMultiple": {
+      "value": 4.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "مبلغ پیش‌فرض بازپرداخت دستی بدهی",
+      "confidence": "estimate"
+    },
+    "investmentQuickTradeShare": {
+      "value": 0.25,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "سهم پیش‌فرض نقدینگی برای هر نوبت سرمایه‌گذاری",
+      "confidence": "estimate"
+    },
+    "investmentQuickTradeMinMinWageMultiple": {
+      "value": 1.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "حداقل مبلغ خرید سریع در بازار دارایی",
+      "confidence": "estimate"
+    },
+    "investmentQuickTradeMaxMinWageMultiple": {
+      "value": 16.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "حداکثر مبلغ هر نوبت خرید سریع",
+      "confidence": "estimate"
+    },
+    "giftMinWageMultiple": {
+      "value": 0.5,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه خرید هدیه برای نزدیکان",
+      "confidence": "estimate"
+    },
+    "domesticTripMinWageMultiple": {
+      "value": 2.5,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "هزینه سفر دو نفره داخلی",
+      "confidence": "estimate"
+    },
+    "weddingMinWageMultiple": {
+      "value": 16.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد هزینه متعارف مراسم ازدواج به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "carAnnualMaintenanceRate": {
+      "value": 0.04,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه سالانه بیمه، سوخت و استهلاک خودرو به نسبت ارزش روز",
+      "confidence": "estimate"
+    },
+    "carRepairRate": {
+      "value": 0.03,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "هزینه سرویس دوره‌ای خودرو به نسبت ارزش روز",
+      "confidence": "estimate"
+    },
+    "carInflationPassThrough": {
+      "value": 0.7,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب رشد اسمی قیمت خودرو به نسبت تورم",
+      "confidence": "estimate"
+    },
+    "retirementPensionRatio": {
+      "value": 0.55,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "نسبت مستمری بازنشستگی به آخرین حقوق",
+      "confidence": "estimate"
+    },
+    "overtimeBonusRatio": {
+      "value": 0.22,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "نسبت پاداش اضافه‌کار سالانه",
+      "confidence": "estimate"
+    },
+    "raiseMultiplier": {
+      "value": 1.18,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب ارتقای شغلی و افزایش حقوق واقعی",
+      "confidence": "estimate"
+    },
+    "usdInflationPassThrough": {
+      "value": 0.94,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب همگامی نرخ دلار با تورم در سال‌های آینده",
+      "confidence": "estimate"
+    },
+    "usdVolatilityMin": {
+      "value": -0.1,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداقل نوسان سالانه ارز پیرامون روند تورمی",
+      "confidence": "estimate"
+    },
+    "usdVolatilityMax": {
+      "value": 0.1,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداکثر نوسان سالانه ارز پیرامون روند تورمی",
+      "confidence": "estimate"
+    },
+    "goldInflationPassThrough": {
+      "value": 0.96,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب همگامی طلا و سکه با تورم در سال‌های آینده",
+      "confidence": "estimate"
+    },
+    "goldVolatilityMin": {
+      "value": -0.09,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداقل نوسان سالانه طلا پیرامون روند تورمی",
+      "confidence": "estimate"
+    },
+    "goldVolatilityMax": {
+      "value": 0.11,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداکثر نوسان سالانه طلا پیرامون روند تورمی",
+      "confidence": "estimate"
+    },
+    "bourseInflationPassThrough": {
+      "value": 0.85,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب همگامی بورس تهران با تورم اسمی",
+      "confidence": "estimate"
+    },
+    "bourseVolatilityMin": {
+      "value": -0.22,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداقل نوسان سالانه بورس",
+      "confidence": "estimate"
+    },
+    "bourseVolatilityMax": {
+      "value": 0.34,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداکثر نوسان سالانه بورس",
+      "confidence": "estimate"
+    },
+    "housingInflationPassThrough": {
+      "value": 0.92,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب رشد اسمی قیمت مسکن نسبت به تورم سالانه",
+      "confidence": "estimate"
+    },
+    "rentInflationPassThrough": {
+      "value": 0.88,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب رشد سالانه اجاره‌بها نسبت به تورم",
+      "confidence": "estimate"
+    },
+    "cryptoDriftMin": {
+      "value": -0.42,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداقل بازده واقعی سالانه رمزارز",
+      "confidence": "estimate"
+    },
+    "cryptoDriftMax": {
+      "value": 0.65,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "حداکثر بازده واقعی سالانه رمزارز",
+      "confidence": "estimate"
+    },
+    "familyHelpProbability": {
+      "value": 0.22,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "احتمال کمک مالی خانواده برای مسکن یا شروع زندگی در سنین ۲۴ تا ۳۲ سالگی",
+      "confidence": "estimate"
+    },
+    "familyHelpWealthyMinWageMultiple": {
+      "value": 180.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد کمک مسکن خانواده ثروتمند به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "familyHelpUpperMiddleMinWageMultiple": {
+      "value": 55.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد کمک مسکن خانواده مرفه به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "inheritanceWealthyMinWageMultiple": {
+      "value": 360.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد سهم‌الارث خانواده ثروتمند به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "inheritanceUpperMiddleMinWageMultiple": {
+      "value": 120.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد سهم‌الارث خانواده مرفه به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "inheritanceMiddleMinWageMultiple": {
+      "value": 35.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد سهم‌الارث خانواده متوسط به نسبت حداقل مزد",
+      "confidence": "estimate"
+    },
+    "inheritancePoorMinWageMultiple": {
+      "value": 4.0,
+      "unit": "minWageMonthly_multiple",
+      "asOf": "1405-08",
+      "source": "برآورد اندوخته به ارث رسیده در خانواده کم‌درآمد",
+      "confidence": "estimate"
+    },
+    "scenarioLowInflationMin": {
+      "value": 0.12,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "کف تورم سالانه در سناریوی مهار تورم پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioLowInflationMax": {
+      "value": 0.2,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "سقف تورم سالانه در سناریوی مهار تورم پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioLowWageCatchup": {
+      "value": 0.98,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب تعدیل مزد با تورم در سناریوی تورم پایین",
+      "confidence": "estimate"
+    },
+    "scenarioMediumInflationMin": {
+      "value": 0.2,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "کف تورم سالانه در سناریوی تداوم میان‌مدت پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioMediumInflationMax": {
+      "value": 0.3,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "سقف تورم سالانه در سناریوی تداوم میان‌مدت پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioMediumWageCatchup": {
+      "value": 0.95,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب تعدیل مزد با تورم در سناریوی تورم متوسط",
+      "confidence": "estimate"
+    },
+    "scenarioHighInflationMin": {
+      "value": 0.28,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "کف تورم سالانه در سناریوی جهش تورمی پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioHighInflationMax": {
+      "value": 0.42,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "سقف تورم سالانه در سناریوی جهش تورمی پس از ۱۴۰۵",
+      "confidence": "estimate"
+    },
+    "scenarioHighWageCatchup": {
+      "value": 0.92,
+      "unit": "ratio",
+      "asOf": "1405-08",
+      "source": "ضریب تعدیل مزد با تورم در سناریوی تورم بالا",
+      "confidence": "estimate"
+    }
+  },
+  "cityHousingMultipliers": {
+    "tehran": {
+      "value": 1.0,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "شهر مرجع تهران (میانگین ۲۴۹ میلیون تومان در هر متر مربع آگهی)",
+      "confidence": "verified"
+    },
+    "isfahan": {
+      "value": 0.46,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن اصفهان به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "shiraz": {
+      "value": 0.45,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن شیراز به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "mashhad": {
+      "value": 0.44,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن مشهد به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "tabriz": {
+      "value": 0.42,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن تبریز به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "rasht": {
+      "value": 0.36,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن رشت به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "sari": {
+      "value": 0.35,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن ساری به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "bandar_abbas": {
+      "value": 0.34,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن بندرعباس به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "ahvaz": {
+      "value": 0.32,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن اهواز به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "yazd": {
+      "value": 0.3,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن یزد به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "kermanshah": {
+      "value": 0.28,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن کرمانشاه به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "gorgan": {
+      "value": 0.28,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن گرگان به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "zahedan": {
+      "value": 0.22,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن زاهدان به میانگین تهران",
+      "confidence": "estimate"
+    },
+    "village": {
+      "value": 0.12,
+      "unit": "ratio_of_tehran",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت قیمت مسکن روستایی به میانگین تهران",
+      "confidence": "estimate"
+    }
+  },
+  "housingRegionMultipliers": {
+    "north": {
+      "value": 2.3574,
+      "unit": "ratio_of_city_avg",
+      "asOf": "1405-08",
+      "source": "نسبت قیمت منطقه ۱ تهران (۵۸۷ میلیون) به میانگین کل شهر تهران (۲۴۹ میلیون)",
+      "confidence": "verified"
+    },
+    "mid": {
+      "value": 1.0,
+      "unit": "ratio_of_city_avg",
+      "asOf": "1405-08",
+      "source": "میانگین مناطق میانی شهر",
+      "confidence": "verified"
+    },
+    "south": {
+      "value": 0.58,
+      "unit": "ratio_of_city_avg",
+      "asOf": "1405-08",
+      "source": "برآورد نسبت مناطق جنوبی و حاشیه اقتصادی به میانگین شهر",
+      "confidence": "estimate"
+    }
+  }
+}

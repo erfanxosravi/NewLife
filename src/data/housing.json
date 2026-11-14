@@ -1,0 +1,96 @@
+{
+  "housingListings": [
+    {
+      "id": "rent_south_apt",
+      "titleFa": "آپارتمان متراژ متوسط جنوب شهر (رهن و اجاره)",
+      "mode": "rent",
+      "areaSqm": 70,
+      "regionTier": "south",
+      "baseDepositRahnToman": 641000000,
+      "baseMonthlyRentToman": 6000000,
+      "baseBuyPriceToman": 0
+    },
+    {
+      "id": "rent_small_apt",
+      "titleFa": "آپارتمان ۷۵ متری مناطق میانی (رهن و اجاره)",
+      "mode": "rent",
+      "areaSqm": 75,
+      "regionTier": "mid",
+      "baseDepositRahnToman": 1580000000,
+      "baseMonthlyRentToman": 24500000,
+      "baseBuyPriceToman": 0
+    },
+    {
+      "id": "rent_family_apt",
+      "titleFa": "آپارتمان ۱۱۰ متری خانوادگی (رهن و اجاره)",
+      "mode": "rent",
+      "areaSqm": 110,
+      "regionTier": "mid",
+      "baseDepositRahnToman": 2150000000,
+      "baseMonthlyRentToman": 34000000,
+      "baseBuyPriceToman": 0
+    },
+    {
+      "id": "buy_south_apt",
+      "titleFa": "خرید آپارتمان ۶۵ متری اقتصادی (منطقه کم‌هزینه‌تر)",
+      "mode": "buy",
+      "areaSqm": 65,
+      "regionTier": "south",
+      "baseDepositRahnToman": 0,
+      "baseMonthlyRentToman": 0,
+      "baseBuyPriceToman": 9387300000
+    },
+    {
+      "id": "buy_economy_apt",
+      "titleFa": "خرید آپارتمان ۷۰ متری استاندارد",
+      "mode": "buy",
+      "areaSqm": 70,
+      "regionTier": "mid",
+      "baseDepositRahnToman": 0,
+      "baseMonthlyRentToman": 0,
+      "baseBuyPriceToman": 17430000000
+    },
+    {
+      "id": "buy_villa_house",
+      "titleFa": "خرید آپارتمان یا ویلای ۱۸۰ متری (منطقه ممتاز)",
+      "mode": "buy",
+      "areaSqm": 180,
+      "regionTier": "north",
+      "baseDepositRahnToman": 0,
+      "baseMonthlyRentToman": 0,
+      "baseBuyPriceToman": 105660000000
+    }
+  ],
+  "vehicleCatalog": [
+    {
+      "id": "car_iranian_eco",
+      "titleFa": "خودرو اقتصادی داخلی",
+      "tier": "iranian",
+      "basePriceToman": 850000000,
+      "annualCostToman": 34000000,
+      "fameBonus": 1,
+      "happinessBonus": 3,
+      "accidentRiskLabel": "متوسط"
+    },
+    {
+      "id": "car_foreign_mid",
+      "titleFa": "سدان یا کراس‌اوور وارداتی",
+      "tier": "foreign",
+      "basePriceToman": 4200000000,
+      "annualCostToman": 110000000,
+      "fameBonus": 4,
+      "happinessBonus": 5,
+      "accidentRiskLabel": "کم"
+    },
+    {
+      "id": "car_luxury_suv",
+      "titleFa": "شاسی‌بلند لوکس",
+      "tier": "luxury",
+      "basePriceToman": 13500000000,
+      "annualCostToman": 320000000,
+      "fameBonus": 8,
+      "happinessBonus": 7,
+      "accidentRiskLabel": "کم"
+    }
+  ]
+}

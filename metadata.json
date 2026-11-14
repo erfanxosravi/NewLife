@@ -1,0 +1,6 @@
+{
+  "name": "زندگینامه",
+  "description": "شبیه‌ساز متنی زندگی ایرانی از تولد تا پایان عمر، کاملاً آفلاین و داده‌محور",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

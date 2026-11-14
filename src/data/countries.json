@@ -1,0 +1,56 @@
+[
+  {
+    "id": "iran",
+    "nameFa": "ایران",
+    "isIran": true,
+    "costOfLivingIndex": 1.0,
+    "baseMigrationCostToman": 0,
+    "difficulty": 0,
+    "paths": []
+  },
+  {
+    "id": "canada",
+    "nameFa": "کانادا",
+    "isIran": false,
+    "costOfLivingIndex": 2.4,
+    "baseMigrationCostToman": 4200000000,
+    "difficulty": 0.55,
+    "paths": ["study", "work", "investment"]
+  },
+  {
+    "id": "germany",
+    "nameFa": "آلمان",
+    "isIran": false,
+    "costOfLivingIndex": 2.1,
+    "baseMigrationCostToman": 2400000000,
+    "difficulty": 0.45,
+    "paths": ["study", "work"]
+  },
+  {
+    "id": "turkey",
+    "nameFa": "ترکیه",
+    "isIran": false,
+    "costOfLivingIndex": 1.35,
+    "baseMigrationCostToman": 1150000000,
+    "difficulty": 0.25,
+    "paths": ["study", "work", "investment"]
+  },
+  {
+    "id": "uae",
+    "nameFa": "امارات",
+    "isIran": false,
+    "costOfLivingIndex": 2.6,
+    "baseMigrationCostToman": 3400000000,
+    "difficulty": 0.4,
+    "paths": ["work", "investment"]
+  },
+  {
+    "id": "uk",
+    "nameFa": "بریتانیا",
+    "isIran": false,
+    "costOfLivingIndex": 2.7,
+    "baseMigrationCostToman": 5100000000,
+    "difficulty": 0.65,
+    "paths": ["study", "work"]
+  }
+]

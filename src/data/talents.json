@@ -1,0 +1,279 @@
+{
+  "distribution": {
+    "alpha": 0.85,
+    "beta": 3.15,
+    "familyBetaMultiplier": 0.7,
+    "standoutThreshold": 72,
+    "rareThreshold": 85
+  },
+  "discovery": {
+    "minAge": 5,
+    "peakMinAge": 5,
+    "peakMaxAge": 18,
+    "lateBloomerMaxAge": 58,
+    "minNaturalDiscoveryScore": 40,
+    "maxNaturalDiscoveriesPerYear": 1,
+    "basePeakProbability": 0.14,
+    "baseLateBloomerProbability": 0.03,
+    "practiceDiscoveryBonus": 0.22
+  },
+  "tiers": [
+    {
+      "id": "curiosity",
+      "minScore": 0,
+      "maxScore": 54,
+      "labelFa": "کنجکاوی",
+      "descriptionFa": "گرایش اولیه و علاقه تجربی که با تمرین می‌تواند رشد کند."
+    },
+    {
+      "id": "interest",
+      "minScore": 55,
+      "maxScore": 71,
+      "labelFa": "علاقه",
+      "descriptionFa": "ذوق طبیعی قابل توجه که در تمرین‌های منظم خودش را نشان می‌دهد."
+    },
+    {
+      "id": "clear_talent",
+      "minScore": 72,
+      "maxScore": 84,
+      "labelFa": "استعداد روشن",
+      "descriptionFa": "توانایی کم‌نظیر که اطرافیان و مربیان هم به سرعت متوجه‌اش می‌شوند."
+    },
+    {
+      "id": "brilliant_talent",
+      "minScore": 85,
+      "maxScore": 100,
+      "labelFa": "استعداد درخشان",
+      "descriptionFa": "درخشش کمیاب و ذاتی که در صورت پرورش و فرصت مناسب، مسیر حرفه‌ای را می‌سازد."
+    }
+  ],
+  "athleticDisciplines": [
+    { "id": "football", "titleFa": "فوتبال", "urbanBias": 1.25 },
+    { "id": "wrestling", "titleFa": "کشتی", "urbanBias": 1.0 },
+    { "id": "volleyball", "titleFa": "والیبال", "urbanBias": 1.1 },
+    { "id": "taekwondo", "titleFa": "تکواندو", "urbanBias": 1.1 },
+    { "id": "weightlifting", "titleFa": "وزنه‌برداری", "urbanBias": 0.95 },
+    { "id": "swimming", "titleFa": "شنا", "urbanBias": 1.15 },
+    { "id": "running", "titleFa": "دوومیدانی", "urbanBias": 1.0 }
+  ],
+  "talents": [
+    {
+      "id": "singing",
+      "titleFa": "آواز و خوانندگی",
+      "categoryFa": "هنر و موسیقی",
+      "lessonTitleFa": "کلاس صداسازی و ردیف آوازی",
+      "lessonCostMinWageMultiple": 0.24,
+      "minPracticeAge": 6,
+      "relatedSkillId": "music",
+      "relatedParentJobKeywords": ["معلم", "موسیقی", "آرایشگر"],
+      "relatedParentTraits": ["شوخ‌طبع", "مهربان", "اهل مطالعه"],
+      "schoolTypeBonus": { "public": 0, "private": 0.06, "sampad": 0.02 },
+      "cityAccessBoostIds": ["tehran", "isfahan", "shiraz", "mashhad", "tabriz"],
+      "discoveryHintsFa": [
+        "زنگ سرود مدرسه یا دورهمی فامیلی وقتی زمزمه کردی، نگاه‌ها به سمت صدایت برگشت.",
+        "متوجه شدی گوش موسیقایی دقیقی داری و گام و تحریرهای آوازی را بی‌زحمت می‌گیری."
+      ]
+    },
+    {
+      "id": "music_instrument",
+      "titleFa": "نوازندگی",
+      "categoryFa": "هنر و موسیقی",
+      "lessonTitleFa": "کلاس ساز سنتی یا مدرن",
+      "lessonCostMinWageMultiple": 0.28,
+      "minPracticeAge": 6,
+      "relatedSkillId": "music",
+      "relatedParentJobKeywords": ["معلم", "مهندس", "موسیقی"],
+      "relatedParentTraits": ["اهل مطالعه", "محتاط", "کم‌حرف"],
+      "schoolTypeBonus": { "public": 0, "private": 0.07, "sampad": 0.03 },
+      "cityAccessBoostIds": ["tehran", "isfahan", "shiraz", "rasht", "tabriz"],
+      "discoveryHintsFa": [
+        "با اولین بار که به سیم تار یا کلیدهای کیبورد دست زدی، ریتم و ملودی را سریع‌تر از بقیه گرفتی.",
+        "تطبیق انگشت‌ها و درک ریتم در تو آن‌قدر طبیعی است که مربی موسیقی هم متوجه‌اش شد."
+      ]
+    },
+    {
+      "id": "acting",
+      "titleFa": "بازیگری و تئاتر",
+      "categoryFa": "نمایش و رسانه",
+      "lessonTitleFa": "کارگاه تئاتر و فن بیان",
+      "lessonCostMinWageMultiple": 0.25,
+      "minPracticeAge": 8,
+      "relatedParentJobKeywords": ["معلم", "اداری"],
+      "relatedParentTraits": ["شوخ‌طبع", "جسور", "ولخرج"],
+      "schoolTypeBonus": { "public": 0.01, "private": 0.06, "sampad": 0.02 },
+      "cityAccessBoostIds": ["tehran", "mashhad", "isfahan", "shiraz"],
+      "discoveryHintsFa": [
+        "در نمایش کوچک مدرسه، لحن و زبان بدنت آن‌قدر واقعی بود که همه در سکوت تماشایت کردند.",
+        "توانایی عجیبی در گرفتن حس‌وحال شخصیت‌های مختلف و انتقال آن به تماشاگر داری."
+      ]
+    },
+    {
+      "id": "athletics",
+      "titleFa": "ورزش حرفه‌ای",
+      "categoryFa": "ورزش و تندرستی",
+      "lessonTitleFa": "ثبت‌نام در باشگاه و آکادمی ورزشی",
+      "lessonCostMinWageMultiple": 0.2,
+      "minPracticeAge": 6,
+      "relatedSkillId": "sport_skill",
+      "relatedParentJobKeywords": ["راننده", "پزشک", "پرستار", "فنی"],
+      "relatedParentTraits": ["پرتلاش", "جسور", "سخت‌گیر"],
+      "schoolTypeBonus": { "public": 0.03, "private": 0.05, "sampad": 0.01 },
+      "cityAccessBoostIds": ["tehran", "tabriz", "ahvaz", "sari", "mashhad", "kermanshah"],
+      "discoveryHintsFa": [
+        "در زنگ ورزش و زمین خاکی محله، چابکی و نفس‌ت از هم‌سن‌وسال‌هایت یک سر و گردن بالاتر بود.",
+        "مربی باشگاه پس از چند جلسه تمرین گفت استقامت و واکنش بدنی کم‌نظیری داری."
+      ]
+    },
+    {
+      "id": "visual_art",
+      "titleFa": "هنرهای تجسمی و خوشنویسی",
+      "categoryFa": "هنر و موسیقی",
+      "lessonTitleFa": "کلاس طراحی، نقاشی یا خوشنویسی",
+      "lessonCostMinWageMultiple": 0.22,
+      "minPracticeAge": 5,
+      "relatedSkillId": "art",
+      "relatedParentJobKeywords": ["معلم", "آرایشگر", "مهندس"],
+      "relatedParentTraits": ["کم‌حرف", "اهل مطالعه", "محتاط"],
+      "schoolTypeBonus": { "public": 0.01, "private": 0.06, "sampad": 0.03 },
+      "cityAccessBoostIds": ["isfahan", "shiraz", "tehran", "yazd", "rasht"],
+      "discoveryHintsFa": [
+        "خط‌خطی‌های حاشیه دفترت به قدری تناسب و جان داشت که معلم هنر آن‌ها را روی برد کلاس زد.",
+        "چشم تیزبینی برای رنگ، سایه و فرم خط داری و ساعت‌ها بی‌خستگی پای طراحی می‌نشینی."
+      ]
+    },
+    {
+      "id": "writing",
+      "titleFa": "نویسندگی و شعر",
+      "categoryFa": "ادبیات و اندیشه",
+      "lessonTitleFa": "انجمن ادبی و کارگاه داستان‌نویسی",
+      "lessonCostMinWageMultiple": 0.14,
+      "minPracticeAge": 8,
+      "relatedSkillId": "english",
+      "relatedParentJobKeywords": ["معلم", "اداری"],
+      "relatedParentTraits": ["اهل مطالعه", "دلسوز", "کم‌حرف"],
+      "schoolTypeBonus": { "public": 0.02, "private": 0.04, "sampad": 0.07 },
+      "cityAccessBoostIds": ["shiraz", "tehran", "mashhad", "isfahan", "rasht"],
+      "discoveryHintsFa": [
+        "انشایی که در کلاس خواندی آن‌قدر تصویرسازی زنده داشت که همه تا جمله آخر گوش دادند.",
+        "کلمه‌ها و وزن جمله‌ها راحت در ذهنت می‌نشینند و نوشته‌هایت حال‌وهوای خاص خودشان را دارند."
+      ]
+    },
+    {
+      "id": "comedy",
+      "titleFa": "طنزپردازی و استندآپ",
+      "categoryFa": "نمایش و رسانه",
+      "lessonTitleFa": "کارگاه طنز و بداهه‌پردازی",
+      "lessonCostMinWageMultiple": 0.16,
+      "minPracticeAge": 9,
+      "relatedParentJobKeywords": ["کاسب", "راننده", "آرایشگر"],
+      "relatedParentTraits": ["شوخ‌طبع", "ولخرج", "جسور"],
+      "schoolTypeBonus": { "public": 0.04, "private": 0.04, "sampad": 0.02 },
+      "cityAccessBoostIds": ["tehran", "isfahan", "tabriz", "shiraz"],
+      "discoveryHintsFa": [
+        "با یک جمله به‌موقع وسط جمع، فضای جدی کلاس را به خنده انداختی و کسی هم دلخور نشد.",
+        "در دیدن تناقض‌های روزمره و تعریف‌کردن خاطره‌های خنده‌دار زمان‌بندی دقیقی داری."
+      ]
+    },
+    {
+      "id": "math_science",
+      "titleFa": "ریاضی و علوم پایه",
+      "categoryFa": "دانش و فناوری",
+      "lessonTitleFa": "کلاس المپیاد و حل مسئله پیشرفته",
+      "lessonCostMinWageMultiple": 0.24,
+      "minPracticeAge": 7,
+      "relatedParentJobKeywords": ["پزشک", "مهندس", "معلم", "پرستار"],
+      "relatedParentTraits": ["اهل مطالعه", "سخت‌گیر", "محتاط"],
+      "schoolTypeBonus": { "public": 0.01, "private": 0.05, "sampad": 0.1 },
+      "cityAccessBoostIds": ["tehran", "isfahan", "mashhad", "tabriz", "yazd"],
+      "discoveryHintsFa": [
+        "مسئله‌هایی که بقیه را گیر می‌اندازد، در ذهن تو مثل پازل‌های ساده کنار هم می‌نشینند.",
+        "کنجکاوی ات درباره منطق عددها و آزمایش‌های علمی از نگاه معلم علوم پنهان نماند."
+      ]
+    },
+    {
+      "id": "programming_tech",
+      "titleFa": "برنامه‌نویسی و فناوری",
+      "categoryFa": "دانش و فناوری",
+      "lessonTitleFa": "دوره کدنویسی و ساخت پروژه نرم‌افزاری",
+      "lessonCostMinWageMultiple": 0.26,
+      "minPracticeAge": 10,
+      "relatedSkillId": "programming",
+      "relatedParentJobKeywords": ["مهندس", "نرم‌افزار", "اداری"],
+      "relatedParentTraits": ["اهل مطالعه", "پرتلاش", "کم‌حرف"],
+      "schoolTypeBonus": { "public": 0.01, "private": 0.05, "sampad": 0.09 },
+      "cityAccessBoostIds": ["tehran", "isfahan", "mashhad", "shiraz", "tabriz"],
+      "discoveryHintsFa": [
+        "بدون این‌که کسی مجبورت کند، ساعت‌ها پشت سیستم نشستن و پیداکردن قلق نرم‌افزارها برایت لذت‌بخش است.",
+        "منطق الگوریتم و خطایابی را با سرعتی یاد می‌گیری که اطرافیان به دنبال حل مشکلات گوشی و کامپیوترشان سراغ تو می‌آیند."
+      ]
+    },
+    {
+      "id": "business_sense",
+      "titleFa": "هوش تجاری و بازاریابی",
+      "categoryFa": "کسب‌وکار",
+      "lessonTitleFa": "کارگاه فروش، مذاکره و مدل کسب‌وکار",
+      "lessonCostMinWageMultiple": 0.22,
+      "minPracticeAge": 12,
+      "relatedSkillId": "business",
+      "relatedParentJobKeywords": ["کاسب", "بازاری", "راننده"],
+      "relatedParentTraits": ["محتاط", "پرتلاش", "ولخرج"],
+      "schoolTypeBonus": { "public": 0.02, "private": 0.05, "sampad": 0.02 },
+      "cityAccessBoostIds": ["tehran", "tabriz", "mashhad", "isfahan", "bandar_abbas"],
+      "discoveryHintsFa": [
+        "خیلی زود متوجه می‌شوی مردم دنبال چه چیزی هستند و چطور می‌شود معامله‌ای برد-برد بست.",
+        "در خرید و فروش‌های کوچک مدرسه‌ای یا کمک در مغازه، چانه و محاسبه سودوزیان در ذهنت آماده است."
+      ]
+    },
+    {
+      "id": "leadership",
+      "titleFa": "رهبری و مدیریت",
+      "categoryFa": "کسب‌وکار",
+      "lessonTitleFa": "کارگاه تیم‌سازی و سخنرانی مدیریتی",
+      "lessonCostMinWageMultiple": 0.2,
+      "minPracticeAge": 10,
+      "relatedSkillId": "business",
+      "relatedParentJobKeywords": ["اداری", "معلم", "پزشک"],
+      "relatedParentTraits": ["دلسوز", "سخت‌گیر", "جسور"],
+      "schoolTypeBonus": { "public": 0.02, "private": 0.05, "sampad": 0.04 },
+      "cityAccessBoostIds": ["tehran", "mashhad", "isfahan", "shiraz"],
+      "discoveryHintsFa": [
+        "هر وقت بین هم‌کلاسی‌ها یا گروهی بی‌نظمی پیش می‌آید، ناخودآگاه تو کارها را تقسیم می‌کنی و همه قبول می‌کنند.",
+        "در تصمیم‌گیری‌های جمعی آرامش خودت را حفظ می‌کنی و حرف‌ت برای بقیه وزن دارد."
+      ]
+    },
+    {
+      "id": "cooking",
+      "titleFa": "آشپزی و شیرینی‌پزی",
+      "categoryFa": "مهارت و زندگی",
+      "lessonTitleFa": "دوره تخصصی آشپزی و قنادی",
+      "lessonCostMinWageMultiple": 0.2,
+      "minPracticeAge": 9,
+      "relatedSkillId": "cooking",
+      "relatedParentJobKeywords": ["خانه‌دار", "کاسب", "آرایشگر"],
+      "relatedParentTraits": ["مهربان", "دلسوز", "مذهبی و سنتی"],
+      "schoolTypeBonus": { "public": 0.03, "private": 0.04, "sampad": 0.01 },
+      "cityAccessBoostIds": ["rasht", "shiraz", "isfahan", "tabriz", "yazd"],
+      "discoveryHintsFa": [
+        "تشخیص عطر ادویه و زمان دقیق پخت در تو غریزی است و دستپخت‌ت تعریف همه را درمی‌آورد.",
+        "با چند ماده ساده در آشپزخانه ترکیب‌هایی می‌سازی که حتی بزرگ‌ترها دستورش را می‌پرسند."
+      ]
+    },
+    {
+      "id": "mechanical",
+      "titleFa": "فنی و مکانیک",
+      "categoryFa": "مهارت و زندگی",
+      "lessonTitleFa": "کارگاه مکانیک، الکترونیک و ساخت",
+      "lessonCostMinWageMultiple": 0.18,
+      "minPracticeAge": 9,
+      "relatedSkillId": "technical",
+      "relatedParentJobKeywords": ["راننده", "مهندس", "فنی"],
+      "relatedParentTraits": ["پرتلاش", "کم‌حرف", "محتاط"],
+      "schoolTypeBonus": { "public": 0.04, "private": 0.02, "sampad": 0.03 },
+      "cityAccessBoostIds": ["tabriz", "isfahan", "tehran", "ahvaz", "sari"],
+      "discoveryHintsFa": [
+        "اسباب‌بازی یا دوچرخه خراب را به جای کنار گذاشتن، با حوصله باز می‌کنی و قلق تعمیرش را پیدا می‌کنی.",
+        "دست‌به‌آچار ماهری هستی و از صدای موتور یا سازوکار ابزارها سریع متوجه ایرادشان می‌شوی."
+      ]
+    }
+  ]
+}
