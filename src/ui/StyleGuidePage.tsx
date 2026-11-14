@@ -1,5 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { gameDataset } from '../data/registry';
+import { createNewSaveGame } from '../engine/generator';
 import { toPersianDigits } from '../engine/jalali';
+import {
+  deriveDefaultPriorities,
+  getJobMarketListings,
+  type JobMarketItem,
+} from '../engine/jobCompass';
+import type { JobCompassPriorities } from '../engine/types';
 import {
   ActionButton,
   ActionRow,
@@ -31,6 +39,19 @@ import {
 import { PersonAvatar } from './components/PersonAvatar';
 import { ChecklistCard, InspectorVisitCard } from './components/AdoptionCards';
 import { BottomSheet } from './components/BottomSheet';
+import {
+  COMPARE_SERIES_COLORS,
+  CompareSheet,
+  FingerprintRadar,
+  JobDeck,
+  JobDetailSheet,
+  JobRow,
+  MatchRing,
+  PrioritySheet,
+  PriorityStrip,
+  ReadinessRing,
+  prioritiesToRadarValues,
+} from './components/jobCompass';
 import {
   IconBackRtl,
   IconBrandMark,
@@ -71,6 +92,52 @@ export function StyleGuidePage({
   const [infoOpen, setInfoOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
+
+  // Job Compass StyleGuide fixture state
+  const sampleSave = useMemo(() => {
+    const sg = createNewSaveGame(
+      { seed: 'styleguide-job-compass', birthCityId: 'tehran', birthJalaliYear: 1384 },
+      gameDataset,
+    );
+    sg.state.currentJalaliYear = 1405;
+    sg.state.player.age = 21;
+    sg.state.player.education.level = 'diploma';
+    sg.state.player.education.inSchool = false;
+    sg.state.player.militaryStatus = 'completed';
+    sg.state.player.discoveredTalents = [
+      {
+        talentId: 'visual_art',
+        tier: 'clear_talent',
+        discoveredAge: 16,
+        hintTextFa: 'استعداد هنری و کار با فرم و رنگ',
+      },
+    ];
+    return sg;
+  }, []);
+  const defaultPriorities = useMemo(
+    () => deriveDefaultPriorities(sampleSave.state),
+    [sampleSave],
+  );
+  const [jcPriorities, setJcPriorities] = useState<JobCompassPriorities>(defaultPriorities);
+  const [jcCustomized, setJcCustomized] = useState(false);
+  const [jcPriorityOpen, setJcPriorityOpen] = useState(false);
+  const [jcSalaryUnit, setJcSalaryUnit] = useState<'monthly' | 'annual'>('monthly');
+  const [jcSelectedItem, setJcSelectedItem] = useState<JobMarketItem | null>(null);
+  const [jcCompareOpen, setJcCompareOpen] = useState(false);
+  const [jcShortlist, setJcShortlist] = useState<string[]>(['barber']);
+  const [jcPinnedId, setJcPinnedId] = useState<string | null>('software_engineer');
+
+  const jcListings = useMemo(
+    () =>
+      getJobMarketListings(sampleSave.state, gameDataset, {
+        priorities: jcPriorities,
+      }),
+    [sampleSave, jcPriorities],
+  );
+  const sampleReady = jcListings.ready[0] ?? jcListings.allItems[0];
+  const sampleNearLocked = jcListings.nearReady[0] ?? jcListings.allItems[1];
+  const sampleFutureLocked = jcListings.future[0] ?? jcListings.allItems[2];
+  const sampleCompareItems = [sampleReady, sampleNearLocked].filter(Boolean);
 
   return (
     <div className="flex min-h-[100dvh] w-full justify-center bg-[var(--surface-2)]">
@@ -448,6 +515,106 @@ export function StyleGuidePage({
               window.setTimeout(() => setToastOpen(false), 1800);
             }}
           />
+
+          {/* Job Compass & Job Market Redesign Showcase */}
+          <Card className="space-y-4" data-testid="styleguide-job-compass">
+            <SectionHeader
+              title="قطب‌نمای شغل و ردیف‌های بازار کار"
+              subtitle="نمایش کامل عنوان بدون بریدگی، حقوق با واحد، حلقه تناسب و نمودار پنج‌محوری"
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <MatchRing score={86} />
+                <MatchRing score={58} />
+                <ReadinessRing score={67} />
+              </div>
+              <div className="flex items-center rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-0.5">
+                {(['monthly', 'annual'] as const).map((unit) => (
+                  <button
+                    key={unit}
+                    type="button"
+                    onClick={() => setJcSalaryUnit(unit)}
+                    className={`min-h-[40px] rounded-lg px-2.5 text-xs font-bold ${
+                      jcSalaryUnit === unit
+                        ? 'bg-[var(--surface)] text-[var(--primary-strong)]'
+                        : 'text-[var(--text-muted)]'
+                    }`}
+                  >
+                    {unit === 'monthly' ? 'ماهانه' : 'سالانه'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <PriorityStrip
+              priorities={jcPriorities}
+              customized={jcCustomized}
+              onOpenEditor={() => setJcPriorityOpen(true)}
+            />
+
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] divide-y divide-[var(--border)]">
+              {[sampleReady, sampleNearLocked, sampleFutureLocked]
+                .filter((x): x is JobMarketItem => Boolean(x))
+                .map((item) => (
+                  <JobRow
+                    key={`sg-row-${item.job.id}`}
+                    item={item}
+                    salaryUnit={jcSalaryUnit}
+                    isPinnedGoal={jcPinnedId === item.job.id}
+                    isShortlisted={jcShortlist.includes(item.job.id)}
+                    onSelect={() => setJcSelectedItem(item)}
+                  />
+                ))}
+            </div>
+
+            {sampleReady && (
+              <FingerprintRadar
+                series={[
+                  {
+                    id: sampleReady.job.id,
+                    labelFa: sampleReady.job.shortTitle,
+                    values: sampleReady.fingerprint,
+                    stroke: COMPARE_SERIES_COLORS[0].stroke,
+                    fill: COMPARE_SERIES_COLORS[0].fill,
+                  },
+                  {
+                    id: 'sg-player',
+                    labelFa: 'اولویت‌های تو',
+                    values: prioritiesToRadarValues(jcPriorities),
+                    stroke: 'var(--text)',
+                    fill: 'rgba(138, 117, 104, 0.08)',
+                    dashed: true,
+                  },
+                ]}
+              />
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              <ActionButton
+                label="پیش‌نمایش جزئیات شغل"
+                variant="secondary"
+                onClick={() => sampleReady && setJcSelectedItem(sampleReady)}
+              />
+              <ActionButton
+                label="مقایسه دو شغل"
+                variant="secondary"
+                onClick={() => setJcCompareOpen(true)}
+              />
+            </div>
+
+            <JobDeck
+              items={jcListings.allItems.slice(0, 4)}
+              salaryUnit={jcSalaryUnit}
+              shortlistedIds={jcShortlist}
+              onShortlistAndNext={(jobId) =>
+                setJcShortlist((prev) =>
+                  prev.includes(jobId) ? prev : [...prev, jobId],
+                )
+              }
+              onOpenDetail={(item) => setJcSelectedItem(item)}
+            />
+          </Card>
         </main>
 
         <BottomSheet
@@ -511,6 +678,66 @@ export function StyleGuidePage({
         />
 
         <Toast visible={toastOpen} message="عملیات نمونه با موفقیت اجرا شد" tone="success" />
+
+        <PrioritySheet
+          open={jcPriorityOpen}
+          priorities={jcPriorities}
+          customized={jcCustomized}
+          onClose={() => setJcPriorityOpen(false)}
+          onChange={(next) => {
+            setJcPriorities(next);
+            setJcCustomized(true);
+          }}
+          onReset={() => {
+            setJcPriorities(defaultPriorities);
+            setJcCustomized(false);
+          }}
+        />
+
+        <JobDetailSheet
+          open={Boolean(jcSelectedItem)}
+          item={jcSelectedItem}
+          saveGame={sampleSave}
+          priorities={jcPriorities}
+          salaryUnit={jcSalaryUnit}
+          isShortlisted={jcSelectedItem ? jcShortlist.includes(jcSelectedItem.job.id) : false}
+          isPinnedGoal={jcSelectedItem ? jcPinnedId === jcSelectedItem.job.id : false}
+          isInCompare={false}
+          onClose={() => setJcSelectedItem(null)}
+          onToggleShortlist={(jobId) =>
+            setJcShortlist((prev) =>
+              prev.includes(jobId) ? prev.filter((x) => x !== jobId) : [...prev, jobId],
+            )
+          }
+          onTogglePinGoal={(jobId) =>
+            setJcPinnedId((prev) => (prev === jobId ? null : jobId))
+          }
+          onToggleCompare={() => {
+            setJcSelectedItem(null);
+            setJcCompareOpen(true);
+          }}
+          onStartInterview={() => {
+            setJcSelectedItem(null);
+            setToastOpen(true);
+            window.setTimeout(() => setToastOpen(false), 1800);
+          }}
+          onNavigateGapTarget={() => {
+            setJcSelectedItem(null);
+            setToastOpen(true);
+            window.setTimeout(() => setToastOpen(false), 1800);
+          }}
+        />
+
+        <CompareSheet
+          open={jcCompareOpen}
+          items={sampleCompareItems}
+          salaryUnit={jcSalaryUnit}
+          onClose={() => setJcCompareOpen(false)}
+          onOpenJobDetail={(item) => {
+            setJcCompareOpen(false);
+            setJcSelectedItem(item);
+          }}
+        />
       </div>
     </div>
   );

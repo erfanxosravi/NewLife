@@ -17,11 +17,13 @@ export function Card({
   className = '',
   tinted = false,
   onClick,
+  'data-testid': dataTestId,
 }: {
   children: ReactNode;
   className?: string;
   tinted?: boolean;
   onClick?: () => void;
+  'data-testid'?: string;
 }) {
   const base = `rounded-2xl border border-[var(--border)] p-3.5 ${
     tinted ? 'bg-[var(--surface-2)]' : 'bg-[var(--surface)]'
@@ -31,6 +33,7 @@ export function Card({
     return (
       <button
         type="button"
+        data-testid={dataTestId}
         onClick={onClick}
         className={`${base} w-full text-right transition-colors hover:border-[var(--primary)] active:scale-[0.99]`}
       >
@@ -39,7 +42,11 @@ export function Card({
     );
   }
 
-  return <section className={base}>{children}</section>;
+  return (
+    <section data-testid={dataTestId} className={base}>
+      {children}
+    </section>
+  );
 }
 
 export function SectionHeader({

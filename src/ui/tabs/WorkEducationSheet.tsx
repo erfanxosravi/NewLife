@@ -2,9 +2,14 @@ import { useMemo, useState } from 'react';
 import { gameDataset } from '../../data/registry';
 import { formatToman, toPersianDigits } from '../../engine/jalali';
 import { formatSpecialRouteChoiceSummary } from '../../engine/talents';
+import {
+  ensureJobCompassState,
+  jobGapSteps,
+  jobReadiness,
+  jobSalaryRange,
+} from '../../engine/jobCompass';
 import type {
   HighSchoolTrack,
-  JobDefinition,
   SaveGame,
   SpecialCareerRouteId,
   TalentId,
@@ -12,13 +17,13 @@ import type {
 } from '../../engine/types';
 import { useI18n } from '../../i18n/useI18n';
 import {
-  applyForJobAction,
   changeWorkplaceAction,
   developTalentAction,
   enrollUniversityAction,
   enterSpecialFallbackCareerAction,
   performCareerAction,
   performStudyAction,
+  pinJobGoalAction,
   pursueSpecialCareerAction,
   selectHighSchoolTrackAction,
   selectMilitaryOptionAction,
@@ -33,7 +38,6 @@ import {
   getAllLicensesStatus,
   getCurrentJobPromotionState,
   getEducationHistory,
-  getJobApplicationStatus,
   getKonkurFeeToman,
   getMilitaryBuyoutCostToman,
   getPendingEmployerOffer,
@@ -55,6 +59,12 @@ import {
   OwnedBusinessDetailSheet,
   OwnershipFlowDetailSheet,
 } from '../components/CareerOwnershipPanel';
+import {
+  EmojiSprite,
+  JobIconTile,
+  JobMarketSheet,
+  type JobGapActionTarget,
+} from '../components/jobCompass';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
   ActionButton,
@@ -99,7 +109,6 @@ interface WorkEducationSheetProps {
 }
 
 type SubTab = 'education' | 'career' | 'skills' | 'military';
-type JobFilter = 'all' | 'دولتی' | 'خصوصی' | 'آزاد' | 'خانوادگی';
 
 const TRACK_INFO: {
   id: HighSchoolTrack;
@@ -192,7 +201,6 @@ export function WorkEducationSheet({
   const showMilitary = player.gender === 'male' && player.age >= 17;
 
   const [subTab, setSubTab] = useState<SubTab>(player.age < 18 ? 'education' : 'career');
-  const [jobFilter, setJobFilter] = useState<JobFilter>('all');
   const [talentFilter, setTalentFilter] = useState<'discovered' | 'all'>('all');
   const [specialFilter, setSpecialFilter] = useState<'ready' | 'all'>('all');
   const [selectedRoutes, setSelectedRoutes] = useState<Record<string, SpecialCareerRouteId>>({});
@@ -209,7 +217,7 @@ export function WorkEducationSheet({
 
   const [openLadderSheet, setOpenLadderSheet] = useState(false);
   const [openJobBoardSheet, setOpenJobBoardSheet] = useState(false);
-  const [selectedJobDetail, setSelectedJobDetail] = useState<JobDefinition | null>(null);
+  const [initialMarketJobId, setInitialMarketJobId] = useState<string | null>(null);
   const [openSpecialListSheet, setOpenSpecialListSheet] = useState(false);
   const [selectedSpecialId, setSelectedSpecialId] = useState<string | null>(null);
   const [openOwnedBizSheet, setOpenOwnedBizSheet] = useState(false);
@@ -236,6 +244,43 @@ export function WorkEducationSheet({
   const pendingEmployerOffer = getPendingEmployerOffer(state);
   const pendingFamilyInheritance = getPendingFamilyBizInheritance(state);
   const ownedBiz = state.ownedBusiness;
+  const compassState = useMemo(() => ensureJobCompassState(state), [state]);
+
+  const pinnedGoalInfo = useMemo(() => {
+    if (!compassState.pinnedJobId) return null;
+    const job = gameDataset.jobs.find((j) => j.id === compassState.pinnedJobId);
+    if (!job) return null;
+    const readiness = jobReadiness(state, job, gameDataset);
+    const gapSteps = jobGapSteps(state, job, gameDataset);
+    const salary = jobSalaryRange(job, state, gameDataset);
+    return { job, readiness, gapSteps, salary };
+  }, [compassState.pinnedJobId, state]);
+
+  const handleNavigateGapTarget = (target: JobGapActionTarget) => {
+    setOpenJobBoardSheet(false);
+    setInitialMarketJobId(null);
+    if (target.type === 'education' || target.type === 'konkur') {
+      setSubTab('education');
+    } else if (target.type === 'uni') {
+      setSubTab('education');
+      if (player.education.konkurRank !== undefined && !player.education.inSchool) {
+        setOpenUniSheet(true);
+      }
+    } else if (target.type === 'license') {
+      setSubTab('career');
+      setOpenLicensesSheet(true);
+    } else if (target.type === 'skill') {
+      setSubTab('skills');
+      if (
+        target.id &&
+        gameDataset.skills.findIndex((s) => s.id === target.id) >= 6
+      ) {
+        setOpenAllSkillsSheet(true);
+      }
+    } else if (target.type === 'military' && showMilitary) {
+      setSubTab('military');
+    }
+  };
 
   const tabItems = useMemo(() => {
     const base: { value: SubTab; label: string }[] = [
@@ -248,11 +293,6 @@ export function WorkEducationSheet({
     }
     return base;
   }, [showMilitary, t]);
-
-  const filteredJobs = useMemo(() => {
-    if (jobFilter === 'all') return gameDataset.jobs;
-    return gameDataset.jobs.filter((j) => (j.employerType ?? 'خصوصی') === jobFilter);
-  }, [jobFilter]);
 
   const currentStageLabel = t(`education.stageLabels.${player.education.level}`);
   const tutorCost = getTutorCostToman(state, gameDataset);
@@ -275,9 +315,6 @@ export function WorkEducationSheet({
     : null;
   const activeSpecialCard = selectedSpecialId
     ? specialCareerCards.find((c) => c.career.id === selectedSpecialId) ?? null
-    : null;
-  const activeJobDetailStatus = selectedJobDetail
-    ? getJobApplicationStatus(selectedJobDetail, state, gameDataset)
     : null;
 
   return (
@@ -493,8 +530,12 @@ export function WorkEducationSheet({
                     onInfo={() => setInfoTopic('career')}
                     metrics={[
                       {
-                        label: 'خالص حقوق سالانه',
-                        value: <CurrencyText amountToman={player.job.annualSalaryToman} />,
+                        label: 'خالص حقوق ماهانه',
+                        value: (
+                          <bdi dir="rtl" className="tabular-nums">
+                            {formatToman(Math.round(player.job.annualSalaryToman / 12))} / ماه
+                          </bdi>
+                        ),
                         tone: 'success',
                       },
                       {
@@ -531,6 +572,93 @@ export function WorkEducationSheet({
                       },
                     ]}
                   />
+                )}
+
+                {pinnedGoalInfo && (
+                  <Card className="space-y-3" data-testid="career-goal-card">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <JobIconTile iconKey={pinnedGoalInfo.job.iconKey} />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--primary-strong)]">
+                            <EmojiSprite emoji="🎯" label="هدف شغلی" className="text-xs" />
+                            <span>{t('careerMarket.goalCardTitle')}</span>
+                          </div>
+                          <h4 className="mt-0.5 text-base font-bold leading-snug text-[var(--text)]">
+                            {pinnedGoalInfo.job.shortTitle}
+                          </h4>
+                          <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                            {pinnedGoalInfo.readiness.shortGapFa}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-xl bg-[var(--primary-soft)] px-2.5 py-1 text-xs font-bold tabular-nums text-[var(--primary-strong)]">
+                        {toPersianDigits(pinnedGoalInfo.readiness.score)}٪
+                      </span>
+                    </div>
+
+                    <div
+                      className="h-2 w-full overflow-hidden rounded-full bg-[var(--surface-2)]"
+                      role="progressbar"
+                      aria-valuenow={pinnedGoalInfo.readiness.score}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <div
+                        className="h-full rounded-full bg-[var(--primary)] transition-all duration-300"
+                        style={{ width: `${pinnedGoalInfo.readiness.score}%` }}
+                      />
+                    </div>
+
+                    <ProgressStepper
+                      orientation="vertical"
+                      steps={pinnedGoalInfo.gapSteps.map((step) => ({
+                        id: step.id,
+                        title: step.titleFa,
+                        subtitle: step.subtitleFa,
+                        status: step.done ? 'done' : step.actionTarget ? 'current' : 'upcoming',
+                      }))}
+                    />
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      {(() => {
+                        const nextActionable = pinnedGoalInfo.gapSteps.find(
+                          (s) => !s.done && s.actionTarget,
+                        );
+                        if (nextActionable?.actionTarget) {
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => handleNavigateGapTarget(nextActionable.actionTarget!)}
+                              className="min-h-[44px] flex-1 rounded-xl bg-[var(--primary)] px-3 text-xs font-bold text-[var(--on-primary)] hover:bg-[var(--primary-strong)]"
+                            >
+                              {nextActionable.actionTarget.labelFa}
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInitialMarketJobId(pinnedGoalInfo.job.id);
+                          setOpenJobBoardSheet(true);
+                        }}
+                        className="min-h-[44px] flex-1 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 text-xs font-bold text-[var(--text)] hover:border-[var(--primary)]"
+                      >
+                        مشاهده شغل
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateSave(pinJobGoalAction(saveGame, pinnedGoalInfo.job.id))
+                        }
+                        className="min-h-[44px] rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text)]"
+                      >
+                        {t('careerMarket.unpinGoal')}
+                      </button>
+                    </div>
+                  </Card>
                 )}
 
                 {(player.job ||
@@ -1211,175 +1339,19 @@ export function WorkEducationSheet({
         )}
       </DetailSheet>
 
-      {/* Job Board DetailSheet */}
-      <DetailSheet
+      {/* Job Compass Market Sheet */}
+      <JobMarketSheet
         open={openJobBoardSheet}
-        onClose={() => setOpenJobBoardSheet(false)}
-        title={t('career.jobBoard')}
-        subtitle="برای مشاهده جزئیات، کسورات و شرایط روی هر شغل بزن"
-        stickySubHeader={
-          <FilterChips
-            value={jobFilter}
-            onChange={setJobFilter}
-            items={[
-              { value: 'all', label: 'همه' },
-              { value: 'دولتی', label: 'دولتی' },
-              { value: 'خصوصی', label: 'خصوصی' },
-              { value: 'آزاد', label: 'آزاد' },
-              { value: 'خانوادگی', label: 'خانوادگی' },
-            ]}
-          />
-        }
-      >
-        <SectionGroup title="فهرست مشاغل">
-          {filteredJobs.map((job) => {
-            const status = getJobApplicationStatus(job, state, gameDataset);
-            const isCurrent = player.job?.jobId === job.id;
-            return (
-              <ActionRow
-                key={job.id}
-                icon={<IconCareerEdu className="h-4 w-4" />}
-                iconTone={isCurrent ? 'success' : status.eligible ? 'primary' : 'neutral'}
-                title={job.titleFa}
-                subtitle={`${job.employerType ?? 'خصوصی'} · استرس ${toPersianDigits(job.stress)}٪ · شانس ${toPersianDigits(status.estimatedChancePct)}٪`}
-                value={formatToman(status.estimatedSalary)}
-                statusChip={isCurrent ? 'done' : status.eligible ? 'in_progress' : 'locked'}
-                showChevron
-                onClick={() => setSelectedJobDetail(job)}
-              />
-            );
-          })}
-        </SectionGroup>
-      </DetailSheet>
-
-      {/* Single Job DetailSheet (z-[56]) */}
-      <DetailSheet
-        open={Boolean(selectedJobDetail && activeJobDetailStatus)}
-        onClose={() => setSelectedJobDetail(null)}
-        title={selectedJobDetail?.titleFa ?? ''}
-        subtitle={selectedJobDetail?.employerType ?? 'خصوصی'}
-        zIndexClass="z-[56]"
-        footer={
-          selectedJobDetail && activeJobDetailStatus ? (
-            <ActionButton
-              label={player.job?.jobId === selectedJobDetail.id ? 'شغل فعلی تو' : 'ارسال درخواست و مصاحبه'}
-              costText={`خالص ${formatToman(activeJobDetailStatus.estimatedSalary)} / سال`}
-              disabled={player.job?.jobId === selectedJobDetail.id || !activeJobDetailStatus.eligible}
-              disabledReason={
-                player.job?.jobId === selectedJobDetail.id
-                  ? 'در حال فعالیت'
-                  : activeJobDetailStatus.reason
-              }
-              onClick={() => {
-                const res = applyForJobAction(saveGame, selectedJobDetail, gameDataset);
-                onUpdateSave(res);
-                if (res.success) {
-                  setSelectedJobDetail(null);
-                  setOpenJobBoardSheet(false);
-                }
-              }}
-            />
-          ) : undefined
-        }
-      >
-        {selectedJobDetail && activeJobDetailStatus && (
-          <>
-            <HubHeroCard
-              icon={<IconCareerEdu className="h-5 w-5" />}
-              title={selectedJobDetail.titleFa}
-              subtitle={
-                selectedJobDetail.noPromotions
-                  ? 'شغل آزاد بدون ترفیع سازمانی'
-                  : `سقف مسیر استخدامی: ${selectedJobDetail.ladder[selectedJobDetail.ladder.length - 1].titleFa}`
-              }
-              status={
-                player.job?.jobId === selectedJobDetail.id
-                  ? 'done'
-                  : activeJobDetailStatus.eligible
-                    ? 'in_progress'
-                    : 'locked'
-              }
-              metrics={[
-                {
-                  label: 'خالص سالانه',
-                  value: formatToman(activeJobDetailStatus.estimatedSalary),
-                  tone: 'success',
-                },
-                { label: 'استرس', value: `${toPersianDigits(selectedJobDetail.stress)}٪` },
-                {
-                  label: 'شانس پذیرش',
-                  value: `${toPersianDigits(activeJobDetailStatus.estimatedChancePct)}٪`,
-                  tone: 'primary',
-                },
-              ]}
-            />
-
-            <SectionGroup title="برآورد حقوق و کسورات">
-              <ActionRow
-                title="ناخالص سالانه"
-                value={formatToman(activeJobDetailStatus.breakdown.grossAnnual)}
-              />
-              <ActionRow
-                title="کسورات، بیمه و مالیات"
-                value={formatToman(
-                  activeJobDetailStatus.breakdown.commission +
-                    activeJobDetailStatus.breakdown.runningCosts +
-                    activeJobDetailStatus.breakdown.bimeh +
-                    activeJobDetailStatus.breakdown.incomeTax,
-                )}
-              />
-              <ActionRow
-                title="معادل ارزی"
-                value={formatUsdEquivalentHint(
-                  activeJobDetailStatus.estimatedSalary,
-                  state,
-                  gameDataset,
-                )}
-              />
-            </SectionGroup>
-
-            <RequirementsChecklist
-              title="پیش‌نیازهای استخدام"
-              items={[
-                {
-                  id: 'age18',
-                  label: 'حداقل ۱۸ سال سن',
-                  met: player.age >= 18,
-                  currentText: `${toPersianDigits(player.age)} سال`,
-                  requiredText: '۱۸ سال',
-                },
-                {
-                  id: 'edu',
-                  label: `حداقل مدرک: ${t(`education.stageLabels.${selectedJobDetail.minEducation}`)}`,
-                  met: activeJobDetailStatus.reason !== 'مدرک تحصیلی کافی نیست',
-                },
-                ...(selectedJobDetail.requiredLicenseId
-                  ? [
-                      {
-                        id: 'lic',
-                        label: `دریافت ${
-                          gameDataset.businesses.licenses.find(
-                            (l) => l.id === selectedJobDetail.requiredLicenseId,
-                          )?.titleFa ?? 'مجوز تخصصی'
-                        }`,
-                        met: (player.licenses ?? []).includes(selectedJobDetail.requiredLicenseId),
-                      },
-                    ]
-                  : []),
-                ...(selectedJobDetail.employerType === 'دولتی'
-                  ? [
-                      {
-                        id: 'gov_rec',
-                        label: 'نداشتن سوءپیشینه کیفری',
-                        met: player.criminalRecord === 0,
-                      },
-                    ]
-                  : []),
-              ]}
-            />
-          </>
-        )}
-      </DetailSheet>
+        saveGame={saveGame}
+        initialJobId={initialMarketJobId}
+        onClose={() => {
+          setOpenJobBoardSheet(false);
+          setInitialMarketJobId(null);
+        }}
+        onUpdateSave={onUpdateSave}
+        onSilentSaveUpdate={onEffortChange}
+        onNavigateGapTarget={handleNavigateGapTarget}
+      />
 
       {/* Special Careers List DetailSheet */}
       <DetailSheet

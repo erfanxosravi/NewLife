@@ -279,21 +279,28 @@ async function run() {
             await page.waitForSelector('text=مجوزهای رسمی و حرفه‌ای');
             await page.locator('[role="dialog"] button[aria-label="بازگشت"]').last().click();
           }
-          // Apply to barber job via Job Board -> Job Detail -> Apply
+          // Apply to barber job via Job Market -> Job Detail -> Mini Interview
           const jobBoardEntry = page.locator('[data-testid="job-board-entry"]');
           if ((await jobBoardEntry.count()) > 0) {
             await jobBoardEntry.click();
-            await page.waitForSelector('text=فهرست مشاغل');
-            const barberRow = page.locator('[role="dialog"] button:has-text("آرایشگر")').first();
+            await page.waitForSelector('[data-testid="priority-strip"]');
+            const barberRow = page.locator('[data-testid="job-row-barber"]');
             if ((await barberRow.count()) > 0) {
               await barberRow.click();
-              await page.waitForSelector('text=پیش‌نیازهای استخدام');
-              const applyBarberBtn = page
-                .locator('[role="dialog"] button:has-text("ارسال درخواست و مصاحبه")')
-                .last();
+              await page.waitForSelector('[data-testid="job-detail-requirements"]');
+              const applyBarberBtn = page.locator('[data-testid="job-detail-apply-btn"]');
               if ((await applyBarberBtn.count()) > 0 && (await applyBarberBtn.isEnabled())) {
                 await applyBarberBtn.click();
-                await page.waitForTimeout(200);
+                await page.waitForSelector('[data-testid="interview-begin-btn"]');
+                await page.click('[data-testid="interview-begin-btn"]');
+                for (let step = 0; step < 3; step++) {
+                  const qCard = page.locator('[data-testid="interview-question-card"]');
+                  if ((await qCard.count()) === 0) break;
+                  await qCard.locator('button').first().click();
+                  await page.click('[data-testid="interview-next-btn"]');
+                }
+                await page.waitForSelector('[data-testid="interview-result-card"]');
+                await page.click('[data-testid="interview-done-btn"]');
               }
             }
           }

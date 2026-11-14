@@ -10,6 +10,7 @@ interface BottomSheetProps {
   allowSnapToggle?: boolean;
   dismissible?: boolean;
   headerExtra?: ReactNode;
+  zIndexClass?: string;
   children: ReactNode;
 }
 
@@ -22,6 +23,7 @@ export function BottomSheet({
   allowSnapToggle = false,
   dismissible = true,
   headerExtra,
+  zIndexClass = 'z-50',
   children,
 }: BottomSheetProps) {
   const [currentSnap, setCurrentSnap] = useState<'half' | 'full'>(snap);
@@ -97,7 +99,7 @@ export function BottomSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 backdrop-blur-[2px]"
+      className={`fixed inset-0 ${zIndexClass} flex items-end justify-center bg-black/45 backdrop-blur-[2px]`}
       onClick={() => {
         if (dismissible && onClose) onClose();
       }}

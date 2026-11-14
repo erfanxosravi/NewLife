@@ -685,7 +685,7 @@ export function jobMatch(
 
   let explanationFa = '';
   if (topHigh.length > 0 && lowHigh.length > 0) {
-    explanationFa = `در ${topHigh.slice(0, 2).join(' و ')} هم‌سو با اولویت توست، اما در ${lowHigh[0]} پایین‌تر از انتظر است.`;
+    explanationFa = `در ${topHigh.slice(0, 2).join(' و ')} هم‌سو با اولویت توست، اما در ${lowHigh[0]} پایین‌تر از انتظار است.`;
   } else if (topHigh.length >= 2) {
     explanationFa = `در ${topHigh.slice(0, 2).join(' و ')} دقیقاً هم‌راستای اولویت‌های الان توست${talentMatched ? ' و با استعدادت هم می‌خواند.' : '.'}`;
   } else if (finalScore >= 65) {
