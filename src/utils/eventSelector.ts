@@ -61,19 +61,20 @@ export function pickPendingEventForTurn(
   if (!save.state.isAlive) return null;
 
   const rng = new SeededRNG(`${save.seed}:turn:${save.state.turn}`);
+  const allEvents = [...dataset.events, ...(dataset.adoption?.longTermEvents ?? [])];
 
   // Check scheduled follow-ups first
   const due = save.state.scheduledEvents.find(
     (item) => item.triggerAtAge === save.state.player.age,
   );
   if (due) {
-    const found = dataset.events.find((e) => e.id === due.eventId);
+    const found = allEvents.find((e) => e.id === due.eventId);
     if (found && isContentAllowed(found, save)) {
       return found;
     }
   }
 
-  const eligible = dataset.events.filter((ev) => matchesConditions(ev, save));
+  const eligible = allEvents.filter((ev) => matchesConditions(ev, save));
   if (eligible.length === 0) return null;
 
   // Trigger an event roughly ~65% of eligible turns so choices feel frequent and lively

@@ -31,6 +31,7 @@ export function CharacterCreation({
   const [birthYearMode, setBirthYearMode] = useState<'random' | number>('random');
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
+  const [startingScenarioId, setStartingScenarioId] = useState<'standard' | 'welfare_center'>('standard');
   const [advancedOpen, setAdvancedOpen] = useState<boolean>(false);
 
   const selectedCity = useMemo(
@@ -94,6 +95,7 @@ export function CharacterCreation({
         birthJalaliYear: birthYearMode === 'random' ? undefined : birthYearMode,
         firstName: firstName.trim() || undefined,
         lastName: lastName.trim() || undefined,
+        startingScenarioId,
       },
       gameDataset,
     );
@@ -119,7 +121,9 @@ export function CharacterCreation({
     birthYearMode === 'random'
       ? 'سال تصادفی'
       : `متولد ${toPersianDigits(birthYearMode)}`;
-  const identityOneLine = `${identityGenderText} · ${identityCityText} · ${identityYearText} · خانواده‌ای تصادفی`;
+  const identityOriginText =
+    startingScenarioId === 'welfare_center' ? 'خانه کودکان بهزیستی' : 'خانواده‌ای تصادفی';
+  const identityOneLine = `${identityGenderText} · ${identityCityText} · ${identityYearText} · ${identityOriginText}`;
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
@@ -146,6 +150,28 @@ export function CharacterCreation({
         </div>
 
         <Card className="space-y-3.5">
+          <div>
+            <label className="mb-1.5 block text-xs font-bold text-[var(--text-muted)]">
+              {t('adoption.welfarePackTitle')}
+            </label>
+            <SegmentedControl
+              value={startingScenarioId}
+              onChange={(val) => {
+                triggerHaptic('light');
+                setStartingScenarioId(val);
+              }}
+              items={[
+                { value: 'standard', label: t('adoption.welfarePackStandard') },
+                { value: 'welfare_center', label: t('adoption.welfarePackLabel') },
+              ]}
+            />
+            {startingScenarioId === 'welfare_center' && (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-[var(--primary-strong)]">
+                {gameDataset.adoption.challengePack.subtitleFa}
+              </p>
+            )}
+          </div>
+
           <div>
             <label className="mb-1.5 block text-xs font-bold text-[var(--text-muted)]">
               {t('creation.gender')}

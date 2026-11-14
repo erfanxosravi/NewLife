@@ -1,10 +1,12 @@
 import type { GameDataset } from '../data/registry';
+import { createEmptyAdoptionState, generateIndependentAvatarSeed } from './adoption';
 import {
   getInitialPocketMoney,
   initializeMacroFlagsForBirthYear,
   pickInflationScenario,
 } from './economy';
 import { toPersianDigits } from './jalali';
+import { createDefaultJobCompassState } from './jobCompass';
 import { generateRandomSeedString, SeededRNG } from './rng';
 import { CURRENT_SCHEMA_VERSION } from './schemas';
 import { clampStat } from './stats';
@@ -30,6 +32,7 @@ export interface CharacterCreationOptions {
   firstName?: string;
   lastName?: string;
   socialClass?: SocialClass;
+  startingScenarioId?: 'standard' | 'welfare_center';
   contentSettings?: Partial<ContentSettings>;
 }
 
@@ -80,6 +83,10 @@ export function createNewSaveGame(
   const seed = options.seed?.trim() || generateRandomSeedString();
   const rng = new SeededRNG(seed);
 
+  const startingScenarioId: 'standard' | 'welfare_center' =
+    options.startingScenarioId === 'welfare_center' ? 'welfare_center' : 'standard';
+  const isWelfareScenario = startingScenarioId === 'welfare_center';
+
   const gender: Gender = options.gender ?? (rng.chance(0.5) ? 'male' : 'female');
   const birthCity =
     dataset.cities.find((c) => c.id === options.birthCityId) ??
@@ -94,7 +101,7 @@ export function createNewSaveGame(
     (gender === 'male' ? rng.pick(ethNames.maleFirstNames) : rng.pick(ethNames.femaleFirstNames));
   const lastName = options.lastName?.trim() || rng.pick(ethNames.lastNames);
 
-  const socialClass = options.socialClass ?? pickSocialClass(rng);
+  const socialClass = isWelfareScenario ? 'poor' : (options.socialClass ?? pickSocialClass(rng));
   const birthJalaliYear = options.birthJalaliYear ?? rng.int(1372, 1403);
   const econScenario = pickInflationScenario(rng);
   const macroInit = initializeMacroFlagsForBirthYear(birthJalaliYear, econScenario, dataset);
@@ -105,7 +112,7 @@ export function createNewSaveGame(
 
   const stats = {
     health: clampStat(rng.int(65, 96) + healthBoost),
-    happiness: clampStat(rng.int(60, 92)),
+    happiness: clampStat(isWelfareScenario ? rng.int(56, 82) : rng.int(60, 92)),
     intelligence: clampStat(rng.int(35, 92) + intelBoost),
     looks: clampStat(rng.int(35, 95)),
     fame: clampStat(socialClass === 'wealthy' ? rng.int(8, 22) : rng.int(0, 8)),
@@ -115,64 +122,96 @@ export function createNewSaveGame(
   const hiddenStats = {
     luck: clampStat(rng.int(15, 90)),
     talent: clampStat(rng.int(20, 95)),
-    conscientiousness: clampStat(rng.int(20, 90)),
+    conscientiousness: clampStat(isWelfareScenario ? rng.int(40, 95) : rng.int(20, 90)),
     riskAppetite: clampStat(rng.int(15, 85)),
   };
 
-  // Generate family
+  // Generate family or welfare center mentor
   const npcs: Record<string, Person> = {};
   const relationships: Relationship[] = [];
   const familyJobs = dataset.jobs;
 
-  const hasFather = rng.chance(0.92);
-  const hasMother = rng.chance(0.96);
-
-  if (hasFather) {
-    const fatherId = 'npc_father';
-    const fatherJob = rng.pick(familyJobs);
-    npcs[fatherId] = {
-      id: fatherId,
-      firstName: rng.pick(ethNames.maleFirstNames),
-      lastName,
-      gender: 'male',
-      age: rng.int(24, 42),
-      traits: [rng.pick(PARENT_TRAITS), rng.pick(PARENT_TRAITS)].filter(
-        (v, i, arr) => arr.indexOf(v) === i,
-      ),
-      jobTitle: fatherJob.titleFa,
+  if (isWelfareScenario) {
+    const mentorGender: Gender = rng.chance(0.6) ? 'female' : 'male';
+    const mentorId = 'npc_mentor_welfare';
+    const mentorFirst =
+      mentorGender === 'male'
+        ? rng.pick(ethNames.maleFirstNames)
+        : rng.pick(ethNames.femaleFirstNames);
+    const mentorLast = rng.pick(ethNames.lastNames);
+    const mentorTitle = rng.pick(dataset.adoption.challengePack.mentorTitlesFa);
+    npcs[mentorId] = {
+      id: mentorId,
+      firstName: mentorFirst,
+      lastName: mentorLast,
+      gender: mentorGender,
+      age: rng.int(28, 44),
+      traits: ['دلسوز', 'صبور'],
+      jobTitle: mentorTitle,
       isAlive: true,
+      avatarSeed: generateIndependentAvatarSeed(rng, 'mentor'),
+      originKind: 'mentor',
     };
     relationships.push({
-      personId: fatherId,
-      role: 'father',
-      closeness: rng.int(65, 95),
-      respect: rng.int(60, 95),
+      personId: mentorId,
+      role: 'friend',
+      closeness: rng.int(75, 92),
+      respect: rng.int(80, 95),
       romance: 0,
     });
-  }
+  } else {
+    const hasFather = rng.chance(0.92);
+    const hasMother = rng.chance(0.96);
 
-  if (hasMother) {
-    const motherId = 'npc_mother';
-    const motherJobTitle = rng.chance(0.45) ? rng.pick(familyJobs).titleFa : 'خانه‌دار';
-    npcs[motherId] = {
-      id: motherId,
-      firstName: rng.pick(ethNames.femaleFirstNames),
-      lastName: rng.pick(ethNames.lastNames),
-      gender: 'female',
-      age: rng.int(21, 38),
-      traits: [rng.pick(PARENT_TRAITS), rng.pick(PARENT_TRAITS)].filter(
-        (v, i, arr) => arr.indexOf(v) === i,
-      ),
-      jobTitle: motherJobTitle,
-      isAlive: true,
-    };
-    relationships.push({
-      personId: motherId,
-      role: 'mother',
-      closeness: rng.int(72, 98),
-      respect: rng.int(70, 98),
-      romance: 0,
-    });
+    if (hasFather) {
+      const fatherId = 'npc_father';
+      const fatherJob = rng.pick(familyJobs);
+      npcs[fatherId] = {
+        id: fatherId,
+        firstName: rng.pick(ethNames.maleFirstNames),
+        lastName,
+        gender: 'male',
+        age: rng.int(24, 42),
+        traits: [rng.pick(PARENT_TRAITS), rng.pick(PARENT_TRAITS)].filter(
+          (v, i, arr) => arr.indexOf(v) === i,
+        ),
+        jobTitle: fatherJob.titleFa,
+        isAlive: true,
+        avatarSeed: generateIndependentAvatarSeed(rng, 'father'),
+      };
+      relationships.push({
+        personId: fatherId,
+        role: 'father',
+        closeness: rng.int(65, 95),
+        respect: rng.int(60, 95),
+        romance: 0,
+      });
+    }
+
+    if (hasMother) {
+      const motherId = 'npc_mother';
+      const motherJobTitle = rng.chance(0.45) ? rng.pick(familyJobs).titleFa : 'خانه‌دار';
+      npcs[motherId] = {
+        id: motherId,
+        firstName: rng.pick(ethNames.femaleFirstNames),
+        lastName: rng.pick(ethNames.lastNames),
+        gender: 'female',
+        age: rng.int(21, 38),
+        traits: [rng.pick(PARENT_TRAITS), rng.pick(PARENT_TRAITS)].filter(
+          (v, i, arr) => arr.indexOf(v) === i,
+        ),
+        jobTitle: motherJobTitle,
+        isAlive: true,
+        avatarSeed: generateIndependentAvatarSeed(rng, 'mother'),
+      };
+      relationships.push({
+        personId: motherId,
+        role: 'mother',
+        closeness: rng.int(72, 98),
+        respect: rng.int(70, 98),
+        romance: 0,
+      });
+    }
   }
 
   const parentJobTitles: string[] = [];
@@ -194,15 +233,17 @@ export function createNewSaveGame(
     dataset,
   });
 
-  const siblingCount = rng.weightedPick(
-    [
-      { n: 0, w: 30 },
-      { n: 1, w: 40 },
-      { n: 2, w: 22 },
-      { n: 3, w: 8 },
-    ],
-    (item) => item.w,
-  ).n;
+  const siblingCount = isWelfareScenario
+    ? 0
+    : rng.weightedPick(
+        [
+          { n: 0, w: 30 },
+          { n: 1, w: 40 },
+          { n: 2, w: 22 },
+          { n: 3, w: 8 },
+        ],
+        (item) => item.w,
+      ).n;
 
   for (let i = 0; i < siblingCount; i++) {
     const sibGender: Gender = rng.chance(0.5) ? 'male' : 'female';
@@ -220,6 +261,7 @@ export function createNewSaveGame(
       traits: [rng.pick(SIBLING_TRAITS)],
       jobTitle: sibAge >= 7 ? 'دانش‌آموز' : 'کودک',
       isAlive: true,
+      avatarSeed: generateIndependentAvatarSeed(rng, `sib_${i}`),
     };
     relationships.push({
       personId: sibId,
@@ -244,7 +286,9 @@ export function createNewSaveGame(
     ? `مادرت «${npcs['npc_mother'].firstName}» (${npcs['npc_mother'].jobTitle})`
     : 'بدون حضور مادر';
 
-  const birthText = `در سال ${toPersianDigits(birthJalaliYear)} خورشیدی در شهر ${birthCity.nameFa} و در خانواده‌ای ${classLabelMap[socialClass]} چشم به جهان گشودی. ${fatherText} و ${motherText} نخستین تکیه‌گاه‌های زندگی تو هستند.`;
+  const birthText = isWelfareScenario
+    ? `در سال ${toPersianDigits(birthJalaliYear)} خورشیدی در شهر ${birthCity.nameFa} چشم به جهان گشودی و سال‌های نخست زندگی را در خانه کودکان بهزیستی با همراهی «${npcs['npc_mentor_welfare']?.firstName ?? 'مربی'}» و دوستان هم‌سن‌وسال خود آغاز می‌کنی.`
+    : `در سال ${toPersianDigits(birthJalaliYear)} خورشیدی در شهر ${birthCity.nameFa} و در خانواده‌ای ${classLabelMap[socialClass]} چشم به جهان گشودی. ${fatherText} و ${motherText} نخستین تکیه‌گاه‌های زندگی تو هستند.`;
 
   const schoolType = pickInitialSchoolType(
     socialClass,
@@ -252,6 +296,8 @@ export function createNewSaveGame(
     birthCity.isVillage,
     rng,
   );
+
+  const playerAvatarSeed = generateIndependentAvatarSeed(rng, 'player');
 
   const initialState: GameState = {
     turn: 0,
@@ -275,7 +321,9 @@ export function createNewSaveGame(
       athleticDiscipline,
       discoveredTalents: [],
       talentSkills: {},
-      moneyToman: getInitialPocketMoney(socialClass, birthJalaliYear, dataset),
+      moneyToman: isWelfareScenario
+        ? 0
+        : getInitialPocketMoney(socialClass, birthJalaliYear, dataset),
       debtToman: 0,
       education: {
         level: 'none',
@@ -296,6 +344,9 @@ export function createNewSaveGame(
         depositRahnToman: 0,
         propertyValueToman: 0,
       },
+      avatarSeed: playerAvatarSeed,
+      startingScenarioId,
+      raisedInWelfareCenter: isWelfareScenario,
     },
     npcs,
     relationships,
@@ -305,6 +356,7 @@ export function createNewSaveGame(
     businessHistory: [],
     flags: {
       ...macroInit.flags,
+      ...(isWelfareScenario ? { raised_in_welfare_center: true } : {}),
     },
     eventHistory: {},
     scheduledEvents: [],
@@ -324,13 +376,20 @@ export function createNewSaveGame(
     deathSummary: null,
     worldSeed: seed,
     will: null,
+    adoption: createEmptyAdoptionState(),
     dynasty: {
       dynastyNameFa: `خاندان ${lastName}`,
       founderNameFa: `${firstName} ${lastName}`,
       worldSeed: seed,
       currentGeneration: 1,
       totalGenerationsLived: 0,
-      familyReputation: socialClass === 'wealthy' ? 60 : socialClass === 'upper_middle' ? 55 : 50,
+      familyReputation: isWelfareScenario
+        ? 50
+        : socialClass === 'wealthy'
+          ? 60
+          : socialClass === 'upper_middle'
+            ? 55
+            : 50,
       dynastyScore: 0,
       unlockedDynastyRibbons: [],
       chapters: [],
@@ -340,6 +399,7 @@ export function createNewSaveGame(
       ancestorMemoriesFa: [],
     },
   };
+  initialState.jobCompass = createDefaultJobCompassState(initialState);
 
   const nowIso = new Date().toISOString();
   return {

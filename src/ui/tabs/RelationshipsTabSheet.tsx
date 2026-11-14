@@ -10,10 +10,13 @@ import {
 } from '../../state/actions';
 import {
   getActionCooldownRemaining,
+  getAdoptionHubSummary,
   getGroupedRelationships,
   getNpcHistory,
   getRelationshipActionCosts,
 } from '../../state/selectors';
+import { AdoptionSheet } from '../AdoptionSheet';
+import { PersonAvatar } from '../components/PersonAvatar';
 import { FullScreenSheet } from '../components/FullScreenSheet';
 import {
   ActionRow,
@@ -68,11 +71,13 @@ export function RelationshipsTabSheet({
   const [showAllDirectory, setShowAllDirectory] = useState(false);
   const [showAllMemories, setShowAllMemories] = useState(false);
   const [showFamilyTree, setShowFamilyTree] = useState(false);
+  const [showAdoptionSheet, setShowAdoptionSheet] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [confirmDivorce, setConfirmDivorce] = useState(false);
   const [confirmMarry, setConfirmMarry] = useState(false);
 
   const grouped = useMemo(() => getGroupedRelationships(state), [state]);
+  const adoptionSummary = useMemo(() => getAdoptionHubSummary(state, gameDataset), [state]);
 
   const activeList = useMemo(() => {
     const base =
@@ -113,14 +118,29 @@ export function RelationshipsTabSheet({
   };
 
   const renderPersonRow = ({ rel, person }: { rel: Relationship; person: Person }) => {
-    const initial = person.firstName.trim().charAt(0) || '؟';
+    const originBadgeFa =
+      person.originKind === 'adopted' ||
+      person.originKind === 'temporary_guardian' ||
+      person.originKind === 'host_family'
+        ? t(`adoption.originLabels.${person.originKind}`)
+        : null;
+    const roleText = originBadgeFa ?? t(`relations.roles.${rel.role}`);
     return (
       <ActionRow
         key={person.id}
-        icon={<span className="text-sm font-bold">{initial}</span>}
+        icon={
+          <PersonAvatar
+            seed={person.avatarSeed ?? person.id}
+            gender={person.gender}
+            age={person.age}
+            size={40}
+            originKind={person.originKind}
+            deceased={!person.isAlive}
+          />
+        }
         iconTone={rel.closeness >= 70 ? 'success' : rel.closeness >= 40 ? 'primary' : 'neutral'}
         title={`${person.firstName} ${person.lastName}`}
-        subtitle={`${t(`relations.roles.${rel.role}`)} · ${formatAgeLabel(person.age)} · ${person.jobTitle}`}
+        subtitle={`${roleText} · ${formatAgeLabel(person.age)} · ${person.jobTitle}`}
         value={`${toPersianDigits(rel.closeness)}٪`}
         showChevron
         onClick={() => openPersonSheet(person.id)}
@@ -185,6 +205,34 @@ export function RelationshipsTabSheet({
             { label: 'فرزندان', value: `${toPersianDigits(grouped.children.length)} فرزند` },
           ]}
         />
+
+        {(subTab === 'children' || adoptionSummary.activeApplication || adoptionSummary.pendingTasksCount > 0) && (
+          <SectionGroup title="سرپرستی و فرزندخواندگی">
+            <ActionRow
+              icon={<IconBaby className="h-4 w-4" />}
+              title={t('adoption.entryTitle')}
+              subtitle={
+                adoptionSummary.pendingTasksCount > 0
+                  ? `${toPersianDigits(adoptionSummary.pendingTasksCount)} تکلیف نظارتی در انتظار انجام`
+                  : adoptionSummary.activeApplication
+                    ? `پرونده فعال · مرحله ${t(`adoption.steps.${adoptionSummary.activeApplication.step}`)}`
+                    : adoptionSummary.eligibilityPermanent.eligible
+                      ? 'واجد شرایط ثبت درخواست قانونی'
+                      : t('adoption.entrySubtitle')
+              }
+              state={
+                adoptionSummary.pendingTasksCount > 0 ||
+                adoptionSummary.activeApplication ||
+                adoptionSummary.eligibilityPermanent.eligible
+                  ? 'recommended'
+                  : 'enabled'
+              }
+              ctaLabel={adoptionSummary.activeApplication ? 'ادامه' : 'مشاهده'}
+              showChevron
+              onClick={() => setShowAdoptionSheet(true)}
+            />
+          </SectionGroup>
+        )}
 
         {(canFindFriend || canFindPartner) && (
           <SectionGroup title="آشنایی تازه">
@@ -274,7 +322,16 @@ export function RelationshipsTabSheet({
             {grouped.deceased.slice(0, 7).map(({ rel, person }) => (
               <ActionRow
                 key={person.id}
-                icon={<span className="text-sm font-bold">{person.firstName.trim().charAt(0) || '؟'}</span>}
+                icon={
+                  <PersonAvatar
+                    seed={person.avatarSeed ?? person.id}
+                    gender={person.gender}
+                    age={person.age}
+                    size={40}
+                    originKind={person.originKind}
+                    deceased
+                  />
+                }
                 iconTone="neutral"
                 title={`${person.firstName} ${person.lastName}`}
                 subtitle={t(`relations.roles.${rel.role}`)}
@@ -327,12 +384,23 @@ export function RelationshipsTabSheet({
           <>
             <HubHeroCard
               icon={
-                <span className="text-base font-bold">
-                  {selectedEntry.person.firstName.trim().charAt(0) || '؟'}
-                </span>
+                <PersonAvatar
+                  seed={selectedEntry.person.avatarSeed ?? selectedEntry.person.id}
+                  gender={selectedEntry.person.gender}
+                  age={selectedEntry.person.age}
+                  size={44}
+                  originKind={selectedEntry.person.originKind}
+                  deceased={!selectedEntry.person.isAlive}
+                />
               }
               title={`${selectedEntry.person.firstName} ${selectedEntry.person.lastName}`}
-              subtitle={`${t(`relations.roles.${selectedEntry.rel.role}`)} · ${selectedEntry.person.jobTitle}${
+              subtitle={`${
+                selectedEntry.person.originKind === 'adopted' ||
+                selectedEntry.person.originKind === 'temporary_guardian' ||
+                selectedEntry.person.originKind === 'host_family'
+                  ? t(`adoption.originLabels.${selectedEntry.person.originKind}`)
+                  : t(`relations.roles.${selectedEntry.rel.role}`)
+              } · ${selectedEntry.person.jobTitle}${
                 selectedEntry.person.traits.length > 0
                   ? ` · ${selectedEntry.person.traits.join('، ')}`
                   : ''
@@ -343,6 +411,28 @@ export function RelationshipsTabSheet({
                 { label: 'سن', value: formatAgeLabel(selectedEntry.person.age) },
               ]}
             />
+
+            {selectedEntry.person.adoptionMeta && (
+              <SectionGroup title="پرونده سرپرستی و نظارت">
+                <ActionRow
+                  icon={<IconBaby className="h-4 w-4" />}
+                  title={
+                    selectedEntry.person.originKind === 'adopted' ||
+                    selectedEntry.person.originKind === 'temporary_guardian' ||
+                    selectedEntry.person.originKind === 'host_family'
+                      ? t(`adoption.originLabels.${selectedEntry.person.originKind}`)
+                      : 'پرونده سرپرستی'
+                  }
+                  subtitle={
+                    selectedEntry.person.adoptionMeta.supervisionClosedAt18
+                      ? `تحویل در سال ${toPersianDigits(selectedEntry.person.adoptionMeta.placedYear)} · نظارت با رسیدن به ۱۸ سالگی به پایان رسید`
+                      : `تحویل در سال ${toPersianDigits(selectedEntry.person.adoptionMeta.placedYear)} · نظارت بهزیستی فعال`
+                  }
+                  showChevron
+                  onClick={() => setShowAdoptionSheet(true)}
+                />
+              </SectionGroup>
+            )}
 
             <Card className="space-y-2.5">
               <StatBar
@@ -638,6 +728,12 @@ export function RelationshipsTabSheet({
           }
           setConfirmDivorce(false);
         }}
+      />
+      <AdoptionSheet
+        open={showAdoptionSheet}
+        saveGame={saveGame}
+        onClose={() => setShowAdoptionSheet(false)}
+        onUpdateSave={onUpdateSave}
       />
     </FullScreenSheet>
   );

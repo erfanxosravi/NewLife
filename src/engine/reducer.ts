@@ -1,4 +1,5 @@
 import type { GameDataset } from '../data/registry';
+import { ensureAdoptionState, stepAdoptionYear } from './adoption';
 import {
   calculateJobAnnualIncomeBreakdown,
   getAnnualLivingExpenseToman,
@@ -7,6 +8,7 @@ import {
   stepMacroYear,
 } from './economy';
 import { toPersianDigits } from './jalali';
+import { ensureJobCompassState, resolveWaitlistedJobsOnYearAdvance } from './jobCompass';
 import { SeededRNG } from './rng';
 import {
   applyHiddenStatDelta,
@@ -71,6 +73,7 @@ function cloneState(state: GameState): GameState {
           specificItems: { ...state.will.specificItems },
         }
       : state.will ?? null,
+    adoption: state.adoption ? ensureAdoptionState(state) : undefined,
     dynasty: state.dynasty
       ? {
           ...state.dynasty,
@@ -81,6 +84,7 @@ function cloneState(state: GameState): GameState {
           ancestorMemoriesFa: [...state.dynasty.ancestorMemoriesFa],
         }
       : undefined,
+    jobCompass: state.jobCompass ? ensureJobCompassState(state) : undefined,
   };
 }
 
@@ -523,6 +527,22 @@ export function advanceYear(save: SaveGame, dataset: GameDataset): SaveGame {
       nextState.player.debtToman + Math.abs(nextState.player.moneyToman),
     );
     nextState.player.moneyToman = 0;
+  }
+
+  // 5b. Adoption supervision, queue progression, and welfare center milestones
+  stepAdoptionYear(nextState, rng, dataset);
+
+  // 5c. Resolve waitlisted job interviews
+  const waitlistNotes = resolveWaitlistedJobsOnYearAdvance(nextState, rng, dataset);
+  for (const note of waitlistNotes) {
+    nextState.timeline.push({
+      id: `turn_${nextState.turn}_job_waitlist_${nextState.timeline.length}`,
+      age,
+      jalaliYear: nextState.currentJalaliYear,
+      title: note.includes('تأیید شد') ? 'پذیرش نهایی از فهرست انتظار' : 'نتیجه فهرست انتظار شغلی',
+      text: note,
+      type: note.includes('تأیید شد') ? 'milestone' : 'life',
+    });
   }
 
   // 6. Achievement checks (using real purchasing power for financial freedom!)

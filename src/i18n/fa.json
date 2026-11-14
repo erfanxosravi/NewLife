@@ -170,7 +170,11 @@
       "friend": "دوست",
       "partner": "نامزد / شریک عاطفی",
       "spouse": "همسر",
-      "child": "فرزند"
+      "child": "فرزند",
+      "grandchild": "نوه",
+      "niece_nephew": "خواهرزاده / برادرزاده",
+      "cousin": "خویشاوند",
+      "ancestor": "نیا"
     },
     "closeness": "صمیمیت",
     "respect": "احترام",
@@ -290,5 +294,59 @@
     "tabStats": "آمار و نمودار",
     "tabHall": "تالار افتخار",
     "shareDynastyCard": "اشتراک‌گذاری کارت دودمان"
+  },
+  "adoption": {
+    "entryTitle": "سرپرستی و فرزندخواندگی",
+    "entrySubtitle": "فرزندخواندگی دائم، امین موقت و خانواده میزبان بر اساس قانون ۱۳۹۲",
+    "hubTitle": "سرپرستی و فرزندخواندگی",
+    "hubSubtitle": "مسیر قانونی بهزیستی و دادگاه خانواده",
+    "steps": {
+      "readiness": "آمادگی",
+      "commitment": "تعهد",
+      "application": "درخواست و مدارک",
+      "evaluation": "ارزیابی",
+      "matching": "انتخاب و آشنایی",
+      "decree": "حکم و تحویل",
+      "supervision": "نظارت"
+    },
+    "outcomes": {
+      "great": "عالی",
+      "satisfactory": "قابل قبول",
+      "needs_improvement": "نیازمند بهبود",
+      "serious_concern": "نیازمند پیگیری جدی"
+    },
+    "originLabels": {
+      "adopted": "فرزندخوانده",
+      "temporary_guardian": "امین موقت",
+      "host_family": "میهمان خانواده میزبان"
+    },
+    "welfarePackTitle": "سناریوی آغازین",
+    "welfarePackStandard": "زندگی معمولی در خانواده",
+    "welfarePackLabel": "بزرگ‌شده در مراکز بهزیستی"
+  },
+  "careerMarket": {
+    "title": "بازار کار",
+    "subtitle": "مقایسه درآمد واقعی، تطابق با اولویت‌ها و نقشه رسیدن به شغل",
+    "readyGroup": "آماده‌ی درخواست",
+    "nearReadyGroup": "نزدیک به آمادگی",
+    "futureGroup": "آینده",
+    "monthly": "ماهانه",
+    "annual": "سالانه",
+    "perMonth": "/ ماه",
+    "perYear": "/ سال",
+    "whatsImportant": "چی برات مهمه؟",
+    "priorityReset": "بازنشانی به پیش‌فرض شرایط من",
+    "deckMode": "کارت‌ها",
+    "compare": "مقایسه",
+    "pinGoal": "🎯 هدف من",
+    "pinnedGoal": "هدف فعلی من",
+    "unpinGoal": "حذف هدف",
+    "startInterview": "شروع مصاحبه و درخواست",
+    "dayInLife": "یک روز کاری",
+    "realityCheck": "حقیقت‌سنجی",
+    "sortMatch": "بیشترین تطابق",
+    "sortSalary": "بیشترین درآمد",
+    "sortReadiness": "آماده‌ترین",
+    "eligibleOnly": "فقط قابل درخواست"
   }
 }

@@ -28,5 +28,23 @@
     "titleFa": "ریشه‌دار و نوه-دار",
     "descriptionFa": "دیدن قد کشیدن نوه در کنار خانواده",
     "category": "family"
+  },
+  {
+    "id": "loving_home",
+    "titleFa": "خانه‌ای پر از مهر",
+    "descriptionFa": "تکمیل مراحل سرپرستی و پذیرش فرزندخوانده در خانواده",
+    "category": "family"
+  },
+  {
+    "id": "steadfast_guardian",
+    "titleFa": "همراهی پایدار تا جوانی",
+    "descriptionFa": "رساندن فرزندخوانده به ۱۸ سالگی با کارنامه مثبت در بازدیدهای نظارتی",
+    "category": "family"
+  },
+  {
+    "id": "helping_hand",
+    "titleFa": "میزبان دل‌گرم",
+    "descriptionFa": "پذیرش سرپرستی موقت یا میزبانی یک کودک برای ساختن روزهایی آرام",
+    "category": "family"
   }
 ]

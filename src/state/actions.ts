@@ -1,5 +1,14 @@
 import { gameDataset, type GameDataset } from '../data/registry';
 import {
+  createInspectorNpc,
+  ensureAdoptionState,
+  evaluateAdoptionEligibility,
+  evaluateHomeVisitAndInterview,
+  generateIndependentAvatarSeed,
+  generateMatchedChildCandidates,
+  getAdoptionCostEstimates,
+} from '../engine/adoption';
+import {
   buildOwnedBusinessFromQuote,
   calculateBusinessAcquisitionQuote,
   createInitialStaffMember,
@@ -15,10 +24,19 @@ import {
   calculateJobAnnualIncomeBreakdown,
   calculateNetWorthToman,
   convertDepositRentPair,
+  getBaselineScaleFromMinWage,
   getMinWageMonthlyForState,
   hasReachedFinancialFreedomMilestone,
 } from '../engine/economy';
 import { formatToman, toPersianDigits } from '../engine/jalali';
+import {
+  clampChancePct,
+  deriveDefaultPriorities,
+  ensureJobCompassState,
+  estimateJobSuccessChance,
+  jobReadiness,
+  jobSalaryRange,
+} from '../engine/jobCompass';
 import {
   applyCharityFoundationEnding,
   closeDynastyCleanly,
@@ -42,6 +60,7 @@ import {
 } from '../engine/talents';
 import type {
   ActivityDefinition,
+  AdoptionCareType,
   Asset,
   BusinessAcquisitionMode,
   BusinessFinancingMode,
@@ -54,6 +73,7 @@ import type {
   HighSchoolTrack,
   HousingListing,
   HousingRegionTier,
+  JobCompassPriorities,
   JobDefinition,
   Loan,
   MilitaryStatus,
@@ -144,6 +164,8 @@ function updateState(
     scheduledEvents: [...save.state.scheduledEvents],
     timeline: [...save.state.timeline],
     unlockedAchievements: [...save.state.unlockedAchievements],
+    adoption: save.state.adoption ? ensureAdoptionState(save.state) : undefined,
+    jobCompass: save.state.jobCompass ? ensureJobCompassState(save.state) : undefined,
   };
 
   mutator(nextState);
@@ -413,6 +435,8 @@ export function runAdvanceYearWithTick(save: SaveGame, dataset: GameDataset = ga
       if (!person || !person.isAlive) continue;
       if (
         rel.role === 'child' &&
+        person.originKind !== 'temporary_guardian' &&
+        person.originKind !== 'host_family' &&
         person.age >= 26 &&
         person.age <= 42 &&
         rng.chance(draft.unlockedAchievements.includes('grandparent') ? 0.04 : 0.18)
@@ -435,6 +459,7 @@ export function runAdvanceYearWithTick(save: SaveGame, dataset: GameDataset = ga
           isAlive: true,
           parentIds: [person.id],
           birthYear: draft.currentJalaliYear,
+          avatarSeed: generateIndependentAvatarSeed(rng, 'gc'),
         };
         draft.relationships.push({
           personId: gcId,
@@ -1998,6 +2023,7 @@ export function interactWithPersonAction(
       rel.romance = clampStat(rel.romance + 18);
       rel.closeness = clampStat(rel.closeness + 12);
       draft.player.maritalStatus = 'married';
+      draft.flags['married_year'] = draft.currentJalaliYear;
       draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 12, fame: 3 });
       msg = `جشن عروسی با ${npc.firstName} برگزار شد و زندگی مشترک را آغاز کردید.`;
       pushTimeline(draft, 'ازدواج', msg, 'milestone', { happiness: 12 });
@@ -2018,6 +2044,8 @@ export function interactWithPersonAction(
         traits: ['کنجکاو', 'مهربان'],
         jobTitle: 'نوزاد',
         isAlive: true,
+        avatarSeed: generateIndependentAvatarSeed(rng, 'child'),
+        originKind: 'biological',
       };
       draft.npcs[childId] = child;
       draft.relationships.push({
@@ -2032,6 +2060,7 @@ export function interactWithPersonAction(
       pushTimeline(draft, `تولد ${childName}`, msg, 'milestone', { happiness: 14 });
     } else if (interaction === 'divorce') {
       draft.player.maritalStatus = 'divorced';
+      delete draft.flags['married_year'];
       draft.relationships.splice(relIdx, 1);
       draft.player.stats = applyStatDelta(draft.player.stats, { happiness: -14, mentalHealth: -12 });
       msg = `زندگی مشترک با ${npc.firstName} با توافق به جدایی رسید.`;
@@ -2094,6 +2123,7 @@ export function findNewRelationshipAction(
       traits: [rng.pick(['خوش‌برخورد', 'اهل سفر', 'دقیق', 'مهربان', 'شوخ‌طبع'])],
       jobTitle: draft.player.age >= 22 ? rng.pick(dataset.jobs).titleFa : 'دانشجو / دانش‌آموز',
       isAlive: true,
+      avatarSeed: generateIndependentAvatarSeed(rng, kind),
     };
     draft.relationships.push({
       personId: npcId,
@@ -2620,6 +2650,945 @@ export function closeDynastyAction(
     save: nextSave,
     success: true,
     message: 'دفتر دودمان با احترام بسته شد',
+  };
+}
+
+export function obtainInfertilityCertificateAction(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (!save.state.isAlive) {
+    return { save, success: false, message: 'زندگی به پایان رسیده است' };
+  }
+  const report = evaluateAdoptionEligibility(save.state, 'permanent', dataset);
+  if (!report.canTakeInfertilityTest) {
+    return {
+      save,
+      success: false,
+      message: 'در حال حاضر نیازی به گواهی پزشکی ناباروری نیست یا شرایط اولیه آن برقرار نیست',
+    };
+  }
+  const cost = report.infertilityTestCostToman;
+  if (save.state.player.moneyToman < cost) {
+    return { save, success: false, message: 'موجودی برای هزینه معاینات و گواهی پزشکی کافی نیست' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    deductMoney(draft, cost);
+    const adoption = ensureAdoptionState(draft);
+    adoption.hasInfertilityCert = true;
+    if (adoption.activeApplication) {
+      adoption.activeApplication.hasInfertilityCert = true;
+    }
+    draft.adoption = adoption;
+    pushTimeline(
+      draft,
+      'دریافت گواهی پزشکی برای تشکیل پرونده سرپرستی',
+      'معاینات تخصصی و گواهی پزشکی لازم برای استفاده از استثنای سابقه ازدواج (ماده ۵ قانون ۱۳۹۲) ثبت شد.',
+      'life',
+    );
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: 'گواهی پزشکی با موفقیت در پرونده ثبت شد',
+  };
+}
+
+export function startOrSelectAdoptionCareTypeAction(
+  save: SaveGame,
+  careType: AdoptionCareType,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (!save.state.isAlive) {
+    return { save, success: false, message: 'زندگی به پایان رسیده است' };
+  }
+  const existing = save.state.adoption?.activeApplication;
+  if (existing && (existing.placedChildPersonId || existing.step === 'supervision')) {
+    return {
+      save,
+      success: false,
+      message: 'تا پایان دوره نظارت پرونده فعلی نمی‌توانی نوع سرپرستی را تغییر دهی',
+    };
+  }
+  const careDef = dataset.adoption.careTypes.find((c) => c.id === careType);
+  if (!careDef) {
+    return { save, success: false, message: 'نوع سرپرستی یافت نشد' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const adoption = ensureAdoptionState(draft);
+    adoption.activeApplication = {
+      id: `adopt_${draft.currentJalaliYear}_${adoption.pastApplicationsCount + 1}`,
+      careType,
+      step: 'readiness',
+      startedYear: draft.currentJalaliYear,
+      commitmentAccepted: false,
+      pausedForReflection: false,
+      hasInfertilityCert: adoption.hasInfertilityCert,
+      completedDocIds: [],
+      portalSubmitted: false,
+      queueYearsRemaining: 0,
+      evaluationStatus: 'not_started',
+      evaluationNotesFa: [],
+      matchedCandidates: [],
+      probationaryApproved: false,
+      courtDecreeIssued: false,
+    };
+    draft.adoption = adoption;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `مسیر «${careDef.titleFa}» انتخاب شد`,
+  };
+}
+
+export function advanceAdoptionFromReadinessAction(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  if (!save.state.isAlive) {
+    return { save, success: false, message: 'زندگی به پایان رسیده است' };
+  }
+  const adoption = ensureAdoptionState(save.state);
+  const careType = adoption.activeApplication?.careType ?? 'permanent';
+  const report = evaluateAdoptionEligibility(save.state, careType, dataset);
+  if (!report.eligible) {
+    return {
+      save,
+      success: false,
+      message: report.blockedReasonFa ?? 'پیش‌نیازهای قانونی این مرحله هنوز کامل نشده‌اند',
+    };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const nextAdopt = ensureAdoptionState(draft);
+    if (!nextAdopt.activeApplication) {
+      nextAdopt.activeApplication = {
+        id: `adopt_${draft.currentJalaliYear}_${nextAdopt.pastApplicationsCount + 1}`,
+        careType,
+        step: 'commitment',
+        startedYear: draft.currentJalaliYear,
+        commitmentAccepted: false,
+        pausedForReflection: false,
+        hasInfertilityCert: nextAdopt.hasInfertilityCert,
+        completedDocIds: [],
+        portalSubmitted: false,
+        queueYearsRemaining: 0,
+        evaluationStatus: 'not_started',
+        evaluationNotesFa: [],
+        matchedCandidates: [],
+        probationaryApproved: false,
+        courtDecreeIssued: false,
+      };
+    } else {
+      nextAdopt.activeApplication.step = 'commitment';
+      nextAdopt.activeApplication.pausedForReflection = false;
+    }
+    draft.adoption = nextAdopt;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: 'مرحله آمادگی تأیید شد؛ منشور تعهد آماده بررسی است',
+  };
+}
+
+export function respondAdoptionCommitmentAction(
+  save: SaveGame,
+  accepted: boolean,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'commitment') {
+    return { save, success: false, message: 'پرونده در مرحله تعهد نیست' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const adoption = ensureAdoptionState(draft);
+    if (!adoption.activeApplication) return;
+    if (accepted) {
+      adoption.activeApplication.commitmentAccepted = true;
+      adoption.activeApplication.pausedForReflection = false;
+      adoption.activeApplication.step = 'application';
+      pushTimeline(
+        draft,
+        'امضای تعهدنامه سرپرستی',
+        'با آگاهی کامل از مسئولیت عاطفی، تربیتی و قانونی، تعهدنامه سرپرستی را پذیرفتی.',
+        'life',
+      );
+    } else {
+      adoption.activeApplication.commitmentAccepted = false;
+      adoption.activeApplication.pausedForReflection = true;
+    }
+    draft.adoption = adoption;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: accepted
+      ? 'تعهدنامه ثبت شد؛ اکنون مدارک را تکمیل کن'
+      : 'پرونده برای فکر و گفت‌وگوی بیشتر بدون هیچ جریمه‌ای مکث شد',
+  };
+}
+
+export function completeAdoptionDocumentAction(
+  save: SaveGame,
+  docId: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'application') {
+    return { save, success: false, message: 'پرونده در مرحله بارگذاری مدارک نیست' };
+  }
+  const doc = dataset.adoption.documents.find((d) => d.id === docId);
+  if (!doc) {
+    return { save, success: false, message: 'مدرک مورد نظر یافت نشد' };
+  }
+  if (app.completedDocIds.includes(docId)) {
+    return { save, success: false, message: 'این مدرک قبلاً ثبت شده است' };
+  }
+
+  const roundedFee = getBaselineScaleFromMinWage(doc.feeMinWageMultiple, save.state, dataset);
+  if (save.state.player.moneyToman < roundedFee) {
+    return { save, success: false, message: 'موجودی برای هزینه صدور این مدرک کافی نیست' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    deductMoney(draft, roundedFee);
+    const adoption = ensureAdoptionState(draft);
+    if (adoption.activeApplication && !adoption.activeApplication.completedDocIds.includes(docId)) {
+      adoption.activeApplication.completedDocIds.push(docId);
+    }
+    draft.adoption = adoption;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `«${doc.titleFa}» در سامانه بارگذاری شد`,
+  };
+}
+
+export function submitAdoptionApplicationAction(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'application') {
+    return { save, success: false, message: 'پرونده در مرحله ثبت درخواست نیست' };
+  }
+  const allDocsDone = dataset.adoption.documents.every((d) => app.completedDocIds.includes(d.id));
+  if (!allDocsDone) {
+    return { save, success: false, message: 'ابتدا تمام مدارک فهرست را تکمیل و بارگذاری کن' };
+  }
+
+  const { applicationBaseCostToman } = getAdoptionCostEstimates(save.state, dataset);
+  if (save.state.player.moneyToman < applicationBaseCostToman) {
+    return { save, success: false, message: 'موجودی برای هزینه ثبت نهایی پرونده کافی نیست' };
+  }
+
+  const rng = new SeededRNG(`${save.seed}:adopt_submit:${save.state.turn}:${app.id}`);
+  const delayed = rng.chance(dataset.adoption.evaluation.queueDelayProbability);
+  let outcomeMsg = 'پرونده در سامانه بهزیستی ثبت شد';
+
+  const nextSave = updateState(
+    save,
+    (draft) => {
+      deductMoney(draft, applicationBaseCostToman);
+      const adoption = ensureAdoptionState(draft);
+      const nextApp = adoption.activeApplication;
+      if (!nextApp) return;
+
+      nextApp.portalSubmitted = true;
+      nextApp.step = 'evaluation';
+
+      if (delayed) {
+        nextApp.evaluationStatus = 'in_queue';
+        nextApp.queueYearsRemaining = 1;
+        nextApp.evaluationNotesFa = [
+          'پرونده شما در صف نوبت کارشناسی بهزیستی ثبت شد؛ نتیجه بازدید منزل در سال آینده اعلام می‌شود.',
+        ];
+        outcomeMsg = 'پرونده ثبت شد و در نوبت بازدید سال آینده قرار گرفت';
+        pushTimeline(
+          draft,
+          'ثبت پرونده سرپرستی در سامانه بهزیستی',
+          'مدارک ارسال شد و زمان بازدید کارشناس منزل برای سال آینده تعیین گردید.',
+          'life',
+        );
+      } else {
+        const evalResult = evaluateHomeVisitAndInterview(draft, nextApp, rng, dataset);
+        nextApp.evaluationStatus = evalResult.status;
+        nextApp.evaluationNotesFa = evalResult.notesFa;
+        nextApp.queueYearsRemaining = 0;
+
+        if (evalResult.status === 'approved') {
+          nextApp.step = 'matching';
+          nextApp.matchedCandidates = generateMatchedChildCandidates(
+            draft,
+            nextApp.careType,
+            rng,
+            dataset,
+          );
+          outcomeMsg = 'ارزیابی کارشناس بهزیستی تأیید شد! فهرست آشنایی آماده است';
+          draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6 });
+          pushTimeline(
+            draft,
+            'تأیید صلاحیت در بازدید منزل بهزیستی',
+            'ارزیابی محیط خانه و مصاحبه با نتیجه مثبت تأیید شد و وارد مرحله آشنایی با کودک شدی.',
+            'milestone',
+            { happiness: 6 },
+          );
+        } else if (evalResult.status === 'rejected') {
+          adoption.pastApplicationsCount += 1;
+          adoption.reapplyCooldownUntilYear =
+            draft.currentJalaliYear + dataset.adoption.evaluation.reapplyCooldownYears;
+          adoption.activeApplication = null;
+          outcomeMsg = 'پرونده در این نوبت تأیید نشد و پس از مهلت قانونی قابل پیگیری مجدد است';
+          pushTimeline(
+            draft,
+            'نتیجه ارزیابی سرپرستی',
+            evalResult.notesFa[evalResult.notesFa.length - 1] ?? outcomeMsg,
+            'life',
+          );
+        } else {
+          outcomeMsg = 'پرونده نیازمند چند بهبود جزئی است؛ نکات کارشناس را بررسی کن';
+          pushTimeline(
+            draft,
+            'نظر اصلاحی کارشناس بازدید',
+            'کارشناس بهزیستی پیشنهادهایی برای تقویت آمادگی خانه یا شرایط روحی ثبت کرد.',
+            'life',
+          );
+        }
+      }
+      draft.adoption = adoption;
+    },
+    rng.getState(),
+  );
+
+  return {
+    save: nextSave,
+    success: true,
+    message: outcomeMsg,
+  };
+}
+
+export function runAdoptionEvaluationNowAction(
+  save: SaveGame,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'evaluation' || app.evaluationStatus !== 'needs_improvements') {
+    return { save, success: false, message: 'پرونده آماده ارزیابی مجدد نیست' };
+  }
+  const report = evaluateAdoptionEligibility(save.state, app.careType, dataset);
+  if (!report.eligible) {
+    return {
+      save,
+      success: false,
+      message: report.blockedReasonFa ?? 'هنوز پیش‌نیازهای قانونی برقرار نیستند',
+    };
+  }
+
+  const rng = new SeededRNG(`${save.seed}:adopt_recheck:${save.state.turn}:${app.id}`);
+  let msg = 'ارزیابی مجدد انجام شد';
+
+  const nextSave = updateState(
+    save,
+    (draft) => {
+      const adoption = ensureAdoptionState(draft);
+      const nextApp = adoption.activeApplication;
+      if (!nextApp) return;
+
+      const evalResult = evaluateHomeVisitAndInterview(draft, nextApp, rng, dataset);
+      nextApp.evaluationStatus = evalResult.status;
+      nextApp.evaluationNotesFa = evalResult.notesFa;
+
+      if (evalResult.status === 'approved') {
+        nextApp.step = 'matching';
+        nextApp.matchedCandidates = generateMatchedChildCandidates(
+          draft,
+          nextApp.careType,
+          rng,
+          dataset,
+        );
+        msg = 'ارزیابی مجدد با موفقیت تأیید شد';
+        draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6 });
+        pushTimeline(
+          draft,
+          'تأیید پرونده سرپرستی پس از بازبینی',
+          'با بهبود شرایط خانه و خانواده، گزارش بازدید کارشناس بهزیستی تأیید شد.',
+          'milestone',
+          { happiness: 6 },
+        );
+      } else if (evalResult.status === 'rejected') {
+        adoption.pastApplicationsCount += 1;
+        adoption.reapplyCooldownUntilYear =
+          draft.currentJalaliYear + dataset.adoption.evaluation.reapplyCooldownYears;
+        adoption.activeApplication = null;
+        msg = 'پرونده در بررسی مجدد تأیید نشد';
+      } else {
+        msg = 'همچنان به تقویت ثبات مسکن، مالی یا آرامش نیاز است';
+      }
+      draft.adoption = adoption;
+    },
+    rng.getState(),
+  );
+
+  return { save: nextSave, success: true, message: msg };
+}
+
+export function conductAdoptionBondingMeetingAction(
+  save: SaveGame,
+  candidateTempId: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'matching' || app.evaluationStatus !== 'approved') {
+    return { save, success: false, message: 'امکان دیدار آشنایی در این مرحله فعال نیست' };
+  }
+  const cand = app.matchedCandidates.find((c) => c.tempId === candidateTempId);
+  if (!cand) {
+    return { save, success: false, message: 'پروفایل کودک یافت نشد' };
+  }
+
+  const { bondingMeetingCostToman } = getAdoptionCostEstimates(save.state, dataset);
+  if (save.state.player.moneyToman < bondingMeetingCostToman) {
+    return { save, success: false, message: 'موجودی برای هزینه رفت‌وآمد و جلسه آشنایی کافی نیست' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    deductMoney(draft, bondingMeetingCostToman);
+    const adoption = ensureAdoptionState(draft);
+    const target = adoption.activeApplication?.matchedCandidates.find(
+      (c) => c.tempId === candidateTempId,
+    );
+    if (target) {
+      target.bondingMeetingsDone += 1;
+    }
+    draft.adoption = adoption;
+    draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 3, mentalHealth: 2 });
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `جلسه آشنایی با ${cand.firstName} برگزار شد`,
+  };
+}
+
+export function selectAdoptionCandidateAction(
+  save: SaveGame,
+  candidateTempId: string,
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app || app.step !== 'matching' || app.evaluationStatus !== 'approved') {
+    return { save, success: false, message: 'ابتدا باید ارزیابی بهزیستی تأیید شده باشد' };
+  }
+  const cand = app.matchedCandidates.find((c) => c.tempId === candidateTempId);
+  if (!cand) {
+    return { save, success: false, message: 'کودک انتخابی در فهرست نیست' };
+  }
+  const requiredMeetings = dataset.adoption.matching.requiredBondingMeetings;
+  if (cand.bondingMeetingsDone < requiredMeetings) {
+    return {
+      save,
+      success: false,
+      message: `حداقل ${toPersianDigits(requiredMeetings)} نشست آشنایی و هم‌صحبتی با ${cand.firstName} لازم است`,
+    };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const adoption = ensureAdoptionState(draft);
+    if (adoption.activeApplication) {
+      adoption.activeApplication.selectedCandidateId = candidateTempId;
+      adoption.activeApplication.step = 'decree';
+    }
+    draft.adoption = adoption;
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `${cand.firstName} برای مرحله حکم و تحویل انتخاب شد`,
+  };
+}
+
+export function finalizeAdoptionPlacementAction(
+  save: SaveGame,
+  params: { customFirstName?: string; enrollSchool?: boolean } = {},
+  dataset: GameDataset = gameDataset,
+): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (
+    !app ||
+    app.step !== 'decree' ||
+    app.evaluationStatus !== 'approved' ||
+    !app.selectedCandidateId
+  ) {
+    return {
+      save,
+      success: false,
+      message: 'صدور حکم و تحویل تنها پس از تأیید ارزیابی و انتخاب کودک در مرحله آشنایی ممکن است',
+    };
+  }
+  const candidate = app.matchedCandidates.find((c) => c.tempId === app.selectedCandidateId);
+  if (!candidate) {
+    return { save, success: false, message: 'اطلاعات کودک انتخاب‌شده یافت نشد' };
+  }
+
+  const report = evaluateAdoptionEligibility(save.state, app.careType, dataset);
+  if (save.state.player.moneyToman < report.placementFeeToman) {
+    return {
+      save,
+      success: false,
+      message: 'موجودی برای هزینه ثبت حکم، شناسنامه و بیمه آتیه کافی نیست',
+    };
+  }
+
+  const rng = new SeededRNG(`${save.seed}:adopt_place:${save.state.turn}:${candidate.tempId}`);
+  let placedChildName = candidate.firstName;
+
+  const nextSave = updateState(
+    save,
+    (draft) => {
+      deductMoney(draft, report.placementFeeToman);
+      const adoption = ensureAdoptionState(draft);
+      const nextApp = adoption.activeApplication;
+      if (!nextApp) return;
+
+      const isPermanent = nextApp.careType === 'permanent';
+      const trimmedName = params.customFirstName?.trim();
+      const childFirstName = isPermanent && trimmedName ? trimmedName : candidate.firstName;
+      placedChildName = childFirstName;
+
+      const ethPool = dataset.names.ethnicities[draft.player.ethnicity];
+      const childLastName = isPermanent ? draft.player.lastName : rng.pick(ethPool.lastNames);
+      const childId = `npc_adopted_${draft.turn}_${Object.keys(draft.npcs).length}`;
+
+      const jobTitle =
+        candidate.age >= 7
+          ? 'دانش‌آموز'
+          : params.enrollSchool && candidate.age >= 4
+            ? 'پیش‌دبستانی'
+            : 'کودک';
+
+      const originKind =
+        nextApp.careType === 'permanent'
+          ? 'adopted'
+          : nextApp.careType === 'temporary_guardian'
+            ? 'temporary_guardian'
+            : 'host_family';
+
+      const childPerson: Person = {
+        id: childId,
+        firstName: childFirstName,
+        lastName: childLastName,
+        gender: candidate.gender,
+        age: candidate.age,
+        traits: [...candidate.traits],
+        jobTitle,
+        isAlive: true,
+        birthYear: draft.currentJalaliYear - candidate.age,
+        avatarSeed: candidate.avatarSeed,
+        originKind,
+        adoptionMeta: {
+          careType: nextApp.careType,
+          placedYear: draft.currentJalaliYear,
+          placedAtChildAge: candidate.age,
+          biologicalOriginKnown: candidate.age >= 5,
+          backgroundFa: candidate.backgroundFa,
+          healthNeedsFa: candidate.healthNeedsFa,
+          supervisionClosedAt18: candidate.age >= 18,
+        },
+      };
+
+      const inspector = createInspectorNpc(draft, rng, dataset);
+
+      draft.npcs[childId] = childPerson;
+      draft.npcs[inspector.id] = inspector;
+      draft.relationships.push({
+        personId: childId,
+        role: 'child',
+        closeness: Math.min(92, 68 + candidate.bondingMeetingsDone * 6),
+        respect: 76,
+        romance: 0,
+      });
+
+      nextApp.probationaryApproved = true;
+      nextApp.courtDecreeIssued = true;
+      nextApp.placedChildPersonId = childId;
+      nextApp.placedYear = draft.currentJalaliYear;
+      nextApp.inspectorPersonId = inspector.id;
+      nextApp.nextVisitYear = draft.currentJalaliYear + 1;
+      nextApp.step = 'supervision';
+
+      adoption.completedAdoptedCount += 1;
+      draft.adoption = adoption;
+
+      if (isPermanent) {
+        draft.flags['has_adopted_child'] = true;
+        if (candidate.age >= 10) {
+          draft.flags['has_adopted_teen_or_preteen'] = true;
+        }
+        unlockAchievement(draft, 'loving_home');
+      } else {
+        unlockAchievement(draft, 'helping_hand');
+      }
+
+      draft.player.stats = applyStatDelta(draft.player.stats, {
+        happiness: 14,
+        mentalHealth: 4,
+      });
+
+      const careTitle =
+        dataset.adoption.careTypes.find((c) => c.id === nextApp.careType)?.titleFa ?? 'سرپرستی';
+      const timelineMsg = isPermanent
+        ? `حکم سرپرستی و تحویل «${childFirstName} ${childLastName}» از سوی دادگاه خانواده و بهزیستی صادر شد؛ خانواده شما با حضورش گرم‌تر شده است.`
+        : `تحویل موقت «${childFirstName}» در قالب «${careTitle}» ثبت شد و نظارت دوره‌ای بهزیستی از سال آینده آغاز می‌شود.`;
+
+      appendNpcHistory(draft, childId, timelineMsg);
+      pushTimeline(draft, `ورود ${childFirstName} به خانه`, timelineMsg, 'milestone', {
+        happiness: 14,
+        mentalHealth: 4,
+      });
+    },
+    rng.getState(),
+  );
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `«${placedChildName}» با حکم قانونی به جمع خانواده پیوست`,
+  };
+}
+
+export function completeAdoptionSupervisionTaskAction(
+  save: SaveGame,
+  visitId: string,
+  taskId: string,
+): ActionOutcome {
+  const adoption = save.state.adoption;
+  if (!adoption) {
+    return { save, success: false, message: 'گزارش نظارتی یافت نشد' };
+  }
+  const visit = adoption.supervisionVisits.find((v) => v.id === visitId);
+  const task = visit?.tasks.find((t) => t.id === taskId);
+  if (!visit || !task) {
+    return { save, success: false, message: 'تکلیف مورد نظر یافت نشد' };
+  }
+  if (task.completed) {
+    return { save, success: false, message: 'این مورد قبلاً انجام شده است' };
+  }
+  if (save.state.player.moneyToman < task.costToman) {
+    return { save, success: false, message: 'موجودی برای انجام این تکلیف کافی نیست' };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    deductMoney(draft, task.costToman);
+    const nextAdoption = ensureAdoptionState(draft);
+    const targetVisit = nextAdoption.supervisionVisits.find((v) => v.id === visitId);
+    const targetTask = targetVisit?.tasks.find((t) => t.id === taskId);
+    if (targetTask) {
+      targetTask.completed = true;
+    }
+    draft.adoption = nextAdoption;
+
+    const childRel = draft.relationships.find((r) => r.personId === visit.childPersonId);
+    if (childRel) {
+      childRel.closeness = clampStat(childRel.closeness + 5);
+    }
+    draft.player.stats = applyStatDelta(draft.player.stats, {
+      mentalHealth: 3,
+      happiness: 2,
+    });
+    pushTimeline(
+      draft,
+      `انجام توصیه ناظر: ${task.titleFa}`,
+      `توصیه مددکار بهزیستی برای حمایت بهتر از ${visit.childNameFa} با موفقیت انجام شد.`,
+      'life',
+      { mentalHealth: 3, happiness: 2 },
+    );
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: `«${task.titleFa}» تکمیل شد`,
+  };
+}
+
+export function abandonAdoptionApplicationAction(save: SaveGame): ActionOutcome {
+  const app = save.state.adoption?.activeApplication;
+  if (!app) {
+    return { save, success: false, message: 'پرونده فعالی وجود ندارد' };
+  }
+  if (app.placedChildPersonId) {
+    return {
+      save,
+      success: false,
+      message: 'پس از تحویل کودک امکان انصراف سیستمی از این پرونده وجود ندارد',
+    };
+  }
+
+  const nextSave = updateState(save, (draft) => {
+    const adoption = ensureAdoptionState(draft);
+    adoption.activeApplication = null;
+    draft.adoption = adoption;
+    pushTimeline(
+      draft,
+      'انصراف از پرونده درخواستی سرپرستی',
+      'پرونده درخواستی پیش از تحویل کودک بسته شد؛ هر زمان آماده بودی می‌توانی دوباره اقدام کنی.',
+      'life',
+    );
+  });
+
+  return {
+    save: nextSave,
+    success: true,
+    message: 'پرونده سرپرستی بسته شد',
+  };
+}
+
+export function setJobPrioritiesAction(
+  save: SaveGame,
+  priorities: JobCompassPriorities,
+  customized = true,
+): SaveGame {
+  return updateState(save, (draft) => {
+    const compass = ensureJobCompassState(draft);
+    compass.priorities = {
+      income: Math.max(0, Math.min(3, Math.round(priorities.income))),
+      calm: Math.max(0, Math.min(3, Math.round(priorities.calm))),
+      security: Math.max(0, Math.min(3, Math.round(priorities.security))),
+      growth: Math.max(0, Math.min(3, Math.round(priorities.growth))),
+      freedom: Math.max(0, Math.min(3, Math.round(priorities.freedom))),
+    };
+    compass.prioritiesCustomized = customized;
+    draft.jobCompass = compass;
+  });
+}
+
+export function resetJobPrioritiesAction(save: SaveGame): SaveGame {
+  return updateState(save, (draft) => {
+    const compass = ensureJobCompassState(draft);
+    compass.priorities = deriveDefaultPriorities(draft);
+    compass.prioritiesCustomized = false;
+    draft.jobCompass = compass;
+  });
+}
+
+export function setJobSalaryUnitAction(
+  save: SaveGame,
+  unit: 'monthly' | 'annual',
+): SaveGame {
+  return updateState(save, (draft) => {
+    const compass = ensureJobCompassState(draft);
+    compass.salaryUnit = unit;
+    draft.jobCompass = compass;
+  });
+}
+
+export function toggleJobShortlistAction(
+  save: SaveGame,
+  jobId: string,
+): { save: SaveGame; added: boolean; count: number } {
+  const current = ensureJobCompassState(save.state).shortlistedJobIds;
+  const exists = current.includes(jobId);
+  const nextIds = exists
+    ? current.filter((id) => id !== jobId)
+    : [...current, jobId].slice(-5);
+
+  const nextSave = updateState(save, (draft) => {
+    const compass = ensureJobCompassState(draft);
+    compass.shortlistedJobIds = nextIds;
+    draft.jobCompass = compass;
+  });
+
+  return { save: nextSave, added: !exists, count: nextIds.length };
+}
+
+export function pinJobGoalAction(
+  save: SaveGame,
+  jobId: string | null,
+): ActionOutcome {
+  const alreadyPinned = save.state.jobCompass?.pinnedJobId === jobId;
+  const targetId = alreadyPinned ? null : jobId;
+  const nextSave = updateState(save, (draft) => {
+    const compass = ensureJobCompassState(draft);
+    compass.pinnedJobId = targetId;
+    draft.jobCompass = compass;
+  });
+  return {
+    save: nextSave,
+    success: true,
+    message: targetId ? 'این شغل به عنوان هدف شغلی تو ثبت شد' : 'هدف شغلی برداشته شد',
+  };
+}
+
+export type JobInterviewOutcomeType = 'hired' | 'waitlist' | 'rejected';
+
+export interface JobInterviewOutcome extends ActionOutcome {
+  outcome: JobInterviewOutcomeType;
+  finalChancePct: number;
+  interviewShiftPct: number;
+  startingMonthlyNet?: number;
+  startingAnnualNet?: number;
+  adviceFa: string;
+}
+
+export function submitJobInterviewAction(
+  save: SaveGame,
+  job: JobDefinition,
+  interviewAnswers: { questionId: string; answerId: string }[],
+  dataset: GameDataset = gameDataset,
+): JobInterviewOutcome {
+  const readiness = jobReadiness(save.state, job, dataset);
+  if (!readiness.eligible || !readiness.canApplyNow) {
+    const msg = readiness.blockedReason ?? 'شرایط درخواست این شغل هنوز کامل نیست';
+    return {
+      save,
+      success: false,
+      message: msg,
+      outcome: 'rejected',
+      finalChancePct: 0,
+      interviewShiftPct: 0,
+      adviceFa: readiness.shortGapFa,
+    };
+  }
+
+  const chanceInfo = estimateJobSuccessChance(job, save.state, dataset);
+  const allQuestions = [
+    ...(dataset.interviews.byJobId[job.id] ?? []),
+    ...dataset.interviews.generalQuestions,
+  ];
+  let rawDelta = 0;
+  for (const picked of interviewAnswers) {
+    const q = allQuestions.find((item) => item.id === picked.questionId);
+    const ans = q?.answers.find((a) => a.id === picked.answerId);
+    if (ans) rawDelta += ans.chanceDeltaPct;
+  }
+  const interviewShiftPct = Math.max(-8, Math.min(10, Math.round(rawDelta)));
+  const finalChancePct = clampChancePct(chanceInfo.baseChancePct + interviewShiftPct);
+
+  const rng = new SeededRNG(`${save.seed}:interview:${job.id}:${save.state.turn}`);
+  const roll = rng.float(0, 100);
+
+  let outcome: JobInterviewOutcomeType;
+  if (roll < finalChancePct) {
+    outcome = 'hired';
+  } else if (roll < Math.min(98, finalChancePct + 14)) {
+    outcome = 'waitlist';
+  } else {
+    outcome = 'rejected';
+  }
+
+  const salaryInfo = jobSalaryRange(job, save.state, dataset);
+  const status = getJobApplicationStatus(job, save.state, dataset);
+
+  const nextSave = updateState(save, (draft) => {
+    draft.flags[`cd_apply_job_${job.id}`] = draft.turn;
+    const compass = ensureJobCompassState(draft);
+
+    if (outcome === 'hired') {
+      if (draft.player.job) {
+        const hist = getWorkHistory(draft);
+        hist.push({
+          title: draft.player.job.title,
+          employer: 'سابقه قبلی',
+          fromYear: draft.currentJalaliYear - draft.player.job.yearsInJob,
+          toYear: draft.currentJalaliYear,
+        });
+        draft.flags['hist_work'] = JSON.stringify(hist.slice(-12));
+      }
+      const level1 = job.ladder[0];
+      draft.player.job = {
+        jobId: job.id,
+        title: `${job.titleFa} (${level1.titleFa})`,
+        track: job.track,
+        level: 1,
+        annualSalaryToman: status.breakdown.netAnnual,
+        stress: job.stress,
+        yearsInJob: 0,
+      };
+      draft.flags['job_years_in_role'] = 0;
+      draft.flags['last_job_gross'] = status.breakdown.grossAnnual;
+      draft.flags['last_job_net'] = status.breakdown.netAnnual;
+      draft.flags['last_job_deductions'] =
+        status.breakdown.commission +
+        status.breakdown.runningCosts +
+        status.breakdown.bimeh +
+        status.breakdown.incomeTax;
+      draft.flags['retired'] = false;
+      if (compass.pinnedJobId === job.id) {
+        compass.pinnedJobId = null;
+      }
+      compass.waitlistedJobs = compass.waitlistedJobs.filter((w) => w.jobId !== job.id);
+      draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 6, fame: 2 });
+      pushTimeline(
+        draft,
+        `استخدام در شغل ${job.titleFa}`,
+        `مصاحبه با موفقیت گذشت و با خالص دریافتی ${formatToman(salaryInfo.expectedMonthlyNet)} در ماه در رده «${level1.titleFa}» شروع به کار کردی.`,
+        'milestone',
+        { happiness: 6 },
+      );
+    } else if (outcome === 'waitlist') {
+      compass.waitlistedJobs = [
+        ...compass.waitlistedJobs.filter((w) => w.jobId !== job.id),
+        {
+          jobId: job.id,
+          appliedTurn: draft.turn,
+          interviewBonusPct: interviewShiftPct,
+        },
+      ];
+      draft.player.stats = applyStatDelta(draft.player.stats, { happiness: 1 });
+      pushTimeline(
+        draft,
+        `فهرست انتظار برای ${job.shortTitle}`,
+        `مصاحبه برای «${job.titleFa}» خوب پیش رفت و پرونده‌ات در صف تأیید تا سال آینده قرار گرفت.`,
+        'life',
+      );
+    } else {
+      draft.player.stats = applyStatDelta(draft.player.stats, { happiness: -2 });
+      pushTimeline(
+        draft,
+        `نتیجه مصاحبه ${job.shortTitle}`,
+        `این بار برای «${job.titleFa}» انتخاب نشدی؛ بالا بردن مهارت مرتبط و هوش شانس دور بعد را بیشتر می‌کند.`,
+        'life',
+      );
+    }
+    draft.jobCompass = compass;
+  });
+
+  const adviceFa =
+    outcome === 'hired'
+      ? `تبریک! حقوق خالص ماهانه از ${formatToman(salaryInfo.expectedMonthlyNet)} شروع می‌شود.`
+      : outcome === 'waitlist'
+        ? 'نتیجه قطعی از فهرست انتظار با رفتن به سال بعد مشخص می‌شود.'
+        : job.requiredSkillId
+          ? 'تا سال بعد مهارت مرتبط را بالا ببر و دوباره مصاحبه بده.'
+          : 'سال بعد با تجربه و تمرکز بیشتر دوباره اقدام کن.';
+
+  return {
+    save: nextSave,
+    success: outcome === 'hired',
+    message:
+      outcome === 'hired'
+        ? `در «${job.shortTitle}» پذیرفته شدی!`
+        : outcome === 'waitlist'
+          ? `در فهرست انتظار «${job.shortTitle}» قرار گرفتی`
+          : `این بار در مصاحبه «${job.shortTitle}» پذیرفته نشدی`,
+    outcome,
+    finalChancePct,
+    interviewShiftPct,
+    startingMonthlyNet: salaryInfo.expectedMonthlyNet,
+    startingAnnualNet: status.breakdown.netAnnual,
+    adviceFa,
   };
 }
 

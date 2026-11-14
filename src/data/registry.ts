@@ -15,10 +15,13 @@ import talentsRaw from './talents.json';
 import careersSpecialRaw from './careers_special.json';
 import businessesRaw from './businesses.json';
 import inheritanceRaw from './inheritance.json';
+import adoptionRaw from './adoption.json';
+import interviewsRaw from './interviews.json';
 import faStringsRaw from '../i18n/fa.json';
 import {
   AchievementsFileSchema,
   ActivitiesFileSchema,
+  AdoptionFileSchema,
   Baseline1405Schema,
   BusinessesCatalogFileSchema,
   CareersSpecialFileSchema,
@@ -29,6 +32,7 @@ import {
   HousingFileSchema,
   I18nStringsSchema,
   InheritanceFileSchema,
+  InterviewsFileSchema,
   JobIncomeFileSchema,
   JobsFileSchema,
   NamesFileSchema,
@@ -39,6 +43,7 @@ import {
 import type {
   AchievementDefinition,
   ActivityDefinition,
+  AdoptionDataset,
   BusinessesCatalog,
   City,
   CountryDefinition,
@@ -46,6 +51,7 @@ import type {
   EventDefinition,
   HousingCatalog,
   InheritanceDataset,
+  InterviewsDataset,
   JobDefinition,
   NamesDataset,
   ShopItemDefinition,
@@ -69,6 +75,8 @@ export interface GameDataset {
   specialCareers: SpecialCareerDefinition[];
   businesses: BusinessesCatalog;
   inheritance: InheritanceDataset;
+  adoption: AdoptionDataset;
+  interviews: InterviewsDataset;
   economy: EconomyDataset;
   faStrings: Record<string, unknown>;
 }
@@ -88,6 +96,8 @@ export function validateAllJsonData(): GameDataset {
   const specialCareers = CareersSpecialFileSchema.parse(careersSpecialRaw);
   const businesses = BusinessesCatalogFileSchema.parse(businessesRaw);
   const inheritance = InheritanceFileSchema.parse(inheritanceRaw);
+  const adoption = AdoptionFileSchema.parse(adoptionRaw);
+  const interviews = InterviewsFileSchema.parse(interviewsRaw);
   const baseline1405 = Baseline1405Schema.parse(baseline1405Raw);
   const historicalSeries = HistoricalSeriesSchema.parse(historicalSeriesRaw);
   const jobIncome = JobIncomeFileSchema.parse(jobIncomeRaw);
@@ -219,6 +229,28 @@ export function validateAllJsonData(): GameDataset {
     }
   }
 
+  const careTypeIds = new Set(adoption.careTypes.map((c) => c.id));
+  if (careTypeIds.size !== adoption.careTypes.length) {
+    throw new Error('Duplicate careType id detected in adoption.json');
+  }
+
+  for (const job of jobs) {
+    if (!interviews.byJobId[job.id] || interviews.byJobId[job.id].length === 0) {
+      throw new Error(`Job "${job.id}" missing interview questions in interviews.json`);
+    }
+    for (const reqId of job.requirementIds) {
+      const valid =
+        reqId === 'age_18' ||
+        reqId === 'clean_record' ||
+        reqId === 'military_free' ||
+        reqId.startsWith('edu_') ||
+        (reqId.startsWith('lic_') && licenseIds.has(reqId.slice(4)));
+      if (!valid) {
+        throw new Error(`Job "${job.id}" references invalid requirementId "${reqId}"`);
+      }
+    }
+  }
+
   return {
     cities,
     names,
@@ -234,6 +266,8 @@ export function validateAllJsonData(): GameDataset {
     specialCareers,
     businesses,
     inheritance,
+    adoption,
+    interviews,
     economy: {
       baseline1405,
       historicalSeries,

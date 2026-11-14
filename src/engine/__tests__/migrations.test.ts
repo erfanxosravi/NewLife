@@ -111,11 +111,53 @@ describe('SaveGame schemaVersion Migrations', () => {
     expect(migrated.state.dynasty?.dynastyNameFa).toContain(validSave.state.player.lastName);
   });
 
-  it('passes through valid v4 save payloads', () => {
-    const validSave = createNewSaveGame({ seed: 'v4-valid' }, gameDataset);
+  it('migrates v4 save payload to v5 cleanly with adoption state and avatar seeds', () => {
+    const validSave = createNewSaveGame({ seed: 'v4-to-v5-test' }, gameDataset);
+    const playerWithoutV5 = { ...(validSave.state.player as unknown as Record<string, unknown>) };
+    delete playerWithoutV5.avatarSeed;
+    const stateWithoutV5 = { ...(validSave.state as unknown as Record<string, unknown>) };
+    delete stateWithoutV5.adoption;
+
+    const v4Save = {
+      ...validSave,
+      schemaVersion: 4,
+      state: {
+        ...stateWithoutV5,
+        player: playerWithoutV5,
+      },
+    };
+
+    const migrated = migrateSaveGame(v4Save);
+    expect(migrated.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(migrated.state.adoption?.activeApplication).toBeNull();
+    expect(migrated.state.adoption?.supervisionVisits).toEqual([]);
+    expect(typeof migrated.state.player.avatarSeed).toBe('string');
+  });
+
+  it('migrates v5 save payload to v6 cleanly with jobCompass defaults', () => {
+    const validSave = createNewSaveGame({ seed: 'v5-to-v6-test' }, gameDataset);
+    const stateWithoutV6 = { ...(validSave.state as unknown as Record<string, unknown>) };
+    delete stateWithoutV6.jobCompass;
+
+    const v5Save = {
+      ...validSave,
+      schemaVersion: 5,
+      state: stateWithoutV6,
+    };
+
+    const migrated = migrateSaveGame(v5Save);
+    expect(migrated.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(migrated.state.jobCompass).toBeDefined();
+    expect(migrated.state.jobCompass?.salaryUnit).toBe('monthly');
+    expect(migrated.state.jobCompass?.shortlistedJobIds).toEqual([]);
+    expect(migrated.state.jobCompass?.pinnedJobId).toBeNull();
+  });
+
+  it('passes through valid current-version save payloads', () => {
+    const validSave = createNewSaveGame({ seed: 'v6-valid' }, gameDataset);
     const result = migrateSaveGame(validSave);
     expect(result.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
-    expect(result.seed).toBe('v4-valid');
+    expect(result.seed).toBe('v6-valid');
   });
 
   it('rejects unsupported future schema versions and malformed data', () => {

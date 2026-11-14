@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { formatAgeLabel, toPersianDigits } from '../engine/jalali';
-import type { GameState } from '../engine/types';
+import type { GameState, Gender, PersonOriginKind } from '../engine/types';
 import { useI18n } from '../i18n/useI18n';
 import { getGroupedRelationships } from '../state/selectors';
+import { PersonAvatar } from './components/PersonAvatar';
 import { Badge, Card, EmptyState, SectionHeader } from './components/Primitives';
 import { IconBaby, IconHeart, IconUser } from './icons';
 
@@ -30,6 +31,9 @@ export function FamilyTreeView({ state }: { state: GameState }) {
     jobFa,
     alive = true,
     highlight = false,
+    avatarSeed,
+    gender,
+    originKind,
   }: {
     name: string;
     role: string;
@@ -38,6 +42,9 @@ export function FamilyTreeView({ state }: { state: GameState }) {
     jobFa?: string;
     alive?: boolean;
     highlight?: boolean;
+    avatarSeed?: string;
+    gender?: Gender;
+    originKind?: PersonOriginKind;
   }) => (
     <div
       className={`rounded-2xl border px-3 py-2 text-center ${
@@ -46,6 +53,18 @@ export function FamilyTreeView({ state }: { state: GameState }) {
           : 'border-[var(--border)] bg-[var(--surface)]'
       } ${!alive ? 'opacity-75' : ''}`}
     >
+      {gender && age !== undefined && (
+        <div className="mb-1.5 flex justify-center">
+          <PersonAvatar
+            seed={avatarSeed ?? name}
+            gender={gender}
+            age={age}
+            size={36}
+            originKind={originKind}
+            deceased={!alive}
+          />
+        </div>
+      )}
       <div className="truncate text-xs font-bold text-[var(--text)]">{name}</div>
       <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
         {role}
@@ -139,6 +158,9 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                     age={person.age}
                     jobFa={person.jobTitle}
                     alive={person.isAlive}
+                    avatarSeed={person.avatarSeed ?? person.id}
+                    gender={person.gender}
+                    originKind={person.originKind}
                   />
                 ))}
               </div>
@@ -158,6 +180,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                 age={state.player.age}
                 jobFa={state.ownedBusiness?.nameFa ?? state.player.job?.title}
                 alive={state.isAlive}
+                avatarSeed={state.player.avatarSeed ?? 'player'}
+                gender={state.player.gender}
                 highlight
               />
               {spouse ? (
@@ -167,6 +191,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                   age={spouse.person.age}
                   jobFa={spouse.person.jobTitle}
                   alive={spouse.person.isAlive}
+                  avatarSeed={spouse.person.avatarSeed ?? spouse.person.id}
+                  gender={spouse.person.gender}
                 />
               ) : (
                 <div className="flex items-center justify-center rounded-2xl border border-dashed border-[var(--border)] p-2 text-[11px] text-[var(--text-muted)]">
@@ -196,16 +222,29 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                 <div className="mx-auto h-5 w-0.5 bg-[var(--border)]" />
                 <SectionHeader title="فرزندان" />
                 <div className="grid grid-cols-2 gap-2">
-                  {children.map(({ person }) => (
-                    <NodeBox
-                      key={person.id}
-                      name={`${person.firstName} ${person.lastName}`}
-                      role={person.gender === 'male' ? 'پسر' : 'دختر'}
-                      age={person.age}
-                      jobFa={person.jobTitle}
-                      alive={person.isAlive}
-                    />
-                  ))}
+                  {children.map(({ person }) => {
+                    const originSuffix =
+                      person.originKind === 'adopted'
+                        ? ' · فرزندخوانده'
+                        : person.originKind === 'temporary_guardian'
+                          ? ' · امین موقت'
+                          : person.originKind === 'host_family'
+                            ? ' · میهمان'
+                            : '';
+                    return (
+                      <NodeBox
+                        key={person.id}
+                        name={`${person.firstName} ${person.lastName}`}
+                        role={`${person.gender === 'male' ? 'پسر' : 'دختر'}${originSuffix}`}
+                        age={person.age}
+                        jobFa={person.jobTitle}
+                        alive={person.isAlive}
+                        avatarSeed={person.avatarSeed ?? person.id}
+                        gender={person.gender}
+                        originKind={person.originKind}
+                      />
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -222,6 +261,8 @@ export function FamilyTreeView({ state }: { state: GameState }) {
                       role="نوه"
                       age={person.age}
                       alive={person.isAlive}
+                      avatarSeed={person.avatarSeed ?? person.id}
+                      gender={person.gender}
                     />
                   ))}
                 </div>

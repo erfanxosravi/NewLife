@@ -21,6 +21,12 @@ import {
   type PromotionEligibility,
 } from '../engine/careers';
 import {
+  ensureAdoptionState,
+  evaluateAdoptionEligibility,
+  getAdoptionCostEstimates,
+  type AdoptionEligibilityReport,
+} from '../engine/adoption';
+import {
   calculateBusinessAcquisitionQuote,
   checkFamilyTakeoverEligibility,
   type BusinessAcquisitionQuote,
@@ -875,6 +881,60 @@ export function getFamilyBusinessCandidates(
     businessDef: b,
     family: checkFamilyTakeoverEligibility(state, b),
   }));
+}
+
+export interface AdoptionHubSummary {
+  adoptionState: ReturnType<typeof ensureAdoptionState>;
+  activeApplication: ReturnType<typeof ensureAdoptionState>['activeApplication'];
+  eligibilityPermanent: AdoptionEligibilityReport;
+  activeEligibility: AdoptionEligibilityReport;
+  costEstimates: ReturnType<typeof getAdoptionCostEstimates>;
+  pendingTasksCount: number;
+  latestVisit: ReturnType<typeof ensureAdoptionState>['supervisionVisits'][number] | null;
+  adoptedChildrenCount: number;
+}
+
+export function getAdoptionHubSummary(
+  state: GameState,
+  dataset: GameDataset = gameDataset,
+): AdoptionHubSummary {
+  const adoptionState = ensureAdoptionState(state);
+  const activeCareType = adoptionState.activeApplication?.careType ?? 'permanent';
+  const eligibilityPermanent = evaluateAdoptionEligibility(state, 'permanent', dataset);
+  const activeEligibility =
+    activeCareType === 'permanent'
+      ? eligibilityPermanent
+      : evaluateAdoptionEligibility(state, activeCareType, dataset);
+  const pendingTasksCount = adoptionState.supervisionVisits.reduce(
+    (sum, v) => sum + v.tasks.filter((t) => !t.completed).length,
+    0,
+  );
+  const latestVisit =
+    adoptionState.supervisionVisits.length > 0
+      ? adoptionState.supervisionVisits[adoptionState.supervisionVisits.length - 1]
+      : null;
+  const adoptedChildrenCount = state.relationships.filter((r) => {
+    if (r.role !== 'child') return false;
+    const p = state.npcs[r.personId];
+    return Boolean(
+      p &&
+        p.isAlive &&
+        (p.originKind === 'adopted' ||
+          p.originKind === 'temporary_guardian' ||
+          p.originKind === 'host_family'),
+    );
+  }).length;
+
+  return {
+    adoptionState,
+    activeApplication: adoptionState.activeApplication,
+    eligibilityPermanent,
+    activeEligibility,
+    costEstimates: getAdoptionCostEstimates(state, dataset),
+    pendingTasksCount,
+    latestVisit,
+    adoptedChildrenCount,
+  };
 }
 
 

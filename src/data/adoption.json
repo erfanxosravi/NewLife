@@ -1,0 +1,471 @@
+{
+  "meta": {
+    "titleFa": "فرزندخواندگی و سرپرستی کودک در ایران",
+    "lawTitleFa": "قانون حمایت از کودکان و نوجوانان بی‌سرپرست و بدسرپرست",
+    "lawYearJalali": 1392,
+    "regulationsYearJalali": 1394,
+    "asOf": "1405-06",
+    "source": "قانون حمایت از کودکان و نوجوانان بی‌سرپرست و بدسرپرست (مصوب ۱۳۹۲/۰۷/۱۰) و آیین‌نامه اجرایی ماده ۳۶ (مصوب ۱۳۹۴) — درگاه ملی فرزندخواندگی بهزیستی",
+    "confidence": "verified",
+    "simplified": true,
+    "religionConditionFlag": {
+      "enabled": false,
+      "hiddenByDefault": true,
+      "labelFa": "انطباق شرایط اعتقادی طبق بند ج ماده ۶ قانون"
+    },
+    "notesFa": [
+      "شبیه‌سازی بازی است: روند واقعی شامل بررسی دقیق‌تر پرونده توسط سازمان بهزیستی و دادگاه خانواده است.",
+      "بر اساس ماده ۵ قانون ۱۳۹۲، اولویت سرپرستی به ترتیب با زوجین بدون فرزند دارای حداقل ۵ سال زندگی مشترک، زنان و دختران بدون شوهر بالای ۳۰ سال (صرفاً برای سرپرستی کودک دختر)، و زوجین دارای فرزند است.",
+      "از نظر حقوقی در قانون مدنی فرزندخوانده ارث قانونی نمی‌برد و تأمین آتیه از طریق بیمه عمر، صلح یا وصیت تا یک‌سوم (ماده ۱۴ قانون ۱۳۹۲) انجام می‌شود؛ در شبیه‌ساز برای تداوم دودمان، فرزندخوانده به عنوان وارث رسمی نیز پذیرفته می‌شود (ساده‌سازی بازی)."
+    ]
+  },
+  "careTypes": [
+    {
+      "id": "permanent",
+      "titleFa": "فرزندخواندگی دائم",
+      "subtitleFa": "سرپرستی کامل و قانونی از طریق بهزیستی و دادگاه خانواده با شناسنامه و نام خانوادگی تازه",
+      "legalBasisFa": "مواد ۵، ۶، ۱۳ و ۱۴ قانون ۱۳۹۲ — قرار آزمایشی ۶ ماهه و حکم قطعی سرپرستی",
+      "commitmentYearsLabelFa": "پیمان دائمی خانواده",
+      "minSavingsMinWageMultiple": 6,
+      "feeMinWageMultiple": 1.2,
+      "requiresIndependentHousing": true,
+      "allowsSingleWomanOnlyFemale": true,
+      "confersPermanentInheritance": true,
+      "supervisionUntilAge": 18
+    },
+    {
+      "id": "temporary_guardian",
+      "titleFa": "امین موقت",
+      "subtitleFa": "سرپرستی موقت کودکانی که والدین یا سرپرست قانونی آن‌ها به طور موقت امکان نگهداری ندارند",
+      "legalBasisFa": "آیین‌نامه اجرایی قانون ۱۳۹۲ و مقررات سپردن موقت با نظارت بهزیستی و دادگاه",
+      "commitmentYearsLabelFa": "دوره‌ای (قابل تمدید با نظر کارشناس)",
+      "minSavingsMinWageMultiple": 3,
+      "feeMinWageMultiple": 0.4,
+      "requiresIndependentHousing": true,
+      "allowsSingleWomanOnlyFemale": true,
+      "confersPermanentInheritance": false,
+      "supervisionUntilAge": 18
+    },
+    {
+      "id": "host_family",
+      "titleFa": "خانواده میزبان (مراقبت موقت)",
+      "subtitleFa": "میزبانی دوره‌ای در پایان هفته‌ها و تعطیلات برای تقویت پیوند عاطفی و آمادگی خانواده‌ها",
+      "legalBasisFa": "طرح خانواده میزبان سازمان بهزیستی برای حمایت عاطفی از کودکان مراکز نگهداری",
+      "commitmentYearsLabelFa": "میزبانی دوره‌ای و تعطیلات",
+      "minSavingsMinWageMultiple": 1.5,
+      "feeMinWageMultiple": 0.15,
+      "requiresIndependentHousing": false,
+      "allowsSingleWomanOnlyFemale": true,
+      "confersPermanentInheritance": false,
+      "supervisionUntilAge": 18
+    }
+  ],
+  "eligibility": {
+    "minApplicantAge": 30,
+    "priorityMaxAge": 50,
+    "minMarriageYearsNoChild": 5,
+    "infertilityExceptionAllowed": true,
+    "singleWomanMinAge": 30,
+    "singleWomanAllowed": true,
+    "singleWomanOnlyFemaleChild": true,
+    "maxCriminalRecord": 0,
+    "minHealth": 50,
+    "minMentalHealth": 55,
+    "minSpouseCloseness": 55,
+    "minGapYearsBelowYoungestBioChild": 2,
+    "infertilityCheckCostMinWageMultiple": {
+      "value": 0.45,
+      "unit": "MinWageMultiple",
+      "asOf": "1405-06",
+      "source": "تعرفه برآوردی آزمایش‌ها و گواهی پزشکی قانونی (ساده‌سازی)",
+      "confidence": "estimate"
+    },
+    "lifeInsuranceCommitmentMinWageMultiple": {
+      "value": 0.8,
+      "unit": "MinWageMultiple",
+      "asOf": "1405-06",
+      "source": "تعهد بیمه آتیه/عمر ماده ۱۴ قانون حمایت از کودکان بی‌سرپرست",
+      "confidence": "estimate"
+    },
+    "applicationBaseCostMinWageMultiple": {
+      "value": 0.25,
+      "unit": "MinWageMultiple",
+      "asOf": "1405-06",
+      "source": "هزینه اداری استعلام‌ها و مدارک سامانه",
+      "confidence": "estimate"
+    }
+  },
+  "documents": [
+    {
+      "id": "doc_identity_marital",
+      "titleFa": "مدارک هویتی و وضعیت تأهل",
+      "subtitleFa": "شناسنامه، کارت ملی و سند ازدواج یا گواهی تجرد",
+      "feeMinWageMultiple": 0.05
+    },
+    {
+      "id": "doc_no_crime",
+      "titleFa": "گواهی عدم سوءپیشینه کیفری",
+      "subtitleFa": "استعلام عدم محکومیت مؤثر کیفری از مراجع قضایی",
+      "feeMinWageMultiple": 0.08
+    },
+    {
+      "id": "doc_health_mental",
+      "titleFa": "گواهی سلامت جسمی و روانی",
+      "subtitleFa": "تأییدیه سلامت روان، عدم اعتیاد و نداشتن بیماری صعب‌العلاج",
+      "feeMinWageMultiple": 0.25
+    },
+    {
+      "id": "doc_financial_housing",
+      "titleFa": "مدارک تمکن مالی و وضعیت مسکن",
+      "subtitleFa": "گواهی شغل یا درآمد، اجاره‌نامه رسمی یا سند مالکیت مناسب",
+      "feeMinWageMultiple": 0.1
+    },
+    {
+      "id": "doc_future_insurance",
+      "titleFa": "تعهد تأمین آتیه و بیمه عمر کودک",
+      "subtitleFa": "تضمین پشتوانه مالی و بیمه‌ای برای آینده کودک (ماده ۱۴ قانون)",
+      "feeMinWageMultiple": 0.5
+    },
+    {
+      "id": "doc_references",
+      "titleFa": "معرفی دو معتمد و تکمیل فرم سامانه",
+      "subtitleFa": "ثبت نام در درگاه بهزیستی و معرفی دو نفر برای استعلام صلاحیت اخلاقی",
+      "feeMinWageMultiple": 0.05
+    }
+  ],
+  "evaluation": {
+    "approvalBaseThreshold": 58,
+    "reapplyCooldownYears": 2,
+    "queueDelayProbability": 0.28,
+    "weights": {
+      "housingStability": 0.22,
+      "incomeStability": 0.22,
+      "relationshipHealth": 0.16,
+      "mentalHealth": 0.18,
+      "noCriminalRecord": 0.12,
+      "references": 0.1
+    }
+  },
+  "matching": {
+    "candidatesPerMatch": 3,
+    "requiredBondingMeetings": 2,
+    "bondingMeetingCostMinWageMultiple": 0.08,
+    "ageBrackets": [
+      {
+        "id": "infant",
+        "labelFa": "نوزاد و شیرخوار (۰ تا ۲ سال)",
+        "minAge": 0,
+        "maxAge": 2
+      },
+      {
+        "id": "toddler",
+        "labelFa": "خردسال (۳ تا ۶ سال)",
+        "minAge": 3,
+        "maxAge": 6
+      },
+      {
+        "id": "school",
+        "labelFa": "دبستانی (۷ تا ۱۲ سال)",
+        "minAge": 7,
+        "maxAge": 12
+      },
+      {
+        "id": "teen",
+        "labelFa": "نوجوان (۱۳ تا ۱۶ سال)",
+        "minAge": 13,
+        "maxAge": 16
+      }
+    ],
+    "childProfiles": [
+      {
+        "id": "profile_infant",
+        "ageBracketId": "infant",
+        "minAge": 0,
+        "maxAge": 2,
+        "backgroundsFa": [
+          "در شیرخوارگاه استان نگهداری می‌شود و با محیط آرام به سرعت خو می‌گیرد.",
+          "از هفته‌های نخست در مرکز مراقبت امن بهزیستی بوده و آماده پیوستن به خانواده است."
+        ],
+        "optionalHealthNeedsFa": [
+          "چکاپ منظم رشد و تغذیه دوره‌ای",
+          "حساسیت خفیف فصلی نیازمند مراقبت ملایم"
+        ],
+        "healthNeedProbability": 0.22
+      },
+      {
+        "id": "profile_toddler",
+        "ageBracketId": "toddler",
+        "minAge": 3,
+        "maxAge": 6,
+        "backgroundsFa": [
+          "کودکی کنجکاو و علاقه‌مند به نقاشی که در خانه کودکان رشد کرده است.",
+          "با مربیان مرکز بسیار صمیمی است و از شنیدن قصه شبانه لذت می‌برد."
+        ],
+        "optionalHealthNeedsFa": [
+          "نیاز به جلسات ملایم گفتاردرمانی برای تقویت اعتمادبه‌نفس",
+          "نیاز به عینک طبی و معاینه سالانه بینایی"
+        ],
+        "healthNeedProbability": 0.28
+      },
+      {
+        "id": "profile_school",
+        "ageBracketId": "school",
+        "minAge": 7,
+        "maxAge": 12,
+        "backgroundsFa": [
+          "دانش‌آموزی باهوش و منظم که به کتابخوانی و بازی‌های گروهی علاقه دارد.",
+          "به حمایت پایدار عاطفی و همراهی در تکالیف مدرسه علاقه‌مند است."
+        ],
+        "optionalHealthNeedsFa": [
+          "نیاز به همراهی مشاور مدرسه برای سازگاری آموزشی",
+          "آلرژی خفیف بهاره نیازمند مراقبت دارویی ساده"
+        ],
+        "healthNeedProbability": 0.25
+      },
+      {
+        "id": "profile_teen",
+        "ageBracketId": "teen",
+        "minAge": 13,
+        "maxAge": 16,
+        "backgroundsFa": [
+          "نوجوانی مستقل و خوش‌فکر که به مهارت‌آموزی و ورزش علاقه نشان می‌دهد.",
+          "به دنبال خانواده‌ای صبور و شنواست که به هویت و آینده‌اش احترام بگذارد."
+        ],
+        "optionalHealthNeedsFa": [
+          "نیاز به جلسات مشاوره حمایتی برای برنامه‌ریزی تحصیلی",
+          "پیگیری ارتودنسی دندانپزشکی"
+        ],
+        "healthNeedProbability": 0.3
+      }
+    ]
+  },
+  "supervision": {
+    "firstVisitNextYear": true,
+    "periodicIntervalYears": 2,
+    "endAtChildAge": 18,
+    "outcomeWeights": {
+      "great": 0.45,
+      "satisfactory": 0.38,
+      "needs_improvement": 0.14,
+      "serious_concern": 0.03
+    },
+    "improvementTaskTemplates": [
+      {
+        "id": "task_family_counseling",
+        "titleFa": "جلسه مشاوره خانواده و پیوند عاطفی",
+        "descriptionFa": "شرکت در دو نشست با مشاور خانواده بهزیستی برای گفت‌وگوی صمیمی‌تر با کودک",
+        "costMinWageMultiple": 0.2
+      },
+      {
+        "id": "task_room_and_study",
+        "titleFa": "بهبود فضای مطالعه و استراحت کودک",
+        "descriptionFa": "مرتب‌سازی اتاق یا میز تحریر اختصاصی و فراهم‌کردن تجهیزات آموزشی",
+        "costMinWageMultiple": 0.35
+      },
+      {
+        "id": "task_health_checkup",
+        "titleFa": "چکاپ کامل پزشکی و دندانپزشکی",
+        "descriptionFa": "ارائه گواهی معاینه دوره‌ای سلامت کودک به مددکار اجتماعی",
+        "costMinWageMultiple": 0.25
+      }
+    ]
+  },
+  "longTermEvents": [
+    {
+      "id": "adopt_attachment_trust",
+      "category": "family",
+      "titleFa": "نخستین شب‌های اعتماد در خانه",
+      "textFa": "چند هفته از ورود فرزندخوانده‌ات به خانه گذشته است. هنوز گاهی با احتیاط در آستانه در می‌ایستد و مطمئن نیست این آرامش همیشگی باشد.",
+      "contentTag": "mild",
+      "weight": 10,
+      "maxOccurrences": 1,
+      "conditions": {
+        "minAge": 30,
+        "requiredFlags": ["has_adopted_child"]
+      },
+      "choices": [
+        {
+          "id": "patient_ritual",
+          "labelFa": "آیین شبانه قصه و گفت‌وگو را با حوصله بسازی",
+          "effects": {
+            "stats": { "happiness": 6, "mentalHealth": 5 },
+            "setFlags": { "adopt_bond_strong": true },
+            "resultTextFa": "با صبوری و ثبات رفتارت، لبخند و حس امنیت کم‌کم جای تردید را می‌گیرد و خانه بوی صمیمیت می‌دهد."
+          }
+        },
+        {
+          "id": "space_and_support",
+          "labelFa": "فضای امن و زمان کافی به او بدهی تا به آرامی خو بگیرد",
+          "effects": {
+            "stats": { "mentalHealth": 4, "happiness": 3 },
+            "resultTextFa": "احترام به ریتم آرامش او باعث می‌شود بی‌آنکه تحت فشار باشد، خودش به تو نزدیک شود."
+          }
+        }
+      ]
+    },
+    {
+      "id": "adopt_school_adjustment",
+      "category": "family",
+      "titleFa": "سازگاری با مدرسه و هم‌کلاسی‌ها",
+      "textFa": "معلم مدرسه گزارش می‌دهد که فرزندت در محیط کلاس هنوز کمی کم‌حرف است و هنگام کار گروهی کنار می‌نشیند.",
+      "contentTag": "mild",
+      "weight": 9,
+      "maxOccurrences": 1,
+      "conditions": {
+        "minAge": 30,
+        "requiredFlags": ["has_adopted_child"]
+      },
+      "choices": [
+        {
+          "id": "coordinate_school",
+          "labelFa": "همکاری با مشاور مدرسه و دعوت دوستان هم‌کلاسی",
+          "effects": {
+            "stats": { "happiness": 5, "mentalHealth": 4, "fame": 2 },
+            "resultTextFa": "با هماهنگی محترمانه معلم و مهمانی کوچک بعدازظهر، یک دوست صمیمی در کلاس پیدا می‌کند."
+          }
+        },
+        {
+          "id": "enroll_hobby",
+          "labelFa": "ثبت‌نام در کلاس هنر یا ورزش مورد علاقه‌اش",
+          "effects": {
+            "stats": { "happiness": 6, "intelligence": 2 },
+            "moneyToman": -1200000,
+            "resultTextFa": "کلاس فوق‌برنامه اعتمادبه‌نفس او را بالا می‌برد و با ذوق درباره تمرین‌هایش تعریف می‌کند."
+          }
+        }
+      ]
+    },
+    {
+      "id": "adopt_origins_question",
+      "category": "family",
+      "titleFa": "پرسش درباره ریشه و گذشته",
+      "textFa": "عصر آرامی در حال چای خوردن هستید که فرزندت با صدایی آرام اما جدی می‌پرسد: «می‌شه درباره روزهای قبل از اومدنم به این خونه بیشتر بگی؟»",
+      "contentTag": "mild",
+      "weight": 10,
+      "maxOccurrences": 1,
+      "conditions": {
+        "minAge": 32,
+        "requiredFlags": ["has_adopted_teen_or_preteen"]
+      },
+      "choices": [
+        {
+          "id": "honest_warm_truth",
+          "labelFa": "صادقانه، محترمانه و متناسب با سنش حقیقت را بگویی",
+          "effects": {
+            "stats": { "mentalHealth": 6, "happiness": 4 },
+            "setFlags": { "adopt_origins_shared": true },
+            "resultTextFa": "در آغوش گرفتن و صداقت گرم تو نشان می‌دهد گذشته راز ترسناکی نیست و پیوندتان عمیق‌تر می‌شود."
+          }
+        },
+        {
+          "id": "counselor_assisted",
+          "labelFa": "با مشورت روان‌شناس کودک به آرامی گفت‌وگو را باز کنی",
+          "effects": {
+            "stats": { "mentalHealth": 7, "happiness": 3 },
+            "moneyToman": -900000,
+            "setFlags": { "adopt_origins_shared": true },
+            "resultTextFa": "با راهنمایی مشاور، تمام پرسش‌ها در فضایی امن پاسخ داده می‌شود و احساس اعتماد دوچندان می‌شود."
+          }
+        }
+      ]
+    },
+    {
+      "id": "adopt_extended_family_reaction",
+      "category": "family",
+      "titleFa": "دیدار نخست با جمع بزرگ‌تر فامیل",
+      "textFa": "در نخستین مهمانی بزرگ خانوادگی، برخی بستگان با کنجکاوی اما مهربانی سوال‌هایی می‌پرسند و نگاه‌ها روی رفتار توست.",
+      "contentTag": "mild",
+      "weight": 8,
+      "maxOccurrences": 1,
+      "conditions": {
+        "minAge": 30,
+        "requiredFlags": ["has_adopted_child"]
+      },
+      "choices": [
+        {
+          "id": "proud_warm_boundary",
+          "labelFa": "با افتخار و مرزگذاری محترمانه از جایگاه فرزندت دفاع کنی",
+          "effects": {
+            "stats": { "happiness": 5, "mentalHealth": 5, "fame": 3 },
+            "resultTextFa": "جدیّت مهربانانه تو به همه نشان می‌دهد فرزندت عضوی کامل و عزیز از این خانواده است."
+          }
+        },
+        {
+          "id": "calm_introduction",
+          "labelFa": "با آرامش و لبخند جمع را به گفت‌وگوهای مشترک دعوت کنی",
+          "effects": {
+            "stats": { "happiness": 4, "mentalHealth": 3 },
+            "resultTextFa": "جو مهمانی به سرعت صمیمی می‌شود و بزرگ‌ترهای فامیل با هدیه‌ای کوچک خوش‌آمد می‌گویند."
+          }
+        }
+      ]
+    },
+    {
+      "id": "adopt_identity_coming_of_age",
+      "category": "family",
+      "titleFa": "تصمیم مستقل در آستانه جوانی",
+      "textFa": "فرزندخوانده‌ات به هجده‌سالگی نزدیک شده و درباره مسیر دانشگاه یا کار آینده‌اش با تو مشورت می‌کند؛ لحنش پر از حس قدردانی و استقلال است.",
+      "contentTag": "mild",
+      "weight": 9,
+      "maxOccurrences": 1,
+      "conditions": {
+        "minAge": 36,
+        "requiredFlags": ["has_adopted_teen_or_preteen"]
+      },
+      "choices": [
+        {
+          "id": "support_choice",
+          "labelFa": "از انتخاب مستقلش حمایت کامل کنی و پشتیبانش بمانی",
+          "effects": {
+            "stats": { "happiness": 8, "mentalHealth": 6, "fame": 3 },
+            "resultTextFa": "نگاه مطمئن او هنگام برنامه‌ریزی آینده نشان می‌دهد سال‌ها همراه‌بودنت چه ثمره‌ای داشته است."
+          }
+        },
+        {
+          "id": "help_future_fund",
+          "labelFa": "بخشی از اندوخته آتیه‌اش را برای شروع کار یا تحصیل در اختیارش بگذاری",
+          "effects": {
+            "stats": { "happiness": 10, "fame": 4 },
+            "moneyToman": -4000000,
+            "resultTextFa": "پشتوانه‌ای که برای روزهای بزرگ‌سالی‌اش ساخته بودی، نخستین قدم‌های مستقلش را محکم می‌کند."
+          }
+        }
+      ]
+    }
+  ],
+  "challengePack": {
+    "id": "welfare_center",
+    "titleFa": "بزرگ‌شده در مراکز بهزیستی",
+    "subtitleFa": "شروع زندگی در خانه کودکان بهزیستی با تکیه بر مربیان دلسوز و اراده شخصی",
+    "descriptionFa": "زندگی را در مرکز نگهداری بهزیستی آغاز می‌کنی؛ مربیان پرتلاش و دوستان مرکز همراه تو هستند و در ۱۸ سالگی با کمک‌هزینه توانمندسازی وارد زندگی مستقل می‌شوی.",
+    "ageOutGrantMinWageMultiple": {
+      "value": 3,
+      "unit": "MinWageMultiple",
+      "asOf": "1405-06",
+      "source": "برآورد کمک‌هزینه ترخیص و توانمندسازی جوانان تحت پوشش بهزیستی در ۱۸ سالگی",
+      "confidence": "estimate"
+    },
+    "mentorTitlesFa": [
+      "مربی مهربان خانه کودکان",
+      "مددکار اجتماعی مرکز",
+      "مشاور توانمندسازی جوانان"
+    ],
+    "earlyLifeMilestones": [
+      {
+        "age": 7,
+        "titleFa": "نخستین سال دبستان با همراهی مربیان",
+        "textFa": "مربیان خانه کودکان کیف و دفترهای نو برایت آماده کرده‌اند و هم‌گروهی‌های مرکز با تو هم‌مسیر مدرسه شده‌اند."
+      },
+      {
+        "age": 13,
+        "titleFa": "کشف توانایی‌ها در کارگاه نوجوانان",
+        "textFa": "در برنامه‌های مهارتی و ورزشی مرکز شرکت می‌کنی و کم‌کم تصویر روشن‌تری از استعدادها و اهداف آینده‌ات می‌سازی."
+      },
+      {
+        "age": 18,
+        "titleFa": "آغاز زندگی مستقل و دریافت حمایت توانمندسازی",
+        "textFa": "در آستانه ۱۸ سالگی با راهنمایی مددکار مرکز و دریافت کمک‌هزینه توانمندسازی، نخستین فصل مستقل زندگی‌ات را آغاز می‌کنی."
+      }
+    ]
+  }
+}

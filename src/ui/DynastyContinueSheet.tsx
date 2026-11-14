@@ -15,6 +15,7 @@ import {
   type ActionOutcome,
 } from '../state/actions';
 import { FullScreenSheet } from './components/FullScreenSheet';
+import { PersonAvatar } from './components/PersonAvatar';
 import {
   ActionButton,
   Badge,
@@ -203,15 +204,13 @@ export function DynastyContinueSheet({
                   >
                     <div className="flex items-start justify-between gap-2.5">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
-                            isSelected
-                              ? 'bg-[var(--primary)] text-[var(--on-primary)]'
-                              : 'bg-[var(--surface-2)] text-[var(--primary-strong)]'
-                          }`}
-                        >
-                          {heir.firstName.slice(0, 1)}
-                        </div>
+                        <PersonAvatar
+                          seed={state.npcs[heir.personId]?.avatarSeed ?? heir.personId}
+                          gender={heir.gender}
+                          age={heir.age}
+                          size={44}
+                          originKind={state.npcs[heir.personId]?.originKind}
+                        />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="truncate text-sm font-bold text-[var(--text)]">

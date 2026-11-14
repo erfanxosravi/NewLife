@@ -1,4 +1,5 @@
 import type { GameDataset } from '../data/registry';
+import { createEmptyAdoptionState, generateIndependentAvatarSeed } from './adoption';
 import {
   calculateNetWorthToman,
   getMinWageMonthlyForState,
@@ -302,7 +303,10 @@ export function settleEstate(params: SettleEstateParams): EstateSettlementResult
 
   // Step 4: Will & Contestation evaluation (Art. 837 & 843 — 1/3 limit)
   const livingSpouse = getLivingRelativesByRole(state, ['spouse'])[0] ?? null;
-  const livingChildren = getLivingRelativesByRole(state, ['child']);
+  const allLivingChildren = getLivingRelativesByRole(state, ['child']);
+  const livingChildren = allLivingChildren.filter(
+    (c) => c.person.originKind !== 'temporary_guardian' && c.person.originKind !== 'host_family',
+  );
   const livingGrandchildren = getLivingRelativesByRole(state, ['grandchild']);
   const livingParents = getLivingRelativesByRole(state, ['father', 'mother']);
   const livingSiblings = getLivingRelativesByRole(state, ['sibling']);
@@ -450,6 +454,7 @@ export function settleEstate(params: SettleEstateParams): EstateSettlementResult
     person: Person;
     roleLabelFa: string;
     weightUnits: number;
+    notesFa?: string;
   }[] = [];
 
   const useEqualChildren =
@@ -463,10 +468,20 @@ export function settleEstate(params: SettleEstateParams): EstateSettlementResult
         : c.person.gender === 'male'
           ? rules.sonToDaughterRatio
           : 1;
+      const isAdopted = c.person.originKind === 'adopted';
       primaryPool.push({
         person: c.person,
-        roleLabelFa: c.person.gender === 'male' ? 'پسر' : 'دختر',
+        roleLabelFa: isAdopted
+          ? c.person.gender === 'male'
+            ? 'پسرخوانده'
+            : 'دخترخوانده'
+          : c.person.gender === 'male'
+            ? 'پسر'
+            : 'دختر',
         weightUnits: units,
+        notesFa: isAdopted
+          ? 'سهم‌الارث و تأمین آتیه فرزندخوانده (شبیه‌سازی ساده بر پایه ماده ۱۴ قانون ۱۳۹۲)'
+          : undefined,
       });
     }
   } else if (livingGrandchildren.length > 0) {
@@ -516,6 +531,7 @@ export function settleEstate(params: SettleEstateParams): EstateSettlementResult
         recipientNameFa: `${entry.person.firstName} ${entry.person.lastName}`,
         roleLabelFa: entry.roleLabelFa,
         weight: afterSpouseWeight * (entry.weightUnits / totalUnits),
+        notesFa: entry.notesFa,
       });
     }
   } else if (chosenHeirId && state.npcs[chosenHeirId]) {
@@ -741,12 +757,18 @@ export function getEligibleHeirs(state: GameState, dataset: GameDataset): HeirCa
   };
 
   for (const { person, rel } of getLivingRelativesByRole(state, ['child'])) {
-    addCandidate(
-      person,
-      rel,
-      'child',
-      person.gender === 'male' ? 'پسر' : 'دختر',
-    );
+    if (person.originKind === 'temporary_guardian' || person.originKind === 'host_family') {
+      continue;
+    }
+    const label =
+      person.originKind === 'adopted'
+        ? person.gender === 'male'
+          ? 'پسرخوانده'
+          : 'دخترخوانده'
+        : person.gender === 'male'
+          ? 'پسر'
+          : 'دختر';
+    addCandidate(person, rel, 'child', label);
   }
   for (const { person, rel } of getLivingRelativesByRole(state, ['grandchild'])) {
     addCandidate(person, rel, 'grandchild', 'نوه');
@@ -1352,7 +1374,24 @@ export function inheritFromDeceasedToHeir(params: InheritToHeirParams): InheritT
         conscientiousness: clampStat(rng.int(25, 90)),
         riskAppetite: clampStat(rng.int(15, 85)),
       },
-      hiddenTalents: blendGeneticsLiteTalents(prevState.player.hiddenTalents, rng, dataset),
+      hiddenTalents:
+        heirNpc.originKind === 'adopted'
+          ? {
+              singing: rng.int(20, 88),
+              music_instrument: rng.int(20, 88),
+              acting: rng.int(20, 88),
+              athletics: rng.int(20, 88),
+              visual_art: rng.int(20, 88),
+              writing: rng.int(20, 88),
+              comedy: rng.int(20, 88),
+              math_science: rng.int(20, 88),
+              programming_tech: rng.int(20, 88),
+              business_sense: rng.int(20, 88),
+              leadership: rng.int(20, 88),
+              cooking: rng.int(20, 88),
+              mechanical: rng.int(20, 88),
+            }
+          : blendGeneticsLiteTalents(prevState.player.hiddenTalents, rng, dataset),
       athleticDiscipline: prevState.player.athleticDiscipline,
       discoveredTalents: [],
       talentSkills: {},
@@ -1376,6 +1415,7 @@ export function inheritFromDeceasedToHeir(params: InheritToHeirParams): InheritT
       maritalStatus: heirNpc.maritalStatus ?? 'single',
       criminalRecord: 0,
       housing: nextHousing,
+      avatarSeed: heirNpc.avatarSeed ?? generateIndependentAvatarSeed(rng, 'heir'),
     },
     npcs: newNpcs,
     relationships: newRelationships,
@@ -1401,7 +1441,16 @@ export function inheritFromDeceasedToHeir(params: InheritToHeirParams): InheritT
     horizonEnded: false,
     deathSummary: null,
     will: null,
+    adoption: createEmptyAdoptionState(),
     dynasty: updatedDynasty,
+    jobCompass: {
+      priorities: { income: 2, calm: 2, security: 2, growth: 2, freedom: 1 },
+      prioritiesCustomized: false,
+      shortlistedJobIds: [],
+      pinnedJobId: null,
+      salaryUnit: prevState.jobCompass?.salaryUnit ?? 'monthly',
+      waitlistedJobs: [],
+    },
   };
 
   return {

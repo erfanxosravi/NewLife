@@ -184,6 +184,27 @@ export interface Player {
   maritalStatus: MaritalStatus;
   criminalRecord: number;
   housing: HousingState;
+  avatarSeed?: string;
+  startingScenarioId?: 'standard' | 'welfare_center';
+  raisedInWelfareCenter?: boolean;
+}
+
+export type PersonOriginKind =
+  | 'biological'
+  | 'adopted'
+  | 'temporary_guardian'
+  | 'host_family'
+  | 'inspector'
+  | 'mentor';
+
+export interface PersonAdoptionMeta {
+  careType: AdoptionCareType;
+  placedYear: number;
+  placedAtChildAge: number;
+  biologicalOriginKnown: boolean;
+  backgroundFa: string;
+  healthNeedsFa?: string;
+  supervisionClosedAt18?: boolean;
 }
 
 export interface Person {
@@ -201,6 +222,9 @@ export interface Person {
   birthYear?: number;
   deathYear?: number;
   maritalStatus?: MaritalStatus;
+  avatarSeed?: string;
+  originKind?: PersonOriginKind;
+  adoptionMeta?: PersonAdoptionMeta;
 }
 
 export interface Relationship {
@@ -361,6 +385,8 @@ export interface GameState {
   deathSummary: DeathSummary | null;
   will?: WillConfig | null;
   dynasty?: DynastyState;
+  adoption?: AdoptionState;
+  jobCompass?: JobCompassState;
 }
 
 export interface SaveGame {
@@ -432,9 +458,110 @@ export interface JobOwnershipPath {
   notesFa: string;
 }
 
+export type JobCompassAxis = 'income' | 'calm' | 'security' | 'growth' | 'freedom';
+
+export type JobIconKey =
+  | 'taxi'
+  | 'scissors'
+  | 'bazaar'
+  | 'code'
+  | 'chalkboard'
+  | 'desk'
+  | 'heartPulse'
+  | 'stethoscope'
+  | 'mortar'
+  | 'scales';
+
+export interface JobTag {
+  icon: string;
+  labelFa: string;
+}
+
+export interface JobFingerprint {
+  income: number;
+  calm: number;
+  security: number;
+  growth: number;
+  freedom: number;
+  isEstimate: boolean;
+  estimatedAxes: JobCompassAxis[];
+  notesFa?: string;
+}
+
+export interface JobDayScene {
+  timeFa: string;
+  emoji: string;
+  textFa: string;
+}
+
+export interface JobCompassPriorities {
+  income: number;
+  calm: number;
+  security: number;
+  growth: number;
+  freedom: number;
+}
+
+export interface WaitlistedJobEntry {
+  jobId: string;
+  appliedTurn: number;
+  appliedYear: number;
+  interviewBonusPct: number;
+}
+
+export interface JobCompassState {
+  priorities: JobCompassPriorities;
+  prioritiesCustomized: boolean;
+  shortlistedJobIds: string[];
+  pinnedJobId: string | null;
+  salaryUnit: 'monthly' | 'annual';
+  waitlistedJobs: WaitlistedJobEntry[];
+}
+
+export type InterviewAnswerStyle = 'honest' | 'ambitious' | 'humble';
+
+export interface InterviewAnswer {
+  id: string;
+  style: InterviewAnswerStyle;
+  styleLabelFa: string;
+  labelFa: string;
+  chanceDeltaPct: number;
+  reactionFa: string;
+  axisAffinity?: JobCompassAxis;
+}
+
+export interface InterviewQuestion {
+  id: string;
+  promptFa: string;
+  answers: InterviewAnswer[];
+}
+
+export interface InterviewsDataset {
+  meta: {
+    titleFa: string;
+    asOf: string;
+    source: string;
+    confidence: DataConfidence;
+  };
+  generalQuestions: InterviewQuestion[];
+  byJobId: Record<string, InterviewQuestion[]>;
+}
+
 export interface JobDefinition {
   id: string;
   titleFa: string;
+  shortTitle: string;
+  tagline?: string;
+  iconKey: JobIconKey;
+  tags: JobTag[];
+  weeklyHours: number;
+  fingerprint: JobFingerprint;
+  longDescription: string;
+  dayInLife: JobDayScene[];
+  pros: string[];
+  cons: string[];
+  realityCheckFa: string;
+  requirementIds: string[];
   track: string;
   employerType?: 'دولتی' | 'خصوصی' | 'آزاد' | 'خانوادگی';
   minEducation: EducationLevel;
@@ -1125,5 +1252,225 @@ export interface InheritanceDataset {
     requiresEmigration?: boolean;
   }[];
 }
+
+export type AdoptionCareType = 'permanent' | 'temporary_guardian' | 'host_family';
+
+export type AdoptionStepId =
+  | 'readiness'
+  | 'commitment'
+  | 'application'
+  | 'evaluation'
+  | 'matching'
+  | 'decree'
+  | 'supervision';
+
+export type AdoptionEvaluationStatus =
+  | 'not_started'
+  | 'in_queue'
+  | 'approved'
+  | 'needs_improvements'
+  | 'rejected';
+
+export type InspectorOutcome =
+  | 'great'
+  | 'satisfactory'
+  | 'needs_improvement'
+  | 'serious_concern';
+
+export interface AdoptionCandidateChild {
+  tempId: string;
+  firstName: string;
+  gender: Gender;
+  age: number;
+  ageBracketId: string;
+  avatarSeed: string;
+  traits: string[];
+  backgroundFa: string;
+  healthNeedsFa?: string;
+  bondingMeetingsDone: number;
+}
+
+export interface AdoptionSupervisionTask {
+  id: string;
+  titleFa: string;
+  descriptionFa: string;
+  costToman: number;
+  completed: boolean;
+}
+
+export interface AdoptionInspectorVisit {
+  id: string;
+  childPersonId: string;
+  childNameFa: string;
+  jalaliYear: number;
+  playerAge: number;
+  childAge: number;
+  inspectorPersonId: string;
+  inspectorNameFa: string;
+  inspectorAvatarSeed: string;
+  outcome: InspectorOutcome;
+  summaryFa: string;
+  followUpRequired: boolean;
+  tasks: AdoptionSupervisionTask[];
+}
+
+export interface AdoptionApplicationState {
+  id: string;
+  careType: AdoptionCareType;
+  step: AdoptionStepId;
+  startedYear: number;
+  commitmentAccepted: boolean;
+  pausedForReflection: boolean;
+  hasInfertilityCert: boolean;
+  completedDocIds: string[];
+  portalSubmitted: boolean;
+  queueYearsRemaining: number;
+  evaluationStatus: AdoptionEvaluationStatus;
+  evaluationNotesFa: string[];
+  reapplyAllowedAfterYear?: number;
+  matchedCandidates: AdoptionCandidateChild[];
+  selectedCandidateId?: string;
+  probationaryApproved: boolean;
+  courtDecreeIssued: boolean;
+  placedChildPersonId?: string;
+  placedYear?: number;
+  inspectorPersonId?: string;
+  nextVisitYear?: number;
+}
+
+export interface AdoptionState {
+  activeApplication: AdoptionApplicationState | null;
+  pastApplicationsCount: number;
+  reapplyCooldownUntilYear?: number;
+  hasInfertilityCert: boolean;
+  supervisionVisits: AdoptionInspectorVisit[];
+  completedAdoptedCount: number;
+}
+
+export interface AdoptionCareTypeDef {
+  id: AdoptionCareType;
+  titleFa: string;
+  subtitleFa: string;
+  legalBasisFa: string;
+  commitmentYearsLabelFa: string;
+  minSavingsMinWageMultiple: number;
+  feeMinWageMultiple: number;
+  requiresIndependentHousing: boolean;
+  allowsSingleWomanOnlyFemale: boolean;
+  confersPermanentInheritance: boolean;
+  supervisionUntilAge: number;
+}
+
+export interface AdoptionDocumentDef {
+  id: string;
+  titleFa: string;
+  subtitleFa: string;
+  feeMinWageMultiple: number;
+}
+
+export interface AdoptionChildProfileTemplate {
+  id: string;
+  ageBracketId: 'infant' | 'toddler' | 'school' | 'teen';
+  minAge: number;
+  maxAge: number;
+  backgroundsFa: string[];
+  optionalHealthNeedsFa: string[];
+  healthNeedProbability: number;
+}
+
+export interface AdoptionDataset {
+  meta: {
+    titleFa: string;
+    lawTitleFa: string;
+    lawYearJalali: number;
+    regulationsYearJalali: number;
+    asOf: string;
+    source: string;
+    confidence: DataConfidence;
+    simplified: boolean;
+    religionConditionFlag: {
+      enabled: boolean;
+      hiddenByDefault: boolean;
+      labelFa: string;
+    };
+    notesFa: string[];
+  };
+  careTypes: AdoptionCareTypeDef[];
+  eligibility: {
+    minApplicantAge: number;
+    priorityMaxAge: number;
+    minMarriageYearsNoChild: number;
+    infertilityExceptionAllowed: boolean;
+    singleWomanMinAge: number;
+    singleWomanAllowed: boolean;
+    singleWomanOnlyFemaleChild: boolean;
+    maxCriminalRecord: number;
+    minHealth: number;
+    minMentalHealth: number;
+    minSpouseCloseness: number;
+    minGapYearsBelowYoungestBioChild: number;
+    infertilityCheckCostMinWageMultiple: SourcedNumber;
+    lifeInsuranceCommitmentMinWageMultiple: SourcedNumber;
+    applicationBaseCostMinWageMultiple: SourcedNumber;
+  };
+  documents: AdoptionDocumentDef[];
+  evaluation: {
+    approvalBaseThreshold: number;
+    reapplyCooldownYears: number;
+    queueDelayProbability: number;
+    weights: {
+      housingStability: number;
+      incomeStability: number;
+      relationshipHealth: number;
+      mentalHealth: number;
+      noCriminalRecord: number;
+      references: number;
+    };
+  };
+  matching: {
+    candidatesPerMatch: number;
+    requiredBondingMeetings: number;
+    bondingMeetingCostMinWageMultiple: number;
+    ageBrackets: {
+      id: 'infant' | 'toddler' | 'school' | 'teen';
+      labelFa: string;
+      minAge: number;
+      maxAge: number;
+    }[];
+    childProfiles: AdoptionChildProfileTemplate[];
+  };
+  supervision: {
+    firstVisitNextYear: boolean;
+    periodicIntervalYears: number;
+    endAtChildAge: number;
+    outcomeWeights: {
+      great: number;
+      satisfactory: number;
+      needs_improvement: number;
+      serious_concern: number;
+    };
+    improvementTaskTemplates: {
+      id: string;
+      titleFa: string;
+      descriptionFa: string;
+      costMinWageMultiple: number;
+    }[];
+  };
+  longTermEvents: EventDefinition[];
+  challengePack: {
+    id: string;
+    titleFa: string;
+    subtitleFa: string;
+    descriptionFa: string;
+    ageOutGrantMinWageMultiple: SourcedNumber;
+    mentorTitlesFa: string[];
+    earlyLifeMilestones: {
+      age: number;
+      titleFa: string;
+      textFa: string;
+    }[];
+  };
+}
+
 
 

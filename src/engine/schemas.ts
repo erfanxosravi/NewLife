@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 6;
 
 export const GenderSchema = z.enum(['male', 'female']);
 
@@ -222,6 +222,34 @@ export const PlayerSchema = z.object({
   maritalStatus: MaritalStatusSchema,
   criminalRecord: z.number().int().min(0),
   housing: HousingStateSchema,
+  avatarSeed: z.string().min(1).optional(),
+  startingScenarioId: z.enum(['standard', 'welfare_center']).optional(),
+  raisedInWelfareCenter: z.boolean().optional(),
+});
+
+export const PersonOriginKindSchema = z.enum([
+  'biological',
+  'adopted',
+  'temporary_guardian',
+  'host_family',
+  'inspector',
+  'mentor',
+]);
+
+export const AdoptionCareTypeSchema = z.enum([
+  'permanent',
+  'temporary_guardian',
+  'host_family',
+]);
+
+export const PersonAdoptionMetaSchema = z.object({
+  careType: AdoptionCareTypeSchema,
+  placedYear: z.number().int().min(1200).max(1700),
+  placedAtChildAge: z.number().int().min(0).max(25),
+  biologicalOriginKnown: z.boolean(),
+  backgroundFa: z.string().min(1),
+  healthNeedsFa: z.string().min(1).optional(),
+  supervisionClosedAt18: z.boolean().optional(),
 });
 
 export const PersonSchema = z.object({
@@ -239,6 +267,9 @@ export const PersonSchema = z.object({
   birthYear: z.number().int().min(1200).max(1700).optional(),
   deathYear: z.number().int().min(1200).max(1700).optional(),
   maritalStatus: MaritalStatusSchema.optional(),
+  avatarSeed: z.string().min(1).optional(),
+  originKind: PersonOriginKindSchema.optional(),
+  adoptionMeta: PersonAdoptionMetaSchema.optional(),
 });
 
 export const RelationshipSchema = z.object({
@@ -457,6 +488,125 @@ export const DynastyStateSchema = z.object({
   isClosed: z.boolean().optional(),
 });
 
+export const AdoptionStepIdSchema = z.enum([
+  'readiness',
+  'commitment',
+  'application',
+  'evaluation',
+  'matching',
+  'decree',
+  'supervision',
+]);
+
+export const AdoptionEvaluationStatusSchema = z.enum([
+  'not_started',
+  'in_queue',
+  'approved',
+  'needs_improvements',
+  'rejected',
+]);
+
+export const InspectorOutcomeSchema = z.enum([
+  'great',
+  'satisfactory',
+  'needs_improvement',
+  'serious_concern',
+]);
+
+export const AdoptionCandidateChildSchema = z.object({
+  tempId: z.string().min(1),
+  firstName: z.string().min(1),
+  gender: GenderSchema,
+  age: z.number().int().min(0).max(17),
+  ageBracketId: z.string().min(1),
+  avatarSeed: z.string().min(1),
+  traits: z.array(z.string().min(1)),
+  backgroundFa: z.string().min(1),
+  healthNeedsFa: z.string().min(1).optional(),
+  bondingMeetingsDone: z.number().int().min(0),
+});
+
+export const AdoptionSupervisionTaskSchema = z.object({
+  id: z.string().min(1),
+  titleFa: z.string().min(1),
+  descriptionFa: z.string().min(1),
+  costToman: z.number().min(0).finite(),
+  completed: z.boolean(),
+});
+
+export const AdoptionInspectorVisitSchema = z.object({
+  id: z.string().min(1),
+  childPersonId: z.string().min(1),
+  childNameFa: z.string().min(1),
+  jalaliYear: z.number().int().min(1200).max(1700),
+  playerAge: z.number().int().min(18).max(130),
+  childAge: z.number().int().min(0).max(25),
+  inspectorPersonId: z.string().min(1),
+  inspectorNameFa: z.string().min(1),
+  inspectorAvatarSeed: z.string().min(1),
+  outcome: InspectorOutcomeSchema,
+  summaryFa: z.string().min(1),
+  followUpRequired: z.boolean(),
+  tasks: z.array(AdoptionSupervisionTaskSchema),
+});
+
+export const AdoptionApplicationStateSchema = z.object({
+  id: z.string().min(1),
+  careType: AdoptionCareTypeSchema,
+  step: AdoptionStepIdSchema,
+  startedYear: z.number().int().min(1200).max(1700),
+  commitmentAccepted: z.boolean(),
+  pausedForReflection: z.boolean(),
+  hasInfertilityCert: z.boolean(),
+  completedDocIds: z.array(z.string().min(1)),
+  portalSubmitted: z.boolean(),
+  queueYearsRemaining: z.number().int().min(0),
+  evaluationStatus: AdoptionEvaluationStatusSchema,
+  evaluationNotesFa: z.array(z.string().min(1)),
+  reapplyAllowedAfterYear: z.number().int().min(1200).max(1700).optional(),
+  matchedCandidates: z.array(AdoptionCandidateChildSchema),
+  selectedCandidateId: z.string().min(1).optional(),
+  probationaryApproved: z.boolean(),
+  courtDecreeIssued: z.boolean(),
+  placedChildPersonId: z.string().min(1).optional(),
+  placedYear: z.number().int().min(1200).max(1700).optional(),
+  inspectorPersonId: z.string().min(1).optional(),
+  nextVisitYear: z.number().int().min(1200).max(1700).optional(),
+});
+
+export const AdoptionStateSchema = z.object({
+  activeApplication: AdoptionApplicationStateSchema.nullable(),
+  pastApplicationsCount: z.number().int().min(0),
+  reapplyCooldownUntilYear: z.number().int().min(1200).max(1700).optional(),
+  hasInfertilityCert: z.boolean(),
+  supervisionVisits: z.array(AdoptionInspectorVisitSchema),
+  completedAdoptedCount: z.number().int().min(0),
+});
+
+export const JobCompassPrioritiesSchema = z.object({
+  income: z.number().int().min(0).max(3),
+  calm: z.number().int().min(0).max(3),
+  security: z.number().int().min(0).max(3),
+  growth: z.number().int().min(0).max(3),
+  freedom: z.number().int().min(0).max(3),
+});
+
+export const WaitlistedJobSchema = z.object({
+  jobId: z.string().min(1),
+  appliedTurn: z.number().int().min(0),
+  appliedYear: z.number().int().min(1250).max(1700),
+  interviewBonusPct: z.number().min(-25).max(25),
+});
+
+export const JobCompassStateSchema = z.object({
+  priorities: JobCompassPrioritiesSchema,
+  prioritiesCustomized: z.boolean(),
+  shortlistedJobIds: z.array(z.string().min(1)),
+  pinnedJobId: z.string().min(1).nullable(),
+  salaryUnit: z.enum(['monthly', 'annual']),
+  waitlistedJobs: z.array(WaitlistedJobSchema),
+});
+
 export const GameStateSchema = z.object({
   turn: z.number().int().min(0),
   birthJalaliYear: z.number().int().min(1250).max(1700),
@@ -481,6 +631,8 @@ export const GameStateSchema = z.object({
   deathSummary: DeathSummarySchema.nullable(),
   will: WillConfigSchema.nullable().optional(),
   dynasty: DynastyStateSchema.optional(),
+  adoption: AdoptionStateSchema.optional(),
+  jobCompass: JobCompassStateSchema.optional(),
 });
 
 export const SaveGameSchema = z.object({
@@ -569,10 +721,59 @@ export const JobOwnershipPathSchema = z
     }
   });
 
+export const JobCompassAxisSchema = z.enum(['income', 'calm', 'security', 'growth', 'freedom']);
+
+export const JobIconKeySchema = z.enum([
+  'taxi',
+  'scissors',
+  'bazaar',
+  'code',
+  'chalkboard',
+  'desk',
+  'heartPulse',
+  'stethoscope',
+  'mortar',
+  'scales',
+]);
+
+export const JobTagSchema = z.object({
+  icon: z.string().min(1),
+  labelFa: z.string().min(1).max(20),
+});
+
+export const JobFingerprintSchema = z.object({
+  income: BoundedStatSchema,
+  calm: BoundedStatSchema,
+  security: BoundedStatSchema,
+  growth: BoundedStatSchema,
+  freedom: BoundedStatSchema,
+  isEstimate: z.boolean(),
+  estimatedAxes: z.array(JobCompassAxisSchema),
+  notesFa: z.string().min(1).optional(),
+});
+
+export const JobDaySceneSchema = z.object({
+  timeFa: z.string().min(1).max(16),
+  emoji: z.string().min(1),
+  textFa: z.string().min(1).max(200),
+});
+
 export const JobDefinitionSchema = z
   .object({
     id: z.string().min(1),
     titleFa: z.string().min(1),
+    shortTitle: z.string().min(1).max(18),
+    tagline: z.string().min(1).max(36).optional(),
+    iconKey: JobIconKeySchema,
+    tags: z.array(JobTagSchema).min(1).max(3),
+    weeklyHours: z.number().int().min(10).max(84),
+    fingerprint: JobFingerprintSchema,
+    longDescription: z.string().min(1).max(400),
+    dayInLife: z.array(JobDaySceneSchema).length(3),
+    pros: z.array(z.string().min(1)).min(1).max(3),
+    cons: z.array(z.string().min(1)).min(1).max(3),
+    realityCheckFa: z.string().min(1).max(300),
+    requirementIds: z.array(z.string().min(1)).min(1),
     track: z.string().min(1),
     employerType: z.enum(['دولتی', 'خصوصی', 'آزاد', 'خانوادگی']).optional(),
     minEducation: EducationLevelSchema,
@@ -623,6 +824,33 @@ export const JobDefinitionSchema = z
   });
 
 export const JobsFileSchema = z.array(JobDefinitionSchema).min(5);
+
+export const InterviewAnswerSchema = z.object({
+  id: z.string().min(1),
+  style: z.enum(['honest', 'ambitious', 'humble']),
+  styleLabelFa: z.string().min(1),
+  labelFa: z.string().min(1),
+  chanceDeltaPct: z.number().min(-15).max(15),
+  reactionFa: z.string().min(1),
+  axisAffinity: JobCompassAxisSchema.optional(),
+});
+
+export const InterviewQuestionSchema = z.object({
+  id: z.string().min(1),
+  promptFa: z.string().min(1),
+  answers: z.array(InterviewAnswerSchema).length(3),
+});
+
+export const InterviewsFileSchema = z.object({
+  meta: z.object({
+    titleFa: z.string().min(1),
+    asOf: z.string().min(1),
+    source: z.string().min(1),
+    confidence: z.enum(['verified', 'estimate']),
+  }),
+  generalQuestions: z.array(InterviewQuestionSchema).min(2),
+  byJobId: z.record(z.string(), z.array(InterviewQuestionSchema).min(1)),
+});
 
 export const LicenseDefinitionSchema = z.object({
   id: z.string().min(1),
@@ -1222,5 +1450,149 @@ export const InheritanceFileSchema = z.object({
     )
     .min(4),
 });
+
+export const AdoptionFileSchema = z.object({
+  meta: z.object({
+    titleFa: z.string().min(1),
+    lawTitleFa: z.string().min(1),
+    lawYearJalali: z.number().int().min(1300).max(1500),
+    regulationsYearJalali: z.number().int().min(1300).max(1500),
+    asOf: z.string().min(1),
+    source: z.string().min(1),
+    confidence: z.enum(['verified', 'estimate']),
+    simplified: z.boolean(),
+    religionConditionFlag: z.object({
+      enabled: z.boolean(),
+      hiddenByDefault: z.boolean(),
+      labelFa: z.string().min(1),
+    }),
+    notesFa: z.array(z.string().min(1)).min(2),
+  }),
+  careTypes: z
+    .array(
+      z.object({
+        id: AdoptionCareTypeSchema,
+        titleFa: z.string().min(1),
+        subtitleFa: z.string().min(1),
+        legalBasisFa: z.string().min(1),
+        commitmentYearsLabelFa: z.string().min(1),
+        minSavingsMinWageMultiple: z.number().min(0),
+        feeMinWageMultiple: z.number().min(0),
+        requiresIndependentHousing: z.boolean(),
+        allowsSingleWomanOnlyFemale: z.boolean(),
+        confersPermanentInheritance: z.boolean(),
+        supervisionUntilAge: z.number().int().min(1).max(25),
+      }),
+    )
+    .length(3),
+  eligibility: z.object({
+    minApplicantAge: z.number().int().min(18).max(60),
+    priorityMaxAge: z.number().int().min(30).max(80),
+    minMarriageYearsNoChild: z.number().int().min(1).max(20),
+    infertilityExceptionAllowed: z.boolean(),
+    singleWomanMinAge: z.number().int().min(18).max(60),
+    singleWomanAllowed: z.boolean(),
+    singleWomanOnlyFemaleChild: z.boolean(),
+    maxCriminalRecord: z.number().int().min(0),
+    minHealth: BoundedStatSchema,
+    minMentalHealth: BoundedStatSchema,
+    minSpouseCloseness: BoundedStatSchema,
+    minGapYearsBelowYoungestBioChild: z.number().int().min(0).max(15),
+    infertilityCheckCostMinWageMultiple: PositiveSourcedNumberSchema,
+    lifeInsuranceCommitmentMinWageMultiple: PositiveSourcedNumberSchema,
+    applicationBaseCostMinWageMultiple: SourcedNumberSchema.refine((d) => d.value >= 0),
+  }),
+  documents: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        titleFa: z.string().min(1),
+        subtitleFa: z.string().min(1),
+        feeMinWageMultiple: z.number().min(0),
+      }),
+    )
+    .min(4),
+  evaluation: z.object({
+    approvalBaseThreshold: z.number().min(20).max(95),
+    reapplyCooldownYears: z.number().int().min(1).max(10),
+    queueDelayProbability: z.number().min(0).max(1),
+    weights: z.object({
+      housingStability: z.number().min(0).max(1),
+      incomeStability: z.number().min(0).max(1),
+      relationshipHealth: z.number().min(0).max(1),
+      mentalHealth: z.number().min(0).max(1),
+      noCriminalRecord: z.number().min(0).max(1),
+      references: z.number().min(0).max(1),
+    }),
+  }),
+  matching: z.object({
+    candidatesPerMatch: z.number().int().min(2).max(5),
+    requiredBondingMeetings: z.number().int().min(1).max(5),
+    bondingMeetingCostMinWageMultiple: z.number().min(0),
+    ageBrackets: z
+      .array(
+        z.object({
+          id: z.enum(['infant', 'toddler', 'school', 'teen']),
+          labelFa: z.string().min(1),
+          minAge: z.number().int().min(0).max(17),
+          maxAge: z.number().int().min(0).max(17),
+        }),
+      )
+      .length(4),
+    childProfiles: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          ageBracketId: z.enum(['infant', 'toddler', 'school', 'teen']),
+          minAge: z.number().int().min(0).max(17),
+          maxAge: z.number().int().min(0).max(17),
+          backgroundsFa: z.array(z.string().min(1)).min(2),
+          optionalHealthNeedsFa: z.array(z.string().min(1)).min(1),
+          healthNeedProbability: z.number().min(0).max(1),
+        }),
+      )
+      .min(4),
+  }),
+  supervision: z.object({
+    firstVisitNextYear: z.boolean(),
+    periodicIntervalYears: z.number().int().min(1).max(5),
+    endAtChildAge: z.number().int().min(18).max(21),
+    outcomeWeights: z.object({
+      great: z.number().min(0),
+      satisfactory: z.number().min(0),
+      needs_improvement: z.number().min(0),
+      serious_concern: z.number().min(0),
+    }),
+    improvementTaskTemplates: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          titleFa: z.string().min(1),
+          descriptionFa: z.string().min(1),
+          costMinWageMultiple: z.number().min(0),
+        }),
+      )
+      .min(3),
+  }),
+  longTermEvents: z.array(EventDefinitionSchema).min(5),
+  challengePack: z.object({
+    id: z.string().min(1),
+    titleFa: z.string().min(1),
+    subtitleFa: z.string().min(1),
+    descriptionFa: z.string().min(1),
+    ageOutGrantMinWageMultiple: PositiveSourcedNumberSchema,
+    mentorTitlesFa: z.array(z.string().min(1)).min(2),
+    earlyLifeMilestones: z
+      .array(
+        z.object({
+          age: z.number().int().min(1).max(18),
+          titleFa: z.string().min(1),
+          textFa: z.string().min(1),
+        }),
+      )
+      .min(3),
+  }),
+});
+
 
 

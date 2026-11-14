@@ -1,8 +1,10 @@
+import { createEmptyAdoptionState } from './adoption';
 import { gameDataset } from '../data/registry';
+import { createDefaultJobCompassState } from './jobCompass';
 import { SeededRNG } from './rng';
 import { CURRENT_SCHEMA_VERSION, SaveGameSchema } from './schemas';
 import { generateHiddenTalentsAndDiscipline } from './talents';
-import type { ContentSettings, SaveGame } from './types';
+import type { ContentSettings, GameState, SaveGame } from './types';
 
 export type MigrationFn = (raw: Record<string, unknown>) => Record<string, unknown>;
 
@@ -175,6 +177,59 @@ const MIGRATIONS: Record<number, MigrationFn> = {
     return {
       ...raw,
       schemaVersion: 4,
+      state,
+    };
+  },
+  4: (raw) => {
+    const seed = typeof raw.seed === 'string' && raw.seed ? raw.seed : 'migrated-v4-seed';
+    const state = (typeof raw.state === 'object' && raw.state !== null
+      ? { ...(raw.state as Record<string, unknown>) }
+      : {}) as Record<string, unknown>;
+    const player = (typeof state.player === 'object' && state.player !== null
+      ? { ...(state.player as Record<string, unknown>) }
+      : {}) as Record<string, unknown>;
+
+    if (typeof player.avatarSeed !== 'string' || !player.avatarSeed) {
+      player.avatarSeed = `${seed}:player`;
+    }
+    state.player = player;
+
+    if (typeof state.npcs === 'object' && state.npcs !== null) {
+      const nextNpcs: Record<string, Record<string, unknown>> = {};
+      for (const [id, npcVal] of Object.entries(state.npcs as Record<string, unknown>)) {
+        if (typeof npcVal === 'object' && npcVal !== null) {
+          const npcObj = { ...(npcVal as Record<string, unknown>) };
+          if (typeof npcObj.avatarSeed !== 'string' || !npcObj.avatarSeed) {
+            npcObj.avatarSeed = `${seed}:npc:${id}`;
+          }
+          nextNpcs[id] = npcObj;
+        }
+      }
+      state.npcs = nextNpcs;
+    }
+
+    if (!state.adoption || typeof state.adoption !== 'object') {
+      state.adoption = createEmptyAdoptionState();
+    }
+
+    return {
+      ...raw,
+      schemaVersion: 5,
+      state,
+    };
+  },
+  5: (raw) => {
+    const state = (typeof raw.state === 'object' && raw.state !== null
+      ? { ...(raw.state as Record<string, unknown>) }
+      : {}) as Record<string, unknown>;
+
+    if (!state.jobCompass || typeof state.jobCompass !== 'object') {
+      state.jobCompass = createDefaultJobCompassState(state as unknown as GameState);
+    }
+
+    return {
+      ...raw,
+      schemaVersion: 6,
       state,
     };
   },

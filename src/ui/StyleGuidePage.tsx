@@ -28,6 +28,8 @@ import {
   Toast,
   Toggle,
 } from './components/Primitives';
+import { PersonAvatar } from './components/PersonAvatar';
+import { ChecklistCard, InspectorVisitCard } from './components/AdoptionCards';
 import { BottomSheet } from './components/BottomSheet';
 import {
   IconBackRtl,
@@ -354,6 +356,97 @@ export function StyleGuidePage({
           <EmptyState
             title="نمونه وضعیت خالی"
             description="وقتی هنوز موردی ثبت نشده باشد، این پیام راهنما نمایش داده می‌شود."
+          />
+
+          {/* PersonAvatar + Adoption Cards Showcase */}
+          <Card className="space-y-3">
+            <SectionHeader
+              title="آواتارهای اختصاصی شخصیت‌ها"
+              subtitle="تولید قطعی و آفلاین بر اساس سن، جنسیت و شناسه یکتا"
+            />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_infant" gender="female" age={1} size={46} />
+                <span className="text-[10px] text-[var(--text-muted)]">نوزاد</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_child" gender="male" age={8} size={46} />
+                <span className="text-[10px] text-[var(--text-muted)]">کودک</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_woman" gender="female" age={29} size={46} />
+                <span className="text-[10px] text-[var(--text-muted)]">جوان</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_man" gender="male" age={38} size={46} />
+                <span className="text-[10px] text-[var(--text-muted)]">میان‌سال</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_inspector" gender="female" age={42} size={46} originKind="inspector" />
+                <span className="text-[10px] text-[var(--text-muted)]">ناظر</span>
+              </div>
+              <div className="flex flex-col items-center gap-1">
+                <PersonAvatar seed="sg_elder" gender="male" age={68} size={46} />
+                <span className="text-[10px] text-[var(--text-muted)]">سالمند</span>
+              </div>
+            </div>
+          </Card>
+
+          <ChecklistCard
+            title="فهرست مدارک نمونه (کارت چک‌لیست)"
+            subtitle="ساختار یک‌ضربه‌ای برای تکمیل مدارک"
+            items={[
+              {
+                id: 'sg_doc_1',
+                title: 'گواهی عدم سوءپیشینه',
+                subtitle: 'استعلام الکترونیکی قوه قضاییه',
+                done: true,
+              },
+              {
+                id: 'sg_doc_2',
+                title: 'بیمه آتیه و مدارک مسکن',
+                subtitle: 'سند یا اجاره‌نامه رسمی و تعهد آتیه',
+                done: false,
+                valueText: '۴ میلیون تومان',
+                ctaLabel: 'ثبت مدرک',
+                onAction: () => {
+                  setToastOpen(true);
+                  window.setTimeout(() => setToastOpen(false), 1800);
+                },
+              },
+            ]}
+          />
+
+          <InspectorVisitCard
+            inspectorGender="female"
+            visit={{
+              id: 'sg_visit_1',
+              childPersonId: 'sg_c1',
+              childNameFa: 'مهسا رضایی',
+              jalaliYear: 1406,
+              playerAge: 34,
+              childAge: 6,
+              inspectorPersonId: 'sg_insp_1',
+              inspectorNameFa: 'سرکار خانم نرگس فرهادی',
+              inspectorAvatarSeed: 'sg_inspector_seed',
+              outcome: 'needs_improvement',
+              summaryFa: 'محیط خانه بسیار صمیمی و آرام است؛ برای تقویت مهارت گفتار و آمادگی مدرسه یک نشست مشاوره پیشنهاد می‌شود.',
+              followUpRequired: true,
+              tasks: [
+                {
+                  id: 'sg_task_1',
+                  titleFa: 'جلسه مشاوره خانواده و پیوند عاطفی',
+                  descriptionFa: 'شرکت در دو نشست با مشاور بهزیستی',
+                  costToman: 3500000,
+                  completed: false,
+                },
+              ],
+            }}
+            playerMoneyToman={25000000}
+            onCompleteTask={() => {
+              setToastOpen(true);
+              window.setTimeout(() => setToastOpen(false), 1800);
+            }}
           />
         </main>
 
